@@ -1,0 +1,23 @@
+exportClasses(
+    "r3Cseq"
+)
+export(
+    "getCoverage",
+    "expCoverage",
+    "contrCoverage",
+    "getReadCountPerRestrictionFragment",
+    "getViewpoint",
+    "calculateRPM",
+    "expRPM",
+    "contrRPM",
+    "getInteractions",
+    "expInteractionRegions",
+    "contrInteractionRegions",
+    "plotOverviewInteractions",
+    "plotInteractionsNearViewpoint",
+    "plotInteractionsPerChromosome",
+    "plot3Cecdf",
+    "export3Cseq2bedGraph",
+    "exportInteractions2text",
+    "generate3CseqReport"
+)
