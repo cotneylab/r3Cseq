@@ -1,5 +1,5 @@
 Package: r3Cseq
-Version: 1.3.0
+Version: 1.3.1
 Date: 10-14-2011
 Title: Analysis of Chromosome Conformation Capture and Next-generation
         Sequencing (3C-seq)
@@ -12,5 +12,5 @@ Description: This package is an implementation of data analysis for the long-ran
 License: GPL-3
 biocViews: Preprocessing, Sequencing, HighThroughputSequencing,
 Collate: AllClasses.R AllGenerics.R RestrictionEnzymeFunctions.R
-        Functions.R Export.R Report.R Visualize3Cseq.R
+        Functions.R Export.R Report.R Visualize3Cseq.R Test.R
 Packaged: 2011-10-19 11:02:34 UTC; supat
