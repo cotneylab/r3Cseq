@@ -1,21 +1,13 @@
 # TODO: These following functions are implemented for visualizing 3C-seq data.
 # Author: Supat Thongjuea
 # Contact:supat.thongjuea@bccs.uib.no 
-
-setGeneric(
-		name="plotOverviewInteractions",
-		def=function(object,cutoff.p_value=0.05,cutoff.fold_change=2){
-			standardGeneric("plotOverviewInteractions")
-		}
-)
-setMethod("plotOverviewInteractions",
-		signature(object = "r3Cseq"),
-		function (object,cutoff.p_value,cutoff.fold_change){
-			if(!is(object,"r3Cseq")){
-				stop("Need the r3Cseq object")
-			}
-			if(isControlInvolved(object)==FALSE){
-				orgName<-organismName(object)
+#####################################
+plotOverviewInteractions<-function (obj,cutoff.qvalue=0.05){
+			
+			stopifnot( is(obj, "r3Cseq") | is(obj,"r3CseqInBatch"))
+			
+			if(isControlInvolved(obj)==FALSE){
+				orgName<-organismName(obj)
 				chr.data=c()
 				if(orgName=="hg18"){
 					for (chr in c(paste('chr',seq(1,22),sep=''),'chrX','chrY')){	
@@ -39,21 +31,16 @@ setMethod("plotOverviewInteractions",
 					stop("Your input organism name is not in the list ('mm9','hg18',and 'hg19')")
 				}
 				######check interactions############
-				expInteractions <-expInteractionRegions(object)
+				expInteractions <-expInteractionRegions(obj)
 				
 				if(nrow(expInteractions) ==0){
 					stop("There are no interaction regions found in r3Cseq object. Use 'getInteractions' function to get interaction regions")
 				}
 				
-				viewpoint <-getViewpoint(object)
-				viewpoint.exp.index<-which(start(expInteractions)==start(viewpoint) & end(expInteractions)==end(viewpoint))
-				viewpoint.index<-which(expInteractions$reads==max(expInteractions$reads))
-				
-				exp.filted <-expInteractions[-(viewpoint.index),]
-				exp.filted <-exp.filted[exp.filted$p_value <=cutoff.p_value,]
+				exp.filted <-expInteractions[expInteractions$q.value <=cutoff.qvalue,]
 				
 				if(nrow(exp.filted) ==0){
-					stop("There are no interaction regions pass your input parameters.")
+					stop("There are no interaction regions pass your qvalue cutoff.")
 				}
 				
 				chr.size.max<-max(chr.data$size)
@@ -61,11 +48,11 @@ setMethod("plotOverviewInteractions",
 				box.x.size=chr.size.max+5e6
 				plot(c(1,box.x.size), c(1,100), type= "n", ylab="",yaxt='n',
 						xaxt='n',xlab="Chromosomal position (Mbp)",
-						main=paste("3C-seq distribution of interaction regions (p-value <=",cutoff.p_value,")"))
+						main=paste("3C-seq distribution of interaction regions (q-value <=",cutoff.qvalue,")"))
 				
-				axis(1, at=(seq(0, max.scale*10^6, by=10*10^6)),lab=c(seq(0,max.scale,by=10)),cex.axis=0.8)
+				axis(1, at=(seq(0, max.scale*10^6, by=10*10^6)),labels=c(seq(0,max.scale,by=10)),cex.axis=0.8)
 				
-				expLabeled<-expLabel(object)
+				#expLabeled<-expLabel(obj)
 				polygon(c(chr.size.max-10e6-10e5,chr.size.max-10e6,chr.size.max-10e6+10e5),
 						c(52,50,52), col="red")
 				text(chr.size.max-2e6,51,"  viewpoint",cex = .8)
@@ -85,7 +72,7 @@ setMethod("plotOverviewInteractions",
 				
 				exp.coor<-data.frame(i=start.exp[1:24],j=end.exp[1:24])
 				
-				exp.filted$rank<-rank(-exp.filted$expRPMs)
+				exp.filted$rank<-rank(-exp.filted$RPMs)
 				exp.max.rank<-max(exp.filted$rank)
 				
 				exppalette<-rev(brewer.pal(7,"Reds"))
@@ -99,40 +86,40 @@ setMethod("plotOverviewInteractions",
 				exp.filted$col[exp.filted$rank > round(0.5*exp.max.rank)]<-exppalette[7]
 				
 				if(round(0.01*exp.max.rank)>0){
-					sv1<-min(exp.filted$expRPMs[exp.filted$rank <=round(0.01*exp.max.rank)])
-					sv2<-min(exp.filted$expRPMs[exp.filted$rank > round(0.01*exp.max.rank) & exp.filted$rank <=round(0.1*exp.max.rank)])
-					sv3<-min(exp.filted$expRPMs[exp.filted$rank > round(0.1*exp.max.rank) & exp.filted$rank <=round(0.2*exp.max.rank)])
-					sv4<-min(exp.filted$expRPMs[exp.filted$rank > round(0.2*exp.max.rank) & exp.filted$rank <=round(0.3*exp.max.rank)])
-					sv5<-min(exp.filted$expRPMs[exp.filted$rank > round(0.3*exp.max.rank) & exp.filted$rank <=round(0.4*exp.max.rank)])
-					sv6<-min(exp.filted$expRPMs[exp.filted$rank > round(0.4*exp.max.rank) & exp.filted$rank <=round(0.5*exp.max.rank)])
+					sv1<-min(exp.filted$RPMs[exp.filted$rank <=round(0.01*exp.max.rank)])
+					sv2<-min(exp.filted$RPMs[exp.filted$rank > round(0.01*exp.max.rank) & exp.filted$rank <=round(0.1*exp.max.rank)])
+					sv3<-min(exp.filted$RPMs[exp.filted$rank > round(0.1*exp.max.rank) & exp.filted$rank <=round(0.2*exp.max.rank)])
+					sv4<-min(exp.filted$RPMs[exp.filted$rank > round(0.2*exp.max.rank) & exp.filted$rank <=round(0.3*exp.max.rank)])
+					sv5<-min(exp.filted$RPMs[exp.filted$rank > round(0.3*exp.max.rank) & exp.filted$rank <=round(0.4*exp.max.rank)])
+					sv6<-min(exp.filted$RPMs[exp.filted$rank > round(0.4*exp.max.rank) & exp.filted$rank <=round(0.5*exp.max.rank)])
 				
-					name1<-paste(">",sv1," RPMs")
-					name2<-paste(sv2,"-",sv1," RPMs")
-					name3<-paste(sv3,"-",sv2," RPMs")
-					name4<-paste(sv4,"-",sv3," RPMs")
-					name5<-paste(sv5,"-",sv4," RPMs")
-					name6<-paste(sv6,"-",sv5," RPMs")
-					name7<-paste("<",sv6," RPMs")
+					name1<-paste(">",round(sv1)," RPMs")
+					name2<-paste(round(sv2),"-",round(sv1)," RPMs")
+					name3<-paste(round(sv3),"-",round(sv2)," RPMs")
+					name4<-paste(round(sv4),"-",round(sv3)," RPMs")
+					name5<-paste(round(sv5),"-",round(sv4)," RPMs")
+					name6<-paste(round(sv6),"-",round(sv5)," RPMs")
+					name7<-paste("<",round(sv6)," RPMs")
 				}else{
-					sv1<-max(exp.filted$expRPMs)
-					sv2<-min(exp.filted$expRPMs[exp.filted$rank > round(0.01*exp.max.rank) & exp.filted$rank <=round(0.1*exp.max.rank)])
-					sv3<-min(exp.filted$expRPMs[exp.filted$rank > round(0.1*exp.max.rank) & exp.filted$rank <=round(0.2*exp.max.rank)])
-					sv4<-min(exp.filted$expRPMs[exp.filted$rank > round(0.2*exp.max.rank) & exp.filted$rank <=round(0.3*exp.max.rank)])
-					sv5<-min(exp.filted$expRPMs[exp.filted$rank > round(0.3*exp.max.rank) & exp.filted$rank <=round(0.4*exp.max.rank)])
-					sv6<-min(exp.filted$expRPMs[exp.filted$rank > round(0.4*exp.max.rank) & exp.filted$rank <=round(0.5*exp.max.rank)])
+					sv1<-max(exp.filted$RPMs)
+					sv2<-min(exp.filted$RPMs[exp.filted$rank > round(0.01*exp.max.rank) & exp.filted$rank <=round(0.1*exp.max.rank)])
+					sv3<-min(exp.filted$RPMs[exp.filted$rank > round(0.1*exp.max.rank) & exp.filted$rank <=round(0.2*exp.max.rank)])
+					sv4<-min(exp.filted$RPMs[exp.filted$rank > round(0.2*exp.max.rank) & exp.filted$rank <=round(0.3*exp.max.rank)])
+					sv5<-min(exp.filted$RPMs[exp.filted$rank > round(0.3*exp.max.rank) & exp.filted$rank <=round(0.4*exp.max.rank)])
+					sv6<-min(exp.filted$RPMs[exp.filted$rank > round(0.4*exp.max.rank) & exp.filted$rank <=round(0.5*exp.max.rank)])
 					
-					name1<-paste(">",sv1," RPMs")
-					name2<-paste(sv2,"-",sv1," RPMs")
-					name3<-paste(sv3,"-",sv2," RPMs")
-					name4<-paste(sv4,"-",sv3," RPMs")
-					name5<-paste(sv5,"-",sv4," RPMs")
-					name6<-paste(sv6,"-",sv5," RPMs")
-					name7<-paste("<",sv6," RPMs")
+					name1<-paste(">",round(sv1)," RPMs")
+					name2<-paste(round(sv2),"-",round(sv1)," RPMs")
+					name3<-paste(round(sv3),"-",round(sv2)," RPMs")
+					name4<-paste(round(sv4),"-",round(sv3)," RPMs")
+					name5<-paste(round(sv5),"-",round(sv4)," RPMs")
+					name6<-paste(round(sv6),"-",round(sv5)," RPMs")
+					name7<-paste("<",round(sv6)," RPMs")
 				}
 				exp.names<-c(name1,name2,name3,name4,name5,name6,name7)
 				
 				
-				viewpoint <-getViewpoint(object)
+				viewpoint <-getViewpoint(obj)
 				i=0
 				for (chri in 1:nrow(chr.data)){
 					i=i+1
@@ -148,34 +135,27 @@ setMethod("plotOverviewInteractions",
 						}
 					}
 				}
-				legend("topright",legend = exp.names, fill=exppalette, cex=0.55,title=expLabeled,bty="n")
+				legend("topright",legend = exp.names, fill=exppalette, cex=0.55,title="experiment",bty="n")
 			}
-			if(isControlInvolved(object)==TRUE){
+			if(isControlInvolved(obj)==TRUE){
 				
 				######check interactions######
-				expInteractions <-expInteractionRegions(object)
-				contrInteractions <-contrInteractionRegions(object)
+				expInteractions <-expInteractionRegions(obj)
+				contrInteractions <-contrInteractionRegions(obj)
 				
 				if(nrow(expInteractions) ==0){
 					stop("There are no interaction regions found in r3Cseq object. Use 'getInteractions' function to get interaction regions")
 				}
-				viewpoint <-getViewpoint(object)
 				
-				viewpoint.exp.index<-which(start(expInteractions)==start(viewpoint) & end(expInteractions)==end(viewpoint))
-				viewpoint.contr.index<-which(start(contrInteractions)==start(viewpoint) & end(contrInteractions)==end(viewpoint))
-				
-				exp.filted <-expInteractions[-(viewpoint.exp.index),]
-				contr.filted<-contrInteractions[-(viewpoint.contr.index),]
-				
-				exp.filted <-exp.filted[exp.filted$p_value <=cutoff.p_value & exp.filted$fold_change >=cutoff.fold_change,]
-				contr.filted <-contr.filted[contr.filted$p_value <=cutoff.p_value & contr.filted$fold_change >=cutoff.fold_change,]
+				exp.filted <-expInteractions[expInteractions$q.value <=cutoff.qvalue,]
+				contr.filted <-contrInteractions[contrInteractions$q.value <=cutoff.qvalue,]
 				if(nrow(exp.filted) ==0){
 					stop("There are no interaction regions pass your input parameters.")
 				}
 				
 				#######draw chromosome########
 				
-				orgName<-organismName(object)
+				orgName<-organismName(obj)
 				chr.data=c()
 				if(orgName=="hg18"){
 					for (chr in c(paste('chr',seq(1,22),sep=''),'chrX','chrY')){	
@@ -204,12 +184,12 @@ setMethod("plotOverviewInteractions",
 				box.x.size=chr.size.max+5e6
 				plot(c(1,box.x.size), c(1,100), type= "n", ylab="",yaxt='n',
 						xaxt='n',xlab="Chromosomal position (Mbp)",
-						main=paste("3C-seq distribution of interaction regions (p-value <=",cutoff.p_value,"and fold change >=",cutoff.fold_change,")"))
+						main=paste("3C-seq distribution of interaction regions (q-value <=",cutoff.qvalue,")"))
 				
-				axis(1, at=(seq(0, max.scale*10^6, by=10*10^6)),lab=c(seq(0,max.scale,by=10)),cex.axis=0.8)
+				axis(1, at=(seq(0, max.scale*10^6, by=10*10^6)),labels=c(seq(0,max.scale,by=10)),cex.axis=0.8)
 				
-				expLabeled<-expLabel(object)
-				controlLabeled<-contrLabel(object)
+				#expLabeled<-expLabel(obj)
+				#controlLabeled<-contrLabel(obj)
 				polygon(c(chr.size.max-10e6-10e5,chr.size.max-10e6,chr.size.max-10e6+10e5),
 						c(52,50,52), col="red")
 				text(chr.size.max-2e6,51,"  viewpoint",cex = .8)
@@ -233,8 +213,8 @@ setMethod("plotOverviewInteractions",
 				exp.coor<-data.frame(i=start.exp[1:24],j=end.exp[1:24])
 				contr.coor<-data.frame(i=start.contr[1:24],j=end.contr[1:24])
 				
-				exp.filted$rank<-rank(-exp.filted$expRPMs)
-				contr.filted$rank<-rank(-contr.filted$contrRPMs)
+				exp.filted$rank<-rank(-exp.filted$RPMs)
+				contr.filted$rank<-rank(-contr.filted$RPMs)
 				
 				exp.max.rank<-max(exp.filted$rank)
 				contr.max.rank<-max(contr.filted$rank)
@@ -250,35 +230,35 @@ setMethod("plotOverviewInteractions",
 				exp.filted$col[exp.filted$rank > round(0.5*exp.max.rank)]<-exppalette[7]
 				
 				if(round(0.01*exp.max.rank)>0){
-					sv1<-min(exp.filted$expRPMs[exp.filted$rank <=round(0.01*exp.max.rank)])
-					sv2<-min(exp.filted$expRPMs[exp.filted$rank > round(0.01*exp.max.rank) & exp.filted$rank <=round(0.1*exp.max.rank)])
-					sv3<-min(exp.filted$expRPMs[exp.filted$rank > round(0.1*exp.max.rank) & exp.filted$rank <=round(0.2*exp.max.rank)])
-					sv4<-min(exp.filted$expRPMs[exp.filted$rank > round(0.2*exp.max.rank) & exp.filted$rank <=round(0.3*exp.max.rank)])
-					sv5<-min(exp.filted$expRPMs[exp.filted$rank > round(0.3*exp.max.rank) & exp.filted$rank <=round(0.4*exp.max.rank)])
-					sv6<-min(exp.filted$expRPMs[exp.filted$rank > round(0.4*exp.max.rank) & exp.filted$rank <=round(0.5*exp.max.rank)])
+					sv1<-min(exp.filted$RPMs[exp.filted$rank <=round(0.01*exp.max.rank)])
+					sv2<-min(exp.filted$RPMs[exp.filted$rank > round(0.01*exp.max.rank) & exp.filted$rank <=round(0.1*exp.max.rank)])
+					sv3<-min(exp.filted$RPMs[exp.filted$rank > round(0.1*exp.max.rank) & exp.filted$rank <=round(0.2*exp.max.rank)])
+					sv4<-min(exp.filted$RPMs[exp.filted$rank > round(0.2*exp.max.rank) & exp.filted$rank <=round(0.3*exp.max.rank)])
+					sv5<-min(exp.filted$RPMs[exp.filted$rank > round(0.3*exp.max.rank) & exp.filted$rank <=round(0.4*exp.max.rank)])
+					sv6<-min(exp.filted$RPMs[exp.filted$rank > round(0.4*exp.max.rank) & exp.filted$rank <=round(0.5*exp.max.rank)])
 	
-					name1<-paste(">",sv1," RPMs")
-					name2<-paste(sv2,"-",sv1," RPMs")
-					name3<-paste(sv3,"-",sv2," RPMs")
-					name4<-paste(sv4,"-",sv3," RPMs")
-					name5<-paste(sv5,"-",sv4," RPMs")
-					name6<-paste(sv6,"-",sv5," RPMs")
-					name7<-paste("<",sv6," RPMs")
+					name1<-paste(">",round(sv1)," RPMs")
+					name2<-paste(round(sv2),"-",round(sv1)," RPMs")
+					name3<-paste(round(sv3),"-",round(sv2)," RPMs")
+					name4<-paste(round(sv4),"-",round(sv3)," RPMs")
+					name5<-paste(round(sv5),"-",round(sv4)," RPMs")
+					name6<-paste(round(sv6),"-",round(sv5)," RPMs")
+					name7<-paste("<",round(sv6)," RPMs")
 				}else{
-					sv1<-max(exp.filted$expRPMs)
-					sv2<-min(exp.filted$expRPMs[exp.filted$rank > round(0.01*exp.max.rank) & exp.filted$rank <=round(0.1*exp.max.rank)])
-					sv3<-min(exp.filted$expRPMs[exp.filted$rank > round(0.1*exp.max.rank) & exp.filted$rank <=round(0.2*exp.max.rank)])
-					sv4<-min(exp.filted$expRPMs[exp.filted$rank > round(0.2*exp.max.rank) & exp.filted$rank <=round(0.3*exp.max.rank)])
-					sv5<-min(exp.filted$expRPMs[exp.filted$rank > round(0.3*exp.max.rank) & exp.filted$rank <=round(0.4*exp.max.rank)])
-					sv6<-min(exp.filted$expRPMs[exp.filted$rank > round(0.4*exp.max.rank) & exp.filted$rank <=round(0.5*exp.max.rank)])
+					sv1<-max(exp.filted$RPMs)
+					sv2<-min(exp.filted$RPMs[exp.filted$rank > round(0.01*exp.max.rank) & exp.filted$rank <=round(0.1*exp.max.rank)])
+					sv3<-min(exp.filted$RPMs[exp.filted$rank > round(0.1*exp.max.rank) & exp.filted$rank <=round(0.2*exp.max.rank)])
+					sv4<-min(exp.filted$RPMs[exp.filted$rank > round(0.2*exp.max.rank) & exp.filted$rank <=round(0.3*exp.max.rank)])
+					sv5<-min(exp.filted$RPMs[exp.filted$rank > round(0.3*exp.max.rank) & exp.filted$rank <=round(0.4*exp.max.rank)])
+					sv6<-min(exp.filted$RPMs[exp.filted$rank > round(0.4*exp.max.rank) & exp.filted$rank <=round(0.5*exp.max.rank)])
 					
-					name1<-paste(">",sv1," RPMs")
-					name2<-paste(sv2,"-",sv1," RPMs")
-					name3<-paste(sv3,"-",sv2," RPMs")
-					name4<-paste(sv4,"-",sv3," RPMs")
-					name5<-paste(sv5,"-",sv4," RPMs")
-					name6<-paste(sv6,"-",sv5," RPMs")
-					name7<-paste("<",sv6," RPMs")
+					name1<-paste(">",round(sv1)," RPMs")
+					name2<-paste(round(sv2),"-",round(sv1)," RPMs")
+					name3<-paste(round(sv3),"-",round(sv2)," RPMs")
+					name4<-paste(round(sv4),"-",round(sv3)," RPMs")
+					name5<-paste(round(sv5),"-",round(sv4)," RPMs")
+					name6<-paste(round(sv6),"-",round(sv5)," RPMs")
+					name7<-paste("<",round(sv6)," RPMs")
 				}
 				exp.names<-c(name1,name2,name3,name4,name5,name6,name7)
 				
@@ -294,40 +274,40 @@ setMethod("plotOverviewInteractions",
 				contr.filted$col[contr.filted$rank > round(0.5*contr.max.rank)]<-contrpalette[7]
 				
 				if(round(0.01*contr.max.rank)>0){
-					csv1<-min(contr.filted$contrRPMs[contr.filted$rank <=round(0.01*contr.max.rank)])
-					csv2<-min(contr.filted$contrRPMs[contr.filted$rank > round(0.01*contr.max.rank) & contr.filted$rank <=round(0.1*contr.max.rank)])
-					csv3<-min(contr.filted$contrRPMs[contr.filted$rank > round(0.1*contr.max.rank) & contr.filted$rank <=round(0.2*contr.max.rank)])
-					csv4<-min(contr.filted$contrRPMs[contr.filted$rank > round(0.2*contr.max.rank) & contr.filted$rank <=round(0.3*contr.max.rank)])
-					csv5<-min(contr.filted$contrRPMs[contr.filted$rank > round(0.3*contr.max.rank) & contr.filted$rank <=round(0.4*contr.max.rank)])
-					csv6<-min(contr.filted$contrRPMs[contr.filted$rank > round(0.4*contr.max.rank) & contr.filted$rank <=round(0.5*contr.max.rank)])
+					csv1<-min(contr.filted$RPMs[contr.filted$rank <=round(0.01*contr.max.rank)])
+					csv2<-min(contr.filted$RPMs[contr.filted$rank > round(0.01*contr.max.rank) & contr.filted$rank <=round(0.1*contr.max.rank)])
+					csv3<-min(contr.filted$RPMs[contr.filted$rank > round(0.1*contr.max.rank) & contr.filted$rank <=round(0.2*contr.max.rank)])
+					csv4<-min(contr.filted$RPMs[contr.filted$rank > round(0.2*contr.max.rank) & contr.filted$rank <=round(0.3*contr.max.rank)])
+					csv5<-min(contr.filted$RPMs[contr.filted$rank > round(0.3*contr.max.rank) & contr.filted$rank <=round(0.4*contr.max.rank)])
+					csv6<-min(contr.filted$RPMs[contr.filted$rank > round(0.4*contr.max.rank) & contr.filted$rank <=round(0.5*contr.max.rank)])
 					
-					tname1<-paste(">",csv1," RPMs")
-					tname2<-paste(csv2,"-",csv1," RPMs")
-					tname3<-paste(csv3,"-",csv2," RPMs")
-					tname4<-paste(csv4,"-",csv3," RPMs")
-					tname5<-paste(csv5,"-",csv4," RPMs")
-					tname6<-paste(csv6,"-",csv5," RPMs")
-					tname7<-paste("<",csv6," RPMs")
+					tname1<-paste(">",round(csv1)," RPMs")
+					tname2<-paste(round(csv2),"-",round(csv1)," RPMs")
+					tname3<-paste(round(csv3),"-",round(csv2)," RPMs")
+					tname4<-paste(round(csv4),"-",round(csv3)," RPMs")
+					tname5<-paste(round(csv5),"-",round(csv4)," RPMs")
+					tname6<-paste(round(csv6),"-",round(csv5)," RPMs")
+					tname7<-paste("<",round(csv6)," RPMs")
 				}else{
-					csv1<-max(contr.filted$contrRPMs)
-					csv2<-min(contr.filted$contrRPMs[contr.filted$rank > round(0.01*contr.max.rank) & contr.filted$rank <=round(0.1*contr.max.rank)])
-					csv3<-min(contr.filted$contrRPMs[contr.filted$rank > round(0.1*contr.max.rank) & contr.filted$rank <=round(0.2*contr.max.rank)])
-					csv4<-min(contr.filted$contrRPMs[contr.filted$rank > round(0.2*contr.max.rank) & contr.filted$rank <=round(0.3*contr.max.rank)])
-					csv5<-min(contr.filted$contrRPMs[contr.filted$rank > round(0.3*contr.max.rank) & contr.filted$rank <=round(0.4*contr.max.rank)])
-					csv6<-min(contr.filted$contrRPMs[contr.filted$rank > round(0.4*contr.max.rank) & contr.filted$rank <=round(0.5*contr.max.rank)])
+					csv1<-max(contr.filted$RPMs)
+					csv2<-min(contr.filted$RPMs[contr.filted$rank > round(0.01*contr.max.rank) & contr.filted$rank <=round(0.1*contr.max.rank)])
+					csv3<-min(contr.filted$RPMs[contr.filted$rank > round(0.1*contr.max.rank) & contr.filted$rank <=round(0.2*contr.max.rank)])
+					csv4<-min(contr.filted$RPMs[contr.filted$rank > round(0.2*contr.max.rank) & contr.filted$rank <=round(0.3*contr.max.rank)])
+					csv5<-min(contr.filted$RPMs[contr.filted$rank > round(0.3*contr.max.rank) & contr.filted$rank <=round(0.4*contr.max.rank)])
+					csv6<-min(contr.filted$RPMs[contr.filted$rank > round(0.4*contr.max.rank) & contr.filted$rank <=round(0.5*contr.max.rank)])
 					
-					tname1<-paste(">",csv1," RPMs")
-					tname2<-paste(csv2,"-",csv1," RPMs")
-					tname3<-paste(csv3,"-",csv2," RPMs")
-					tname4<-paste(csv4,"-",csv3," RPMs")
-					tname5<-paste(csv5,"-",csv4," RPMs")
-					tname6<-paste(csv6,"-",csv5," RPMs")
-					tname7<-paste("<",csv6," RPMs")
+					tname1<-paste(">",round(csv1)," RPMs")
+					tname2<-paste(round(csv2),"-",round(csv1)," RPMs")
+					tname3<-paste(round(csv3),"-",round(csv2)," RPMs")
+					tname4<-paste(round(csv4),"-",round(csv3)," RPMs")
+					tname5<-paste(round(csv5),"-",round(csv4)," RPMs")
+					tname6<-paste(round(csv6),"-",round(csv5)," RPMs")
+					tname7<-paste("<",round(csv6)," RPMs")
 				}
 				
 				contr.names<-c(tname1,tname2,tname3,tname4,tname5,tname6,tname7)
 				
-				viewpoint <-getViewpoint(object)
+				viewpoint <-getViewpoint(obj)
 				
 				i=0
 				for (chri in 1:nrow(chr.data)){
@@ -347,239 +327,363 @@ setMethod("plotOverviewInteractions",
 							}
 						}
 				}
-				legend(chr.size.max-10e6-10e5,100,legend = exp.names, fill=exppalette, cex=0.55,title=expLabeled,bty="n")
-				legend(chr.size.max-10e6-10e5,80,legend = contr.names, fill=contrpalette, cex=0.55,title=controlLabeled,bty="n")
+				legend(chr.size.max-10e6-10e5,100,legend = exp.names, fill=exppalette, cex=0.55,title="experiment",bty="n")
+				legend(chr.size.max-10e6-10e5,80,legend = contr.names, fill=contrpalette, cex=0.55,title="control",bty="n")
 			}
-		}
-)
+}
 
-setGeneric(
-		name="plotInteractionsNearViewpoint",
-		def=function(object){
-			standardGeneric("plotInteractionsNearViewpoint")
-		}
-)
-
-setMethod("plotInteractionsNearViewpoint",
-		signature(object = "r3Cseq"),
-		function (object){
-			if(!is(object,"r3Cseq")){
-				stop("Need the r3Cseq object")
-			}
-			if(isControlInvolved(object)==FALSE){
-				expInteractions   <-expInteractionRegions(object)
-				expLabeled <-expLabel(object)
-				########Get viewpoint#####################
-				viewpoint <-getViewpoint(object)
-				############Get chromosome size###########
-				par(mfrow=c(2,2))
-				######look at 10MB around the viewpoint###
-				viewpoint.10mb.start <-start(viewpoint)-5e6
-				viewpoint.10mb.end 	<-end(viewpoint)+5e6
-				exp.10mb   <-expInteractions[start(expInteractions) >=viewpoint.10mb.start & end(expInteractions) <= viewpoint.10mb.end & space(expInteractions)==space(viewpoint),]
-				
-				viewpoint.10mb.index <-which(exp.10mb$reads==max(exp.10mb$reads))
-				exp.10mb$reads[viewpoint.10mb.index]=0
-				exp.10mb$expRPMs[viewpoint.10mb.index]=0
-				exp.10mb$p_start<-start(exp.10mb)-start(viewpoint)
-				
-				
-				y.exp.max <-max(exp.10mb$expRPMs)
-				
-				plot(c(-5e6,5e6),c(1,y.exp.max), type= "n", ylab="Reads/Million",xaxt='n',xlab="Chromosomal position relative to the viewpoint (Mbp)",
-						main=paste("Interaction regions close to viewpoint (zoom in 10 Mb)"))
-				lines(exp.10mb$p_start,exp.10mb$expRPMs,col='blue')
-				abline(v=0,lty=3,col="grey",lwd=2)
-				
-				axis(1, at = c(-5e6,-4e6,-3e6,-2e6,-1e6,0,1e6,2e6,3e6,4e6,5e6),lab=c(-5,-4,-3,-2,-1,0,1,2,3,4,5))
-				legend("topright", legend = c(expLabeled), fill=c("blue"), cex=0.65 )
-				
-				######look at 1MB around the viewpoint###
-				viewpoint.1mb.start	<-start(viewpoint)-5e5
-				viewpoint.1mb.end 	<-end(viewpoint)+5e5
-				exp.1mb   <-expInteractions[start(expInteractions) >=viewpoint.1mb.start & end(expInteractions) <= viewpoint.1mb.end & space(expInteractions)==space(viewpoint),]
-				
-				
-				viewpoint.1mb.index <-which(exp.1mb$reads==max(exp.1mb$reads))
-				exp.1mb$reads[viewpoint.1mb.index]=0
-				exp.1mb$expRPMs[viewpoint.1mb.index]=0
-				exp.1mb$p_start<-start(exp.1mb)-start(viewpoint)
-				
-				y.exp.max <-max(exp.1mb$expRPMs)
-				plot(c(-5e5,5e5),c(1,y.exp.max), type= "n", ylab="Reads/Million",xaxt='n',xlab="Chromosomal position relative to the viewpoint (Mbp)",
-						main=paste("Interaction regions close to viewpoint (zoom in 1 Mb)"))
-				points(exp.1mb$p_start,exp.1mb$expRPMs,col='red',pch=20)	
-				lines(exp.1mb$p_start,exp.1mb$expRPMs,col='blue',lty=2)
-				abline(v=0,lty=3,col="grey",lwd=2)
-				
-				axis(1, at = c(-5e5,-4e5,-3e5,-2e5,-1e5,0,1e5,2e5,3e5,4e5,5e5),lab=c(-0.5,-0.4,-0.3,-0.2,-0.1,0,0.1,0.2,0.3,0.4,0.5))
-				legend("topright", legend = c(expLabeled), fill=c("blue"), cex=0.65 )
-				
-				######look at 500KB around the viewpoint###
-				viewpoint.500k.start <-start(viewpoint)-25e4
-				viewpoint.500k.end 	<-end(viewpoint)+25e4
-				exp.500k   <-expInteractions[start(expInteractions) >=viewpoint.500k.start & end(expInteractions) <= viewpoint.500k.end & space(expInteractions)==space(viewpoint),]
-				
-				viewpoint.500k.index <-which(exp.500k$reads==max(exp.500k$reads))
-				exp.500k$reads[viewpoint.500k.index]=0
-				exp.500k$expRPMs[viewpoint.500k.index]=0
-				
-				exp.500k$p_start <-start(exp.500k)-start(viewpoint)
-				
-				y.exp.max <-max(exp.500k$expRPMs)	
-				plot(c(-2.5e5,2.5e5),c(1,y.exp.max), type= "n", ylab="Reads/Million",xaxt='n',xlab="Chromosomal position relative to the viewpoint (100Kb)",
-						main=paste("Interaction regions close to viewpoint (zoom in 500 KB)"),ylim=c(1,y.exp.max))
-				points(exp.500k$p_start,exp.500k$expRPMs,col='red',pch=20)
-				lines(exp.500k$p_start,exp.500k$expRPMs,col='blue')
-				abline(v=0,lty=3,col="grey",lwd=2)		
-				axis(1, at = c(-2.5e5,-2e5,-1.5e5,-1e5,-0.5e5,0,0.5e5,1e5,1.5e5,2e5,2.5e5),lab=c(-2.5,-2.0,-1.5,-1.0,-0.5,0,0.5,1,1.5,2,2.5))
-				legend("topright", legend = c(expLabeled), fill=c("blue"), cex=0.65 )
-				
-				######look at 100KB around the viewpoint###
-				viewpoint.100k.start <-start(viewpoint)-5e4
-				viewpoint.100k.end 	<-end(viewpoint)+5e4
-				exp.100k   <-expInteractions[start(expInteractions) >=viewpoint.100k.start & end(expInteractions) <= viewpoint.100k.end & space(expInteractions)==space(viewpoint),]
-				viewpoint.100k.index <-which(exp.100k$reads==max(exp.100k$reads))
-				exp.100k$reads[viewpoint.100k.index]=0
-				exp.100k$expRPMs[viewpoint.100k.index]=0
-				
-				exp.100k$p_start <-start(exp.100k)-start(viewpoint)
-				
-				y.exp.max <-max(exp.100k$expRPMs)
-				plot(c(-5e4,5e4),c(1,y.exp.max), type= "n", ylab="Reads/Million",xaxt='n',xlab="Chromosomal position relative to the viewpoint (10Kb)",
-						main=paste("Interaction regions close to viewpoint (zoom in 100 KB)"),ylim=c(1,y.exp.max))
-				points(exp.100k$p_start,exp.100k$expRPMs,col='red',pch=20)
-				lines(exp.100k$p_start,exp.100k$expRPMs,col='blue')
-				abline(v=0,lty=3,col="grey",lwd=2)
-				
-				axis(1, at = c(-5e4,-4e4,-3e4,-2e4,-1e4,0,1e4,2e4,3e4,4e4,5e4),lab=c(-5,-4,-3,-2,-1,0,1,2,3,4,5))
-				legend("topright", legend = c(expLabeled), fill=c("blue"), cex=0.65 )
-			}
-			if(isControlInvolved(object)==TRUE){
-				expInteractions   <-expInteractionRegions(object)
-				contrInteractions <-contrInteractionRegions(object)
-				
-				expLabeled <-expLabel(object)
-				contrLabeled <-contrLabel(object)
-				########Get viewpoint#####################
-				viewpoint <-getViewpoint(object)
-				############Get chromosome size###########
-				par(mfrow=c(2,2))
-				######look at 10MB around the viewpoint###
-				viewpoint.10mb.start <-start(viewpoint)-5e6
-				viewpoint.10mb.end 	<-end(viewpoint)+5e6
-				exp.10mb   <-expInteractions[start(expInteractions) >=viewpoint.10mb.start & end(expInteractions) <= viewpoint.10mb.end & space(expInteractions)==space(viewpoint),]
-				contr.10mb <-contrInteractions[start(contrInteractions) >=viewpoint.10mb.start & end(contrInteractions) <= viewpoint.10mb.end & space(contrInteractions)==space(viewpoint) & contrInteractions$expRPMs==0,]
-				frame.10mb <- c(exp.10mb,contr.10mb)
-				viewpoint.10mb.index <-which(frame.10mb$expRPMs==max(frame.10mb$expRPMs))
-				frame.10mb$expRPMs[viewpoint.10mb.index]=0
-				frame.10mb$contrRPMs[viewpoint.10mb.index]=0
-				frame.10mb$p_start<-start(frame.10mb)-start(viewpoint)
-				
-				
-				y.exp.max <-max(frame.10mb$expRPMs)
-				y.contr.max<-max(frame.10mb$contrRPMs)
-				plot(c(-5e6,5e6),c(-y.contr.max,y.exp.max), type= "n", ylab="Reads/Million",xaxt='n',xlab="Chromosomal position relative to the viewpoint (Mbp)",
-						main=paste("Interaction regions close to viewpoint (zoom in 10 Mb)"))
-				lines(frame.10mb$p_start,frame.10mb$expRPMs,col='blue')
-				lines(frame.10mb$p_start,-frame.10mb$contrRPMs,col='red')
-				abline(v=0,lty=3,col="grey",lwd=2)
-				
-				axis(1, at = c(-5e6,-4e6,-3e6,-2e6,-1e6,0,1e6,2e6,3e6,4e6,5e6),lab=c(-5,-4,-3,-2,-1,0,1,2,3,4,5))
-				legend("topright", legend = c(expLabeled, contrLabeled), fill=c("blue","red"), cex=0.65 )
-				
-				######look at 1MB around the viewpoint###
-				viewpoint.1mb.start	<-start(viewpoint)-5e5
-				viewpoint.1mb.end 	<-end(viewpoint)+5e5
-				exp.1mb <-expInteractions[start(expInteractions) >=viewpoint.1mb.start & end(expInteractions) <= viewpoint.1mb.end & space(expInteractions)==space(viewpoint),]
-				contr.1mb <-contrInteractions[start(contrInteractions) >=viewpoint.1mb.start & end(contrInteractions) <= viewpoint.1mb.end & space(contrInteractions)==space(viewpoint) & contrInteractions$expRPMs==0,]
-				frame.1mb <- c(exp.1mb,contr.1mb)
-				viewpoint.1mb.index <-which(frame.1mb$expRPMs==max(frame.1mb$expRPMs))
-				frame.1mb$expRPMs[viewpoint.1mb.index]=0
-				frame.1mb$contrRPMs[viewpoint.1mb.index]=0
-				frame.1mb$p_start<-start(frame.1mb)-start(viewpoint)
-				
-				y.exp.max <-max(frame.1mb$expRPMs)
-				y.contr.max<-max(frame.1mb$contrRPMs)
-				plot(c(-5e5,5e5),c(-y.contr.max,y.exp.max), type= "n", ylab="Reads/Million",xaxt='n',xlab="Chromosomal position relative to the viewpoint (Mbp)",
-						main=paste("Interaction regions close to viewpoint (zoom in 1 Mb)"))
-				points(frame.1mb$p_start,frame.1mb$expRPMs,col='blue',pch=20)
-				points(frame.1mb$p_start,-frame.1mb$contrRPMs,col='red',pch=20)
-				lines(frame.1mb$p_start,frame.1mb$expRPMs,col='blue',lty=2)
-				lines(frame.1mb$p_start,-frame.1mb$contrRPMs,col='red',lty=2)
-				abline(v=0,lty=3,col="grey",lwd=2)
-				
-				axis(1, at = c(-5e5,-4e5,-3e5,-2e5,-1e5,0,1e5,2e5,3e5,4e5,5e5),lab=c(-0.5,-0.4,-0.3,-0.2,-0.1,0,0.1,0.2,0.3,0.4,0.5))
-				legend("topright", legend = c(expLabeled, contrLabeled), fill=c("blue","red"), cex=0.65 )
-				
-				######look at 500KB around the viewpoint###
-				viewpoint.500k.start <-start(viewpoint)-25e4
-				viewpoint.500k.end 	<-end(viewpoint)+25e4
-				exp.500k   <-expInteractions[start(expInteractions) >=viewpoint.500k.start & end(expInteractions) <= viewpoint.500k.end & space(expInteractions)==space(viewpoint),]
-				contr.500k <-contrInteractions[start(contrInteractions) >=viewpoint.500k.start & end(contrInteractions) <= viewpoint.500k.end & space(contrInteractions)==space(viewpoint) & contrInteractions$expRPMs==0,]
-				frame.500k <- c(exp.500k,contr.500k)
-				viewpoint.500k.index <-which(frame.500k$expRPMs==max(frame.500k$expRPMs))
-				frame.500k$expRPMs[viewpoint.500k.index]=0
-				frame.500k$contrRPMs[viewpoint.500k.index]=0
-				frame.500k$p_start <-start(frame.500k)-start(viewpoint)
-				
-				y.exp.max <-max(frame.500k$expRPMs)
-				y.contr.max<-max(frame.500k$contrRPMs)
-				y.final.max<-pmax(y.exp.max,y.contr.max)
-				plot(c(-2.5e5,2.5e5),c(1,y.final.max), type= "n", ylab="Reads/Million",xaxt='n',xlab="Chromosomal position relative to the viewpoint (100Kb)",
-						main=paste("Interaction regions close to viewpoint (zoom in 500 KB)"),ylim=c(1,y.final.max))
-				points(frame.500k$p_start,frame.500k$expRPMs,col='blue',pch=20)
-				points(frame.500k$p_start,frame.500k$contrRPMs,col='red',pch=20)
-				lines(frame.500k$p_start,frame.500k$expRPMs,col='blue')
-				lines(frame.500k$p_start,frame.500k$contrRPMs,col='red')
-				abline(v=0,lty=3,col="grey",lwd=2)
-				
-				axis(1, at = c(-2.5e5,-2e5,-1.5e5,-1e5,-0.5e5,0,0.5e5,1e5,1.5e5,2e5,2.5e5),lab=c(-2.5,-2.0,-1.5,-1.0,-0.5,0,0.5,1,1.5,2,2.5))
-				legend("topright", legend = c(expLabeled, contrLabeled), fill=c("blue","red"), cex=0.65 )
-				
-				######look at 100KB around the viewpoint###
-				viewpoint.100k.start <-start(viewpoint)-5e4
-				viewpoint.100k.end 	<-end(viewpoint)+5e4
-				exp.100k   <-expInteractions[start(expInteractions) >=viewpoint.100k.start & end(expInteractions) <= viewpoint.100k.end & space(expInteractions)==space(viewpoint),]
-				contr.100k <-contrInteractions[start(contrInteractions) >=viewpoint.100k.start & end(contrInteractions) <= viewpoint.100k.end & space(contrInteractions)==space(viewpoint) & contrInteractions$expRPMs==0,]
-				frame.100k <- c(exp.100k,contr.100k)
-				viewpoint.100k.index <-which(frame.100k$expRPMs==max(frame.100k$expRPMs))
-				frame.100k$expRPMs[viewpoint.100k.index]=0
-				frame.100k$contrRPMs[viewpoint.100k.index]=0
-				frame.100k$p_start <-start(frame.100k)-start(viewpoint)
-				
-				y.exp.max <-max(frame.100k$expRPMs)
-				y.contr.max<-max(frame.100k$contrRPMs)
-				y.final.max<-pmax(y.exp.max,y.contr.max)
-				plot(c(-5e4,5e4),c(1,y.final.max), type= "n", ylab="Reads/Million",xaxt='n',xlab="Chromosomal position relative to the viewpoint (10Kb)",
-						main=paste("Interaction regions close to viewpoint (zoom in 100 KB)"),ylim=c(1,y.final.max))
-				points(frame.100k$p_start,frame.100k$expRPMs,col='blue',pch=20)
-				points(frame.100k$p_start,frame.100k$contrRPMs,col='red',pch=20)
-				lines(frame.100k$p_start,frame.100k$expRPMs,col='blue')
-				lines(frame.100k$p_start,frame.100k$contrRPMs,col='red')
-				abline(v=0,lty=3,col="grey",lwd=2)
-				
-				axis(1, at = c(-5e4,-4e4,-3e4,-2e4,-1e4,0,1e4,2e4,3e4,4e4,5e4),lab=c(-5,-4,-3,-2,-1,0,1,2,3,4,5))
-				legend("topright", legend = c(expLabeled, contrLabeled), fill=c("blue","red"), cex=0.65 )
-			}
-		}
-)
-
-setGeneric(
-		name="plotInteractionsPerChromosome",
-		def=function(object,chromosomeName){
-			standardGeneric("plotInteractionsPerChromosome")
-		}
-)
-
-setMethod("plotInteractionsPerChromosome",
-		signature(object = "r3Cseq"),
-		
-		function(object,chromosomeName){
+plotInteractionsNearViewpoint<-function(obj,distance=5e5){
 			
-			if(!is(object,"r3Cseq")){
-				stop("Need the r3Cseq object")
+			stopifnot( is(obj, "r3Cseq") | is(obj,"r3CseqInBatch"))
+			if(distance < 50000 | distance > 500000){
+				stop("Please select distance between 50Kb - 500Kb")
 			}
+			########Get viewpoint############
+			viewpoint <-getViewpoint(obj)
+			viewpoint.chr<-as.character(space(viewpoint))
+			########Get organism#############
+			orgName<-organismName(obj)
+			chr.size<-0
+			if(orgName=="hg18"){
+					chr.size<-seqlengths(Hsapiens)[viewpoint.chr]
+			}else if(orgName=="hg19"){
+					chr.size<-seqlengths(Hsapiens)[viewpoint.chr]
+					
+			}else if(orgName =="mm9"){
+					chr.size<-seqlengths(Mmusculus)[viewpoint.chr]
+					
+			}
+			
+			if(isControlInvolved(obj)==FALSE){
+				expInteractions   <-expInteractionRegions(obj)
+				#expLabeled <-expLabel(obj)
+				######look around the viewpoint###
+				r.start <-start(viewpoint)-distance
+				r.end 	<-end(viewpoint)+distance
+	
+				r.start <-ifelse(r.start <0,1,r.start)
+				r.end   <-ifelse(r.end <=chr.size,r.end,chr.size)
+				c.vec   <- c(rep(0,r.end-r.start))
+				####Get refGenes######
+				genes<-get3CseqRefGene(obj)
+				g.chr<-subset(genes,chromosome==viewpoint.chr)
+				g.r<-subset(g.chr,start>=r.start & end <= r.end)
+				
+				par(fig=c(0,1,0.7,1))
+				par(mar=c(0,5,1,2))
+				
+				if(nrow(g.r)>0){
+					g.r<-g.r[order(g.r$start),]
+					g.r$rel.start <-g.r$start-r.start
+					g.r$rel.end <-g.r$end-r.start
+					g.r$size<-g.r$end-g.r$start+1
+					
+					plot(c(1,2*distance), c(1,60), type= "n", xlab="", ylab="",xaxt='n',yaxt='n')
+					abline(v=start(viewpoint)-r.start, col="red",lty=3,lwd=2)
+					y1.start=30
+					for(i in 1:nrow(g.r)){
+								gx<-g.r[i,]
+								gx.start<-gx$rel.start
+								gx.end <-gx$rel.end
+								gx.size<-gx$size
+								gx.strand<-gx$strand
+								
+								if(c.vec[gx$rel.start]==0){
+									y1.start = y1.start
+									c.vec[gx$rel.start:gx$rel.end]=1
+								}else{
+									y1.start = y1.start+8
+									if(y1.start >50){
+										y1.start=10
+									}
+								}
+								text(gx$rel.start,y1.start+2,gx$name,cex =0.8)
+								
+								if(gx.size >=100){
+									s.q <-ifelse(gx.size <=5000,500,5000)
+									s.q <-ifelse(s.q > gx.size, gx.size-10,s.q)
+									
+									xx<-seq(gx.start,gx.start+gx.size-s.q, by=s.q)
+									yy<-seq(gx.start+s.q,gx.start+gx.size, by=s.q)
+									
+									if(gx.strand==-1){
+										for(i in 1:length(xx)){
+											lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-1))
+											lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-4))
+										}
+									}else{
+										for(i in 1:length(xx)){
+											lines(c(xx[i],yy[i]),c(y1.start-1,y1.start-2))
+											lines(c(xx[i],yy[i]),c(y1.start-4,y1.start-3))
+										}
+									}
+									rect(gx.start,y1.start-3,gx.start+gx.size,(y1.start-2), col="red")
+								}	
+					}
+				}
+				legend("topleft",legend = "Refseq Genes",fill="red", cex=0.55,bty="n")
+				####Draw Restriction map####
+				enzymeDb	<-new("repbaseEnzyme")
+				resEnzyme 	<-restrictionEnzyme(obj)	
+				chr.fragment <- getRestrictionFragments(enzymeDb,resEnzyme,orgName,viewpoint.chr)
+				
+				RE.r <-subset(chr.fragment,start >=r.start & end <=r.end)
+				
+				RE.r$rel.start <-RE.r$start-r.start
+				RE.r$rel.end <-RE.r$end-r.start
+				
+				par(fig=c(0,1,0.60,0.70),new=T)
+				par(mar=c(0,5,0.1,2))
+				
+				plot(c(1,2*distance), c(1,60), type= "n", xlab="", ylab="",xaxt='n',yaxt='n')
+				
+				for(i in 1:nrow(RE.r)){
+					if((i%%2)==0){
+						i.start<-RE.r$rel.start[i]
+						i.end  <-RE.r$rel.end[i]
+						rect(i.start, 15, i.end, 25, col="blue")
+					}else{
+						i.start<-RE.r$rel.start[i]
+						i.end  <-RE.r$rel.end[i]
+						rect(i.start, 25, i.end,35, col="blue")
+					}
+				}
+				legend("topleft",legend = "Restriction Fragments",fill="blue", cex=0.55,bty="n")
+				abline(v=start(viewpoint)-r.start, col="red",lty=3,lwd=2)
+				#######Draw Interaction regions##########
+				exp.data<-expInteractions[start(expInteractions) >=r.start & end(expInteractions) <= r.end & space(expInteractions)==viewpoint.chr,]
+				exp.data$p_start<-start(exp.data)-start(viewpoint)
+				
+				exppalette<-rev(brewer.pal(9,"Reds"))
+				
+				exp.data$col[exp.data$q.value <=0.00001]<-exppalette[1]
+				exp.data$col[exp.data$q.value > 0.00001 & exp.data$q.value <=0.0001]<-exppalette[2]
+				exp.data$col[exp.data$q.value > 0.0001 & exp.data$q.value <=0.001]<-exppalette[3]
+				exp.data$col[exp.data$q.value > 0.001 & exp.data$q.value <=0.01]<-exppalette[4]
+				exp.data$col[exp.data$q.value > 0.01 & exp.data$q.value <=0.05]<-exppalette[5]
+				exp.data$col[exp.data$q.value > 0.05 & exp.data$q.value <=0.1]<-exppalette[6]
+				exp.data$col[exp.data$q.value > 0.1 & exp.data$q.value <=0.2]<-exppalette[7]
+				exp.data$col[exp.data$q.value > 0.2 & exp.data$q.value <=0.5]<-exppalette[8]
+				exp.data$col[exp.data$q.value > 0.5]<-exppalette[9]
+				
+				t.names<-c("q-value<=0.00001",
+						"0.00001 >q-value<= 0.0001",
+						"0.0001 >q-value<= 0.001",
+						"0.001 >q-value<= 0.01",
+						"0.01 >q-value<= 0.05",
+						"0.05 >q-value<= 0.1",
+						"0.1 >q-value<= 0.2",
+						"0.2 >q-value<= 0.5",
+						"q-value >0.5"
+				)	
+				par(fig=c(0,1,0.12,0.60),new=T)
+				par(mar=c(4,5,0.1,2))
+				y.exp.max <-max(exp.data$nReads)
+				plot(c(-1*(distance),distance),c(1,y.exp.max), type= "n", ylab="Reads",xlab="Distance (bp) relative to the viewpoint")
+				points(exp.data$p_start,exp.data$nReads,col=exp.data$col,pch=19)	
+				lines(exp.data$p_start,exp.data$nReads,col='black',lty=1)
+				abline(v=0,lty=3,col="red",lwd=2)
+				
+				legend("topleft",legend = t.names, fill=exppalette, cex=0.55,title="q-value",bty="n")
+				
+
+			}
+			if(isControlInvolved(obj)==TRUE){
+				expInteractions   <-expInteractionRegions(obj)
+				contrInteractions <-contrInteractionRegions(obj)	
+				########Get labels################
+				#expLabeled <-expLabel(obj)
+				#contrLabeled <-contrLabel(obj)
+				######look around the viewpoint###
+				r.start <-start(viewpoint)-distance
+				r.end 	<-end(viewpoint)+distance
+				
+				r.start <-ifelse(r.start <0,1,r.start)
+				r.end   <-ifelse(r.end <=chr.size,r.end,chr.size)
+				c.vec   <- c(rep(0,r.end-r.start))
+				####Get refGenes######
+				genes<-get3CseqRefGene(obj)
+				g.chr<-subset(genes,chromosome==viewpoint.chr)
+				g.r<-subset(g.chr,start>=r.start & end <= r.end)
+				
+				par(fig=c(0,1,0.8,1))
+				par(mar=c(0,5,1,2))
+				
+				if(nrow(g.r)>0){
+					g.r<-g.r[order(g.r$start),]
+					g.r$rel.start <-g.r$start-r.start
+					g.r$rel.end <-g.r$end-r.start
+					g.r$size<-g.r$end-g.r$start+1
+					
+					plot(c(1,2*distance), c(1,60), type= "n", xlab="", ylab="",xaxt='n',yaxt='n')
+					abline(v=start(viewpoint)-r.start, col="red",lty=3,lwd=2)
+					y1.start=30
+					for(i in 1:nrow(g.r)){
+						gx<-g.r[i,]
+						gx.start<-gx$rel.start
+						gx.end <-gx$rel.end
+						gx.size<-gx$size
+						gx.strand<-gx$strand
+						
+						if(c.vec[gx$rel.start]==0){
+							y1.start = y1.start
+							c.vec[gx$rel.start:gx$rel.end]=1
+						}else{
+							y1.start = y1.start+8
+							if(y1.start >50){
+								y1.start=10
+							}
+						}
+						text(gx$rel.start,y1.start+2,gx$name,cex =0.8)
+						
+						if(gx.size >=100){
+							s.q <-ifelse(gx.size <=5000,500,5000)
+							s.q <-ifelse(s.q > gx.size, gx.size-10,s.q)
+							
+							xx<-seq(gx.start,gx.start+gx.size-s.q, by=s.q)
+							yy<-seq(gx.start+s.q,gx.start+gx.size, by=s.q)
+							
+							if(gx.strand==-1){
+								for(i in 1:length(xx)){
+									lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-1))
+									lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-4))
+								}
+							}else{
+								for(i in 1:length(xx)){
+									lines(c(xx[i],yy[i]),c(y1.start-1,y1.start-2))
+									lines(c(xx[i],yy[i]),c(y1.start-4,y1.start-3))
+								}
+							}
+							rect(gx.start,y1.start-3,gx.start+gx.size,(y1.start-2), col="red")
+						}	
+					}
+				}
+				legend("topleft",legend = "Refseq Genes",fill="red", cex=0.55,bty="n")
+				####Draw Restriction map####
+				enzymeDb	<-new("repbaseEnzyme")
+				resEnzyme 	<-restrictionEnzyme(obj)	
+				chr.fragment <- getRestrictionFragments(enzymeDb,resEnzyme,orgName,viewpoint.chr)
+				
+				RE.r <-subset(chr.fragment,start >=r.start & end <=r.end)
+				
+				RE.r$rel.start <-RE.r$start-r.start
+				RE.r$rel.end <-RE.r$end-r.start
+				
+				par(fig=c(0,1,0.75,0.80),new=T)
+				par(mar=c(0,5,0.1,2))
+				
+				plot(c(1,2*distance), c(1,60), type= "n", xlab="", ylab="",xaxt='n',yaxt='n')
+				for(i in 1:nrow(RE.r)){
+					if((i%%2)==0){
+						i.start<-RE.r$rel.start[i]
+						i.end  <-RE.r$rel.end[i]
+						rect(i.start, 15, i.end, 25, col="blue")
+					}else{
+						i.start<-RE.r$rel.start[i]
+						i.end  <-RE.r$rel.end[i]
+						rect(i.start, 25, i.end,35, col="blue")
+					}
+				}
+				legend("topleft",legend = "Restriction Fragments",fill="blue", cex=0.55,bty="n")
+				abline(v=start(viewpoint)-r.start, col="red",lty=3,lwd=2)
+				#######Draw Interaction regions##########
+				exp.data<-expInteractions[start(expInteractions) >=r.start & end(expInteractions) <= r.end & space(expInteractions)==viewpoint.chr,]
+				exp.data$p_start<-start(exp.data)-start(viewpoint)
+				
+				exppalette<-rev(brewer.pal(9,"Reds"))
+				
+				exp.data$col[exp.data$q.value <=0.00001]<-exppalette[1]
+				exp.data$col[exp.data$q.value > 0.00001 & exp.data$q.value <=0.0001]<-exppalette[2]
+				exp.data$col[exp.data$q.value > 0.0001 & exp.data$q.value <=0.001]<-exppalette[3]
+				exp.data$col[exp.data$q.value > 0.001 & exp.data$q.value <=0.01]<-exppalette[4]
+				exp.data$col[exp.data$q.value > 0.01 & exp.data$q.value <=0.05]<-exppalette[5]
+				exp.data$col[exp.data$q.value > 0.05 & exp.data$q.value <=0.1]<-exppalette[6]
+				exp.data$col[exp.data$q.value > 0.1 & exp.data$q.value <=0.2]<-exppalette[7]
+				exp.data$col[exp.data$q.value > 0.2 & exp.data$q.value <=0.5]<-exppalette[8]
+				exp.data$col[exp.data$q.value > 0.5]<-exppalette[9]
+				
+				
+				contr.data<-contrInteractions[start(contrInteractions) >=r.start & end(contrInteractions) <= r.end & space(contrInteractions)==viewpoint.chr,]
+				contr.data$p_start<-start(contr.data)-start(viewpoint)
+				
+				contrpalette<-rev(brewer.pal(9,"Blues"))
+				
+				contr.data$col[contr.data$q.value <=0.00001]<-contrpalette[1]
+				contr.data$col[contr.data$q.value > 0.00001 & contr.data$q.value <=0.0001]<-contrpalette[2]
+				contr.data$col[contr.data$q.value > 0.0001 & contr.data$q.value <=0.001]<-contrpalette[3]
+				contr.data$col[contr.data$q.value > 0.001 & contr.data$q.value <=0.01]<-contrpalette[4]
+				contr.data$col[contr.data$q.value > 0.01 & contr.data$q.value <=0.05]<-contrpalette[5]
+				contr.data$col[contr.data$q.value > 0.05 & contr.data$q.value <=0.1]<-contrpalette[6]
+				contr.data$col[contr.data$q.value > 0.1 & contr.data$q.value <=0.2]<-contrpalette[7]
+				contr.data$col[contr.data$q.value > 0.2 & contr.data$q.value <=0.5]<-contrpalette[8]
+				contr.data$col[contr.data$q.value > 0.5]<-contrpalette[9]
+							
+				t.names<-c("q-value<=0.00001",
+						"0.00001 >q-value<= 0.0001",
+						"0.0001 >q-value<= 0.001",
+						"0.001 >q-value<= 0.01",
+						"0.01 >q-value<= 0.05",
+						"0.05 >q-value<= 0.1",
+						"0.1 >q-value<= 0.2",
+						"0.2 >q-value<= 0.5",
+						"q-value >0.5"
+				)	
+				par(fig=c(0,1,0.50,0.75),new=T)
+				par(mar=c(0,5,0.1,2))
+				y.exp.max <-max(exp.data$RPMs)
+		
+				plot(c(-1*(distance),distance),c(1,y.exp.max), type= "n", ylab="RPMs",xaxt='n')
+				points(exp.data$p_start,exp.data$RPMs,col=exp.data$col,pch=19)
+				lines(exp.data$p_start,exp.data$RPMs,col='black',lty=1)
+				
+				legend("topleft",legend = t.names, fill=exppalette, cex=0.55,title="q-value",bty="n")
+				legend("topright",legend = "experiment", cex=1,bty="n")
+				abline(v=0,lty=3,col="red",lwd=2)
+				
+				par(fig=c(0,1,0.25,0.50),new=T)
+				par(mar=c(0,5,0.1,2))
+				y.exp.max <-max(exp.data$RPMs)
+				plot(c(-1*(distance),distance),c(1,y.exp.max), type= "n", ylab="RPMs",xaxt='n')				
+				points(contr.data$p_start,contr.data$RPMs,col=contr.data$col,pch=19)	
+				lines(contr.data$p_start,contr.data$RPMs,col='black',lty=1)
+				legend("topleft",legend = t.names, fill=contrpalette, cex=0.55,title="q-value",bty="n")
+				legend("topright",legend = "control", cex=1,bty="n")
+				abline(v=0,lty=3,col="red",lwd=2)
+				
+				#####Draw log2 of subtraction#####
+				exp.rpm<-data.frame(start=start(exp.data),end=end(exp.data),exp_RPMs=exp.data$RPMs)
+				exp.rpm<-subset(exp.rpm,exp_RPMs>=1)
+				contr.rpm<-data.frame(start=start(contr.data),end=end(contr.data),contr_RPMs=contr.data$RPMs)
+				contr.rpm<-subset(contr.rpm,contr_RPMs>=1)
+				combined.rpm<-merge(exp.rpm,contr.rpm,by.x=c("start","end"),by.y=c("start","end"),all=T)
+				combined.rpm[is.na(combined.rpm)==TRUE]<-0
+				combined.rpm$log2fold<-log2((combined.rpm$exp_RPMs+1)/(combined.rpm$contr_RPMs+1))
+				combined.rpm$p_start<-combined.rpm$start-start(viewpoint)
+				combined.rpm$p_end<-combined.rpm$end-start(viewpoint)
+				
+				par(fig=c(0,1,0,0.25),new=T)
+				par(mar=c(4,5,0.1,2))
+				
+				plot(c(-1*(distance),distance),c(min(combined.rpm$log2fold),max(combined.rpm$log2fold)), type= "n", ylab="Exp/Cont (log2)",xlab="Distance (bp) from the viewpoint")
+				
+				for(i in 1:nrow(combined.rpm)){
+					start<-combined.rpm$p_start[i]
+					end  <-combined.rpm$p_end[i]
+					log2.fold <-combined.rpm$log2fold[i]
+					if(log2.fold >0){
+						rect(start,0,end,log2.fold, col="red")
+					}else{
+						rect(start,0,end,log2.fold, col="blue")
+					}
+				}
+				abline(v=0,lty=3,col="red",lwd=2)
+				abline(h=0,lty=3,col="black",lwd=2)
+			}
+}
+
+plotInteractionsPerChromosome<-function(obj,chromosomeName){
+	
+			stopifnot( is(obj, "r3Cseq") | is(obj,"r3CseqInBatch"))
 			if(chromosomeName ==character(1)){
 				stop("Require the chromosome name for example : 'chr1'")
 			}
@@ -587,8 +691,8 @@ setMethod("plotInteractionsPerChromosome",
 				stop("Require the correct format chromosome name : 'chr1','chrX','chrY'")
 			}
 			
-			if(isControlInvolved(object)==FALSE){
-				orgName<-organismName(object)
+			if(isControlInvolved(obj)==FALSE){
+				orgName<-organismName(obj)
 				chr.size=c()
 				
 				if(orgName=="hg18"){
@@ -601,102 +705,102 @@ setMethod("plotInteractionsPerChromosome",
 					stop("Your input organism name is not in the list ('mm9','hg18',and 'hg19')")
 				}
 				
-				expLabeled<-expLabel(object)
+				#expLabeled<-expLabel(obj)
 				
-				expInteractions   <-expInteractionRegions(object)
+				expInteractions   <-expInteractionRegions(obj)
 				
 				if(nrow(expInteractions) >0){
-					viewpoint <-getViewpoint(object)
+					viewpoint <-getViewpoint(obj)
 					
 					if(space(viewpoint)==chromosomeName){
 						chr.exp   <-expInteractions[space(expInteractions)==chromosomeName,]
 						if(nrow(chr.exp ) ==0){
 							stop("There is no interaction regions found in your selected chromosome!!.")
 						}
-						###Remove the viewpoint from the plot###
-						exp.index<-which(start(chr.exp)==start(viewpoint))
-						chr.exp<-chr.exp[-(exp.index),]
-						chr.exp.data  <-data.frame(start=start(chr.exp),expRPMs=chr.exp$expRPMs,p_value=chr.exp$p_value)
-						chr.exp.data  <-chr.exp.data[!is.finite(-log10(chr.exp.data$p_value))==FALSE,]
+						chr.exp.data  <-data.frame(start=start(chr.exp),nReads=chr.exp$nReads,q.value=chr.exp$q.value)
+						e.smooth<-smooth.spline(chr.exp.data$nReads,spar=0.5)
+						e.fitted<-fitted(e.smooth)
+						chr.exp.data$expected<-e.fitted
 						
 						exppalette<-rev(brewer.pal(9,"Reds"))
 						
-						chr.exp.data$col[chr.exp.data$p_value <=0.00001]<-exppalette[1]
-						chr.exp.data$col[chr.exp.data$p_value > 0.00001 & chr.exp.data$p_value <=0.0001]<-exppalette[2]
-						chr.exp.data$col[chr.exp.data$p_value > 0.0001 & chr.exp.data$p_value <=0.001]<-exppalette[3]
-						chr.exp.data$col[chr.exp.data$p_value > 0.001 & chr.exp.data$p_value <=0.01]<-exppalette[4]
-						chr.exp.data$col[chr.exp.data$p_value > 0.01 & chr.exp.data$p_value <=0.05]<-exppalette[5]
-						chr.exp.data$col[chr.exp.data$p_value > 0.05 & chr.exp.data$p_value <=0.1]<-exppalette[6]
-						chr.exp.data$col[chr.exp.data$p_value > 0.1 & chr.exp.data$p_value <=0.2]<-exppalette[7]
-						chr.exp.data$col[chr.exp.data$p_value > 0.2 & chr.exp.data$p_value <=0.5]<-exppalette[8]
-						chr.exp.data$col[chr.exp.data$p_value > 0.5]<-exppalette[9]
+						chr.exp.data$col[chr.exp.data$q.value <=0.00001]<-exppalette[1]
+						chr.exp.data$col[chr.exp.data$q.value > 0.00001 & chr.exp.data$q.value <=0.0001]<-exppalette[2]
+						chr.exp.data$col[chr.exp.data$q.value > 0.0001 & chr.exp.data$q.value <=0.001]<-exppalette[3]
+						chr.exp.data$col[chr.exp.data$q.value > 0.001 & chr.exp.data$q.value <=0.01]<-exppalette[4]
+						chr.exp.data$col[chr.exp.data$q.value > 0.01 & chr.exp.data$q.value <=0.05]<-exppalette[5]
+						chr.exp.data$col[chr.exp.data$q.value > 0.05 & chr.exp.data$q.value <=0.1]<-exppalette[6]
+						chr.exp.data$col[chr.exp.data$q.value > 0.1 & chr.exp.data$q.value <=0.2]<-exppalette[7]
+						chr.exp.data$col[chr.exp.data$q.value > 0.2 & chr.exp.data$q.value <=0.5]<-exppalette[8]
+						chr.exp.data$col[chr.exp.data$q.value > 0.5]<-exppalette[9]
 						
-						t.names<-c("p-value<=0.00001",
-								"0.00001 >p-value<= 0.0001",
-								"0.0001 >p-value<= 0.001",
-								"0.001 >p-value<= 0.01",
-								"0.01 >p-value<= 0.05",
-								"0.05 >p-value<= 0.1",
-								"0.1 >p-value<= 0.2",
-								"0.2 >p-value<= 0.5",
-								"p-value >0.5"
+						t.names<-c("q-value<=0.00001",
+								"0.00001 >q-value<= 0.0001",
+								"0.0001 >q-value<= 0.001",
+								"0.001 >q-value<= 0.01",
+								"0.01 >q-value<= 0.05",
+								"0.05 >q-value<= 0.1",
+								"0.1 >q-value<= 0.2",
+								"0.2 >q-value<= 0.5",
+								"q-value >0.5"
 						)							
-						plot(chr.exp.data$start,chr.exp.data$expRPMs,pch=19,
+						plot(chr.exp.data$start,chr.exp.data$nReads,pch=19,
 								col=chr.exp.data$col,
-								xlab="Chromosomal position (Mb)",
-								ylab="Reads/Million",
-								main = paste(chromosomeName,":",expLabeled)
+								xlab="Chromosomal position (bp)",
+								ylab="Reads",
+								main = paste(chromosomeName,":","experiment")
 						)
 						abline(v=start(viewpoint), col="black",lty=3)
-						legend("topright",legend = t.names, fill=exppalette, cex=0.55,title="p-value",bty="n")
+						lines(chr.exp.data$start,chr.exp.data$expected,col="blue",lwd=2)
+						legend("topright",legend = t.names, fill=exppalette, cex=0.55,title="q-value",bty="n")
+						legend("topleft",legend = "expected reads",lty=c(1),col="blue", cex=0.55,bty="n")
 						
 					}else{
 						chr.exp   <-expInteractions[space(expInteractions)==chromosomeName,]
 						if(nrow(chr.exp) ==0){
 							stop("There is no interaction regions found in your selected chromosome!!.")
 						}	
-						chr.exp.data  <-data.frame(start=start(chr.exp),expRPMs=chr.exp$expRPMs,p_value=chr.exp$p_value)
-						chr.exp.data  <-chr.exp.data[!is.finite(-log10(chr.exp.data$p_value))==FALSE,]	
-						
+						chr.exp.data  <-data.frame(start=start(chr.exp),nReads=chr.exp$nReads,q.value=chr.exp$q.value)
+					
 						exppalette<-rev(brewer.pal(9,"Reds"))
 						
-						chr.exp.data$col[chr.exp.data$p_value <=0.00001]<-exppalette[1]
-						chr.exp.data$col[chr.exp.data$p_value > 0.00001 & chr.exp.data$p_value <=0.0001]<-exppalette[2]
-						chr.exp.data$col[chr.exp.data$p_value > 0.0001 & chr.exp.data$p_value <=0.001]<-exppalette[3]
-						chr.exp.data$col[chr.exp.data$p_value > 0.001 & chr.exp.data$p_value <=0.01]<-exppalette[4]
-						chr.exp.data$col[chr.exp.data$p_value > 0.01 & chr.exp.data$p_value <=0.05]<-exppalette[5]
-						chr.exp.data$col[chr.exp.data$p_value > 0.05 & chr.exp.data$p_value <=0.1]<-exppalette[6]
-						chr.exp.data$col[chr.exp.data$p_value > 0.1 & chr.exp.data$p_value <=0.2]<-exppalette[7]
-						chr.exp.data$col[chr.exp.data$p_value > 0.2 & chr.exp.data$p_value <=0.5]<-exppalette[8]
-						chr.exp.data$col[chr.exp.data$p_value > 0.5]<-exppalette[9]
+						chr.exp.data$col[chr.exp.data$q.value <=0.00001]<-exppalette[1]
+						chr.exp.data$col[chr.exp.data$q.value > 0.00001 & chr.exp.data$q.value <=0.0001]<-exppalette[2]
+						chr.exp.data$col[chr.exp.data$q.value > 0.0001 & chr.exp.data$q.value <=0.001]<-exppalette[3]
+						chr.exp.data$col[chr.exp.data$q.value > 0.001 & chr.exp.data$q.value <=0.01]<-exppalette[4]
+						chr.exp.data$col[chr.exp.data$q.value > 0.01 & chr.exp.data$q.value <=0.05]<-exppalette[5]
+						chr.exp.data$col[chr.exp.data$q.value > 0.05 & chr.exp.data$q.value <=0.1]<-exppalette[6]
+						chr.exp.data$col[chr.exp.data$q.value > 0.1 & chr.exp.data$q.value <=0.2]<-exppalette[7]
+						chr.exp.data$col[chr.exp.data$q.value > 0.2 & chr.exp.data$q.value <=0.5]<-exppalette[8]
+						chr.exp.data$col[chr.exp.data$q.value > 0.5]<-exppalette[9]
 						
-						t.names<-c("p-value<=0.00001",
-								"0.00001 >p-value<= 0.0001",
-								"0.0001 >p-value<= 0.001",
-								"0.001 >p-value<= 0.01",
-								"0.01 >p-value<= 0.05",
-								"0.05 >p-value<= 0.1",
-								"0.1 >p-value<= 0.2",
-								"0.2 >p-value<= 0.5",
-								"p-value >0.5"
+						t.names<-c("q-value<=0.00001",
+								"0.00001 >q-value<= 0.0001",
+								"0.0001 >q-value<= 0.001",
+								"0.001 >q-value<= 0.01",
+								"0.01 >q-value<= 0.05",
+								"0.05 >q-value<= 0.1",
+								"0.1 >q-value<= 0.2",
+								"0.2 >q-value<= 0.5",
+								"q-value >0.5"
 						)							
-						plot(chr.exp.data$start,chr.exp.data$expRPMs,pch=19,
+						plot(chr.exp.data$start,chr.exp.data$nReads,pch=19,
 								col=chr.exp.data$col,
-								xlab="Chromosomal position (Mb)",
-								ylab="Reads/Million",
-								main = paste(chromosomeName,":",expLabeled)
+								xlab="Chromosomal position (bp)",
+								ylab="Reads",
+								main = paste(chromosomeName,":","experiment")
 						)
 						
-						legend("topright",legend = t.names, fill=exppalette, cex=0.55,title="p-value",bty="n")
+						legend("topright",legend = t.names, fill=exppalette, cex=0.55,title="q-value",bty="n")
 					
 					}
 					
 				}else{
-					stop("No interactions were found in your r3Cseq object!!!")
+					stop("No interactions were found in your r3Cseq obj!!!")
 				}
 			}			
-			if(isControlInvolved(object)==TRUE){
-				orgName<-organismName(object)
+			if(isControlInvolved(obj)==TRUE){
+				orgName<-organismName(obj)
 				chr.size=c()
 				
 				if(orgName=="hg18"){
@@ -709,15 +813,15 @@ setMethod("plotInteractionsPerChromosome",
 					stop("Your input organism name is not in the list ('mm9','hg18',and 'hg19')")
 				}
 				
-				expLabeled<-expLabel(object)
-				controlLabeled<-contrLabel(object)
+				#expLabeled<-expLabel(obj)
+				#controlLabeled<-contrLabel(obj)
 				
-				expInteractions   <-expInteractionRegions(object)
-				contrInteractions <-contrInteractionRegions(object)
+				expInteractions   <-expInteractionRegions(obj)
+				contrInteractions <-contrInteractionRegions(obj)
 				
 				if(nrow(expInteractions) >0){
 					
-					viewpoint <-getViewpoint(object)
+					viewpoint <-getViewpoint(obj)
 					
 					if(space(viewpoint)==chromosomeName){
 						chr.exp   <-expInteractions[space(expInteractions)==chromosomeName,]
@@ -725,83 +829,88 @@ setMethod("plotInteractionsPerChromosome",
 							stop("There is no interaction regions found in your selected chromosome!!.")
 						}
 						chr.contr <-contrInteractions[space(contrInteractions)==chromosomeName,]
-						###Remove the viewpoint from the plot###
-						exp.index<-which(start(chr.exp)==start(viewpoint))
-						contr.index<-which(start(chr.contr)==start(viewpoint))
-						chr.exp<-chr.exp[-(exp.index),]
-						chr.contr<-chr.contr[-(contr.index),]
 						
-						chr.exp.data  <-data.frame(start=start(chr.exp),expRPMs=chr.exp$expRPMs,p_value=chr.exp$p_value)
-						chr.contr.data <-data.frame(start=start(chr.contr),contrRPMs=chr.contr$contrRPMs,p_value=chr.contr$p_value)
+						chr.exp.data  <-data.frame(start=start(chr.exp),RPMs=chr.exp$RPMs,q.value=chr.exp$q.value)
+						chr.contr.data <-data.frame(start=start(chr.contr),RPMs=chr.contr$RPMs,q.value=chr.contr$q.value)
 						
-						chr.exp.data  <-chr.exp.data[!is.finite(-log10(chr.exp.data$p_value))==FALSE,]
-						chr.contr.data <-chr.contr.data[!is.finite(-log10(chr.contr.data$p_value))==FALSE,]
+						e.smooth<-smooth.spline(chr.exp.data$RPMs,spar=0.5)
+						e.fitted<-fitted(e.smooth)
+						chr.exp.data$expected<-e.fitted
 						
+						e.smooth<-smooth.spline(chr.contr.data$RPMs,spar=0.5)
+						e.fitted<-fitted(e.smooth)
+						chr.contr.data$expected<-e.fitted
 						par(mfrow=c(2,1))
 						
 						exppalette<-rev(brewer.pal(9,"Reds"))
 						
-						chr.exp.data$col[chr.exp.data$p_value <=0.00001]<-exppalette[1]
-						chr.exp.data$col[chr.exp.data$p_value > 0.00001 & chr.exp.data$p_value <=0.0001]<-exppalette[2]
-						chr.exp.data$col[chr.exp.data$p_value > 0.0001 & chr.exp.data$p_value <=0.001]<-exppalette[3]
-						chr.exp.data$col[chr.exp.data$p_value > 0.001 & chr.exp.data$p_value <=0.01]<-exppalette[4]
-						chr.exp.data$col[chr.exp.data$p_value > 0.01 & chr.exp.data$p_value <=0.05]<-exppalette[5]
-						chr.exp.data$col[chr.exp.data$p_value > 0.05 & chr.exp.data$p_value <=0.1]<-exppalette[6]
-						chr.exp.data$col[chr.exp.data$p_value > 0.1 & chr.exp.data$p_value <=0.2]<-exppalette[7]
-						chr.exp.data$col[chr.exp.data$p_value > 0.2 & chr.exp.data$p_value <=0.5]<-exppalette[8]
-						chr.exp.data$col[chr.exp.data$p_value > 0.5]<-exppalette[9]
+						chr.exp.data$col[chr.exp.data$q.value <=0.00001]<-exppalette[1]
+						chr.exp.data$col[chr.exp.data$q.value > 0.00001 & chr.exp.data$q.value <=0.0001]<-exppalette[2]
+						chr.exp.data$col[chr.exp.data$q.value > 0.0001 & chr.exp.data$q.value <=0.001]<-exppalette[3]
+						chr.exp.data$col[chr.exp.data$q.value > 0.001 & chr.exp.data$q.value <=0.01]<-exppalette[4]
+						chr.exp.data$col[chr.exp.data$q.value > 0.01 & chr.exp.data$q.value <=0.05]<-exppalette[5]
+						chr.exp.data$col[chr.exp.data$q.value > 0.05 & chr.exp.data$q.value <=0.1]<-exppalette[6]
+						chr.exp.data$col[chr.exp.data$q.value > 0.1 & chr.exp.data$q.value <=0.2]<-exppalette[7]
+						chr.exp.data$col[chr.exp.data$q.value > 0.2 & chr.exp.data$q.value <=0.5]<-exppalette[8]
+						chr.exp.data$col[chr.exp.data$q.value > 0.5]<-exppalette[9]
 						
-						t.names<-c("p-value<=0.00001",
-								"0.00001 >p-value<= 0.0001",
-								"0.0001 >p-value<= 0.001",
-								"0.001 >p-value<= 0.01",
-								"0.01 >p-value<= 0.05",
-								"0.05 >p-value<= 0.1",
-								"0.1 >p-value<= 0.2",
-								"0.2 >p-value<= 0.5",
-								"p-value >0.5"
+						t.names<-c("q-value<=0.00001",
+								"0.00001 >q-value<= 0.0001",
+								"0.0001 >q-value<= 0.001",
+								"0.001 >q-value<= 0.01",
+								"0.01 >q-value<= 0.05",
+								"0.05 >q-value<= 0.1",
+								"0.1 >q-value<= 0.2",
+								"0.2 >q-value<= 0.5",
+								"q-value >0.5"
 								)							
-						plot(chr.exp.data$start,chr.exp.data$expRPMs,pch=19,
+						y.max<-max(chr.exp.data$RPMs)
+						plot(chr.exp.data$start,chr.exp.data$RPMs,pch=19,
 								col=chr.exp.data$col,
-								xlab="Chromosomal position (Mb)",
+								xlab="Chromosomal position (bp)",
 								ylab="Reads/Million",
-								main = paste(chromosomeName,":",expLabeled)
+								ylim=c(0,y.max),
+								main = paste(chromosomeName,":","experiment")
 								)
 						abline(v=start(viewpoint), col="black",lty=3)
-						legend("topright",legend = t.names, fill=exppalette, cex=0.55,title="p-value",bty="n")
+						lines(chr.exp.data$start,chr.exp.data$expected,col="blue",lwd=2)
+						legend("topright",legend = t.names, fill=exppalette, cex=0.55,title="q-value",bty="n")
+						legend("topleft",legend = "expected reads",lty=c(1),col="blue", cex=0.55,bty="n")
 						
 						#####plot control###
 						contrpalette<-rev(brewer.pal(9,"Blues"))
 						
-						chr.contr.data$col[chr.contr.data$p_value <=0.00001]<-contrpalette[1]
-						chr.contr.data$col[chr.contr.data$p_value > 0.00001 & chr.contr.data$p_value <=0.0001]<-contrpalette[2]
-						chr.contr.data$col[chr.contr.data$p_value > 0.0001 & chr.contr.data$p_value <=0.001]<-contrpalette[3]
-						chr.contr.data$col[chr.contr.data$p_value > 0.001 & chr.contr.data$p_value <=0.01]<-contrpalette[4]
-						chr.contr.data$col[chr.contr.data$p_value > 0.01 & chr.contr.data$p_value <=0.05]<-contrpalette[5]
-						chr.contr.data$col[chr.contr.data$p_value > 0.05 & chr.contr.data$p_value <=0.1]<-contrpalette[6]
-						chr.contr.data$col[chr.contr.data$p_value > 0.1 & chr.contr.data$p_value <=0.2]<-contrpalette[7]
-						chr.contr.data$col[chr.contr.data$p_value > 0.2 & chr.contr.data$p_value <=0.5]<-contrpalette[8]
-						chr.contr.data$col[chr.contr.data$p_value > 0.5]<-contrpalette[9]
+						chr.contr.data$col[chr.contr.data$q.value <=0.00001]<-contrpalette[1]
+						chr.contr.data$col[chr.contr.data$q.value > 0.00001 & chr.contr.data$q.value <=0.0001]<-contrpalette[2]
+						chr.contr.data$col[chr.contr.data$q.value > 0.0001 & chr.contr.data$q.value <=0.001]<-contrpalette[3]
+						chr.contr.data$col[chr.contr.data$q.value > 0.001 & chr.contr.data$q.value <=0.01]<-contrpalette[4]
+						chr.contr.data$col[chr.contr.data$q.value > 0.01 & chr.contr.data$q.value <=0.05]<-contrpalette[5]
+						chr.contr.data$col[chr.contr.data$q.value > 0.05 & chr.contr.data$q.value <=0.1]<-contrpalette[6]
+						chr.contr.data$col[chr.contr.data$q.value > 0.1 & chr.contr.data$q.value <=0.2]<-contrpalette[7]
+						chr.contr.data$col[chr.contr.data$q.value > 0.2 & chr.contr.data$q.value <=0.5]<-contrpalette[8]
+						chr.contr.data$col[chr.contr.data$q.value > 0.5]<-contrpalette[9]
 						
-						t.names<-c("p-value<=0.00001",
-								"0.00001 >p-value<= 0.0001",
-								"0.0001 >p-value<= 0.001",
-								"0.001 >p-value<= 0.01",
-								"0.01 >p-value<= 0.05",
-								"0.05 >p-value<= 0.1",
-								"0.1 >p-value<= 0.2",
-								"0.2 >p-value<= 0.5",
-								"p-value >0.5"
+						t.names<-c("q-value<=0.00001",
+								"0.00001 >q-value<= 0.0001",
+								"0.0001 >q-value<= 0.001",
+								"0.001 >q-value<= 0.01",
+								"0.01 >q-value<= 0.05",
+								"0.05 >q-value<= 0.1",
+								"0.1 >q-value<= 0.2",
+								"0.2 >q-value<= 0.5",
+								"q-value >0.5"
 						)							
-						plot(chr.contr.data$start,chr.contr.data$contrRPMs,pch=19,
+						plot(chr.contr.data$start,chr.contr.data$RPMs,pch=19,
 								col=chr.contr.data$col,
-								xlab="Chromosomal position (Mb)",
+								xlab="Chromosomal position (bp)",
 								ylab="Reads/Million",
-								main = paste(chromosomeName,":",controlLabeled)
+								ylim=c(0,y.max),
+								main = paste(chromosomeName,":","control")
 						)
 						abline(v=start(viewpoint), col="black",lty=3)
-						legend("topright",legend = t.names, fill=contrpalette, cex=0.55,title="p-value",bty="n")
-						
+						lines(chr.contr.data$start,chr.contr.data$expected,col="blue",lwd=2)
+						legend("topright",legend = t.names, fill=contrpalette, cex=0.55,title="q-value",bty="n")
+						legend("topleft",legend = "expected reads",lty=c(1),col="blue", cex=0.55,bty="n")
 						
 					}else{
 						chr.exp   <-expInteractions[space(expInteractions)==chromosomeName,]
@@ -811,76 +920,73 @@ setMethod("plotInteractionsPerChromosome",
 							stop("There is no interaction regions found in your selected chromosome!!.")
 						}
 						
-						chr.exp.data  <-data.frame(start=start(chr.exp),expRPMs=chr.exp$expRPMs,p_value=chr.exp$p_value)
-						chr.contr.data <-data.frame(start=start(chr.contr),contrRPMs=chr.contr$contrRPMs,p_value=chr.contr$p_value)
-						
-						chr.exp.data  <-chr.exp.data[!is.finite(-log10(chr.exp.data$p_value))==FALSE,]
-						chr.contr.data <-chr.contr.data[!is.finite(-log10(chr.contr.data$p_value))==FALSE,]
+						chr.exp.data  <-data.frame(start=start(chr.exp),RPMs=chr.exp$RPMs,q.value=chr.exp$q.value)
+						chr.contr.data <-data.frame(start=start(chr.contr),RPMs=chr.contr$RPMs,q.value=chr.contr$q.value)
 						
 						par(mfrow=c(2,1))
 						
 						exppalette<-rev(brewer.pal(9,"Reds"))
 						
-						chr.exp.data$col[chr.exp.data$p_value <=0.00001]<-exppalette[1]
-						chr.exp.data$col[chr.exp.data$p_value > 0.00001 & chr.exp.data$p_value <=0.0001]<-exppalette[2]
-						chr.exp.data$col[chr.exp.data$p_value > 0.0001 & chr.exp.data$p_value <=0.001]<-exppalette[3]
-						chr.exp.data$col[chr.exp.data$p_value > 0.001 & chr.exp.data$p_value <=0.01]<-exppalette[4]
-						chr.exp.data$col[chr.exp.data$p_value > 0.01 & chr.exp.data$p_value <=0.05]<-exppalette[5]
-						chr.exp.data$col[chr.exp.data$p_value > 0.05 & chr.exp.data$p_value <=0.1]<-exppalette[6]
-						chr.exp.data$col[chr.exp.data$p_value > 0.1 & chr.exp.data$p_value <=0.2]<-exppalette[7]
-						chr.exp.data$col[chr.exp.data$p_value > 0.2 & chr.exp.data$p_value <=0.5]<-exppalette[8]
-						chr.exp.data$col[chr.exp.data$p_value > 0.5]<-exppalette[9]
+						chr.exp.data$col[chr.exp.data$q.value <=0.00001]<-exppalette[1]
+						chr.exp.data$col[chr.exp.data$q.value > 0.00001 & chr.exp.data$q.value <=0.0001]<-exppalette[2]
+						chr.exp.data$col[chr.exp.data$q.value > 0.0001 & chr.exp.data$q.value <=0.001]<-exppalette[3]
+						chr.exp.data$col[chr.exp.data$q.value > 0.001 & chr.exp.data$q.value <=0.01]<-exppalette[4]
+						chr.exp.data$col[chr.exp.data$q.value > 0.01 & chr.exp.data$q.value <=0.05]<-exppalette[5]
+						chr.exp.data$col[chr.exp.data$q.value > 0.05 & chr.exp.data$q.value <=0.1]<-exppalette[6]
+						chr.exp.data$col[chr.exp.data$q.value > 0.1 & chr.exp.data$q.value <=0.2]<-exppalette[7]
+						chr.exp.data$col[chr.exp.data$q.value > 0.2 & chr.exp.data$q.value <=0.5]<-exppalette[8]
+						chr.exp.data$col[chr.exp.data$q.value > 0.5]<-exppalette[9]
 						
-						t.names<-c("p-value<=0.00001",
-								"0.00001 >p-value<= 0.0001",
-								"0.0001 >p-value<= 0.001",
-								"0.001 >p-value<= 0.01",
-								"0.01 >p-value<= 0.05",
-								"0.05 >p-value<= 0.1",
-								"0.1 >p-value<= 0.2",
-								"0.2 >p-value<= 0.5",
-								"p-value >0.5"
+						t.names<-c("q-value<=0.00001",
+								"0.00001 >q-value<= 0.0001",
+								"0.0001 >q-value<= 0.001",
+								"0.001 >q-value<= 0.01",
+								"0.01 >q-value<= 0.05",
+								"0.05 >q-value<= 0.1",
+								"0.1 >q-value<= 0.2",
+								"0.2 >q-value<= 0.5",
+								"q-value >0.5"
 						)							
-						plot(chr.exp.data$start,chr.exp.data$expRPMs,pch=19,
+						plot(chr.exp.data$start,chr.exp.data$RPMs,pch=19,
 								col=chr.exp.data$col,
-								xlab="Chromosomal position (Mb)",
+								xlab="Chromosomal position (bp)",
 								ylab="Reads/Million",
-								main = paste(chromosomeName,":",expLabeled)
+								main = paste(chromosomeName,":","experiment")
 						)
 						
-						legend("topright",legend = t.names, fill=exppalette, cex=0.55,title="p-value",bty="n")
+						legend("topright",legend = t.names, fill=exppalette, cex=0.55,title="q-value",bty="n")
 						
 						#####plot control###
 						contrpalette<-rev(brewer.pal(9,"Blues"))
 						
-						chr.contr.data$col[chr.contr.data$p_value <=0.00001]<-contrpalette[1]
-						chr.contr.data$col[chr.contr.data$p_value > 0.00001 & chr.contr.data$p_value <=0.0001]<-contrpalette[2]
-						chr.contr.data$col[chr.contr.data$p_value > 0.0001 & chr.contr.data$p_value <=0.001]<-contrpalette[3]
-						chr.contr.data$col[chr.contr.data$p_value > 0.001 & chr.contr.data$p_value <=0.01]<-contrpalette[4]
-						chr.contr.data$col[chr.contr.data$p_value > 0.01 & chr.contr.data$p_value <=0.05]<-contrpalette[5]
-						chr.contr.data$col[chr.contr.data$p_value > 0.05 & chr.contr.data$p_value <=0.1]<-contrpalette[6]
-						chr.contr.data$col[chr.contr.data$p_value > 0.1 & chr.contr.data$p_value <=0.2]<-contrpalette[7]
-						chr.contr.data$col[chr.contr.data$p_value > 0.2 & chr.contr.data$p_value <=0.5]<-contrpalette[8]
-						chr.contr.data$col[chr.contr.data$p_value > 0.5]<-contrpalette[9]
+						chr.contr.data$col[chr.contr.data$q.value <=0.00001]<-contrpalette[1]
+						chr.contr.data$col[chr.contr.data$q.value > 0.00001 & chr.contr.data$q.value <=0.0001]<-contrpalette[2]
+						chr.contr.data$col[chr.contr.data$q.value > 0.0001 & chr.contr.data$q.value <=0.001]<-contrpalette[3]
+						chr.contr.data$col[chr.contr.data$q.value > 0.001 & chr.contr.data$q.value <=0.01]<-contrpalette[4]
+						chr.contr.data$col[chr.contr.data$q.value > 0.01 & chr.contr.data$q.value <=0.05]<-contrpalette[5]
+						chr.contr.data$col[chr.contr.data$q.value > 0.05 & chr.contr.data$q.value <=0.1]<-contrpalette[6]
+						chr.contr.data$col[chr.contr.data$q.value > 0.1 & chr.contr.data$q.value <=0.2]<-contrpalette[7]
+						chr.contr.data$col[chr.contr.data$q.value > 0.2 & chr.contr.data$q.value <=0.5]<-contrpalette[8]
+						chr.contr.data$col[chr.contr.data$q.value > 0.5]<-contrpalette[9]
 						
-						t.names<-c("p-value<=0.00001",
-								"0.00001 >p-value<= 0.0001",
-								"0.0001 >p-value<= 0.001",
-								"0.001 >p-value<= 0.01",
-								"0.01 >p-value<= 0.05",
-								"0.05 >p-value<= 0.1",
-								"0.1 >p-value<= 0.2",
-								"0.2 >p-value<= 0.5",
-								"p-value >0.5"
+						t.names<-c("q-value<=0.00001",
+								"0.00001 >q-value<= 0.0001",
+								"0.0001 >q-value<= 0.001",
+								"0.001 >q-value<= 0.01",
+								"0.01 >q-value<= 0.05",
+								"0.05 >q-value<= 0.1",
+								"0.1 >q-value<= 0.2",
+								"0.2 >q-value<= 0.5",
+								"q-value >0.5"
 						)							
-						plot(chr.contr.data$start,chr.contr.data$contrRPMs,pch=19,
+						plot(chr.contr.data$start,chr.contr.data$RPMs,pch=19,
 								col=chr.contr.data$col,
-								xlab="Chromosomal position (Mb)",
+								xlab="Chromosomal position (bp)",
 								ylab="Reads/Million",
-								main = paste(chromosomeName,":",controlLabeled)
+								main = paste(chromosomeName,":","control")
 						)
 						
-						legend("topright",legend = t.names, fill=contrpalette, cex=0.55,title="p-value",bty="n")
+						legend("topright",legend = t.names, fill=contrpalette, cex=0.55,title="q-value",bty="n")
 					}
 						
 				}else{
@@ -888,154 +994,422 @@ setMethod("plotInteractionsPerChromosome",
 				}
 				
 			}
+}
+
+setGeneric(
+		name="plotDomainogramNearViewpoint",
+		def=function(object,distance=5e5,maximum_window=25e3, view=c("experiment","control","both")){
+			standardGeneric("plotDomainogramNearViewpoint")
 		}
 )
 
+setMethod("plotDomainogramNearViewpoint",
+		signature(object = "r3Cseq"),
+	
+	function (object,distance,maximum_window,view){
+		
+	if(!is(object,"r3Cseq")){
+				stop("Need to initialize the r3Cseq object")
+			
+	}
+	
+	if(distance < 200000 | distance > 500000){
+		stop("Please select distance between 200Kb - 500Kb")
+	}
+	if(maximum_window > 50e3){
+		stop("The maximum allow for windowing is 50Kb.")
+	}
+	########Get input################################
+	selected_view <- match.arg(view)
+	if(selected_view==""){
+		selected_view<-"experiment"
+	}
+	########Get viewpoint############
+	viewpoint <-getViewpoint(object)
+	viewpoint.chr<-as.character(space(viewpoint))
+	########Get organism#############
+	orgName<-organismName(object)
+	chr.size<-0
+	if(orgName=="hg18"){
+		chr.size<-seqlengths(Hsapiens)[viewpoint.chr]
+	}else if(orgName=="hg19"){
+		chr.size<-seqlengths(Hsapiens)[viewpoint.chr]
+		
+	}else if(orgName =="mm9"){
+		chr.size<-seqlengths(Mmusculus)[viewpoint.chr]
+		
+	}
+	if(selected_view=="experiment"){
+		expInteractions   <-expInteractionRegions(object)
+		######look around the viewpoint###
+		r.start <-start(viewpoint)-distance
+		r.end 	<-end(viewpoint)+distance
+		
+		r.start <-ifelse(r.start <0,1,r.start)
+		r.end   <-ifelse(r.end <=chr.size,r.end,chr.size)
+		c.vec   <- c(rep(0,r.end-r.start))
+		####Get refGenes######
+		genes<-get3CseqRefGene(object)
+		g.chr<-subset(genes,chromosome==viewpoint.chr)
+		g.r<-subset(g.chr,start>=r.start & end <= r.end)
+	
+		par(fig=c(0,1,0.75,1))
+		par(mar=c(0,5,1,2))
+		
+		if(nrow(g.r)>0){
+			g.r<-g.r[order(g.r$start),]
+			g.r$rel.start <-g.r$start-r.start
+			g.r$rel.end <-g.r$end-r.start
+			g.r$size<-g.r$end-g.r$start+1
+			
+			plot(c(1,2*distance), c(1,60), type= "n", xlab="", ylab="",xaxt='n',yaxt='n')
+			abline(v=start(viewpoint)-r.start, col="red",lty=3,lwd=2)
+			y1.start=30
+			for(i in 1:nrow(g.r)){
+				gx<-g.r[i,]
+				gx.start<-gx$rel.start
+				gx.end <-gx$rel.end
+				gx.size<-gx$size
+				gx.strand<-gx$strand
+				
+				if(c.vec[gx$rel.start]==0){
+					y1.start = y1.start
+					c.vec[gx$rel.start:gx$rel.end]=1
+				}else{
+					y1.start = y1.start+8
+					if(y1.start >50){
+						y1.start=10
+					}
+				}
+				text(gx$rel.start,y1.start+2,gx$name,cex =0.8)
+				
+				if(gx.size >=100){
+					s.q <-ifelse(gx.size <=5000,500,5000)
+					s.q <-ifelse(s.q > gx.size, gx.size-10,s.q)
+					
+					xx<-seq(gx.start,gx.start+gx.size-s.q, by=s.q)
+					yy<-seq(gx.start+s.q,gx.start+gx.size, by=s.q)
+					
+					if(gx.strand==-1){
+						for(i in 1:length(xx)){
+							lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-1))
+							lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-4))
+						}
+					}else{
+						for(i in 1:length(xx)){
+							lines(c(xx[i],yy[i]),c(y1.start-1,y1.start-2))
+							lines(c(xx[i],yy[i]),c(y1.start-4,y1.start-3))
+						}
+					}
+					rect(gx.start,y1.start-3,gx.start+gx.size,(y1.start-2), col="red")
+				}	
+			}
+		}
+		legend("topleft",legend = "Refseq Genes",fill="red", cex=0.55,bty="n")
+		#######Draw Interaction regions##########
+		exp.data<-expInteractions[start(expInteractions) >=r.start & end(expInteractions) <= r.end & space(expInteractions)==viewpoint.chr,]
+		exp.data$p_start<-start(exp.data)-start(viewpoint)
+		
+		exppalette<-rev(brewer.pal(9,"Reds"))
+		
+		exp.data$col[exp.data$q.value <=0.00001]<-exppalette[1]
+		exp.data$col[exp.data$q.value > 0.00001 & exp.data$q.value <=0.0001]<-exppalette[2]
+		exp.data$col[exp.data$q.value > 0.0001 & exp.data$q.value <=0.001]<-exppalette[3]
+		exp.data$col[exp.data$q.value > 0.001 & exp.data$q.value <=0.01]<-exppalette[4]
+		exp.data$col[exp.data$q.value > 0.01 & exp.data$q.value <=0.05]<-exppalette[5]
+		exp.data$col[exp.data$q.value > 0.05 & exp.data$q.value <=0.1]<-exppalette[6]
+		exp.data$col[exp.data$q.value > 0.1 & exp.data$q.value <=0.2]<-exppalette[7]
+		exp.data$col[exp.data$q.value > 0.2 & exp.data$q.value <=0.5]<-exppalette[8]
+		exp.data$col[exp.data$q.value > 0.5]<-exppalette[9]
+		
+		t.names<-c("q-value<=0.00001",
+				"0.00001 >q-value<= 0.0001",
+				"0.0001 >q-value<= 0.001",
+				"0.001 >q-value<= 0.01",
+				"0.01 >q-value<= 0.05",
+				"0.05 >q-value<= 0.1",
+				"0.1 >q-value<= 0.2",
+				"0.2 >q-value<= 0.5",
+				"q-value >0.5"
+		)	
+		par(fig=c(0,1,0.35,0.75),new=T)
+		par(mar=c(4,5,0.1,2))
+		y.exp.max <-max(exp.data$nReads)
+		plot(c(-1*(distance),distance),c(1,y.exp.max), type= "n", ylab="Reads",xaxt="n",xlab="")
+		points(exp.data$p_start,exp.data$nReads,col=exp.data$col,pch=19)	
+		lines(exp.data$p_start,exp.data$nReads,col='black',lty=1)
+		abline(v=0,lty=3,col="red",lwd=2)
+		
+		legend("topleft",legend = t.names, fill=exppalette, cex=0.55,title="q-value",bty="n")
+		
+		###########Draw Domainogram################
+		expRawReads<-expRawData(object)
+		expInteractionMatrix<-makeInteractionMatrixNearCisPerWindow(object,expRawReads,max.window=maximum_window,viewpoint,distanceFromViewpoint=distance)
+		col.n<-ncol(expInteractionMatrix)
+		spec = colorRampPalette(c(rev(brewer.pal(5,"Reds")),"gray"))
+		shades = spec(300)
+		
+		par(fig=c(0,1,0,0.45),new=T)
+		par(mar=c(4,5,0.1,2))
+		
+		s.names<-c("very high interaction",
+				"high interaction",
+				"moderate interaction",
+				"moderate-low interaction",
+				"low interaction",
+				"no interaction"
+		)	
+		image(as.matrix(log2(1e-10+expInteractionMatrix[,2:col.n])),xaxt="n",yaxt="n",ylab="Window (Kb)",col=shades,xlab="Distance (bp) relative to the viewpoint")
+		abline(v=0.5,lty=3,col="red",lwd=2)
+		legend("topleft",legend = s.names, fill=c(rev(brewer.pal(5,"Reds")),"gray"), cex=0.55,title="",bty="n")
+		axis(1, at=c(seq(0,1,by=0.1)),lab=c(seq(-distance,distance,distance/5)),cex.axis=0.8,las=2)
+		axis(2, at=c(0, 1),lab=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)
+	}
+	if(selected_view=="control"){
+		contrInteractions <-contrInteractionRegions(object)	
+		######look around the viewpoint###
+		r.start <-start(viewpoint)-distance
+		r.end 	<-end(viewpoint)+distance
+		
+		r.start <-ifelse(r.start <0,1,r.start)
+		r.end   <-ifelse(r.end <=chr.size,r.end,chr.size)
+		c.vec   <- c(rep(0,r.end-r.start))
+		####Get refGenes######
+		genes<-get3CseqRefGene(object)
+		g.chr<-subset(genes,chromosome==viewpoint.chr)
+		g.r<-subset(g.chr,start>=r.start & end <= r.end)
+		
+		par(fig=c(0,1,0.75,1))
+		par(mar=c(0,5,1,2))
+		
+		if(nrow(g.r)>0){
+			g.r<-g.r[order(g.r$start),]
+			g.r$rel.start <-g.r$start-r.start
+			g.r$rel.end <-g.r$end-r.start
+			g.r$size<-g.r$end-g.r$start+1
+			
+			plot(c(1,2*distance), c(1,60), type= "n", xlab="", ylab="",xaxt='n',yaxt='n')
+			abline(v=start(viewpoint)-r.start, col="red",lty=3,lwd=2)
+			y1.start=30
+			for(i in 1:nrow(g.r)){
+				gx<-g.r[i,]
+				gx.start<-gx$rel.start
+				gx.end <-gx$rel.end
+				gx.size<-gx$size
+				gx.strand<-gx$strand
+				
+				if(c.vec[gx$rel.start]==0){
+					y1.start = y1.start
+					c.vec[gx$rel.start:gx$rel.end]=1
+				}else{
+					y1.start = y1.start+8
+					if(y1.start >50){
+						y1.start=10
+					}
+				}
+				text(gx$rel.start,y1.start+2,gx$name,cex =0.8)
+				
+				if(gx.size >=100){
+					s.q <-ifelse(gx.size <=5000,500,5000)
+					s.q <-ifelse(s.q > gx.size, gx.size-10,s.q)
+					
+					xx<-seq(gx.start,gx.start+gx.size-s.q, by=s.q)
+					yy<-seq(gx.start+s.q,gx.start+gx.size, by=s.q)
+					
+					if(gx.strand==-1){
+						for(i in 1:length(xx)){
+							lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-1))
+							lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-4))
+						}
+					}else{
+						for(i in 1:length(xx)){
+							lines(c(xx[i],yy[i]),c(y1.start-1,y1.start-2))
+							lines(c(xx[i],yy[i]),c(y1.start-4,y1.start-3))
+						}
+					}
+					rect(gx.start,y1.start-3,gx.start+gx.size,(y1.start-2), col="red")
+				}	
+			}
+		}
+		legend("topleft",legend = "Refseq Genes",fill="red", cex=0.55,bty="n")
+		#######Draw Interaction regions##########
+		exp.data<-expInteractions[start(expInteractions) >=r.start & end(expInteractions) <= r.end & space(expInteractions)==viewpoint.chr,]
+		exp.data$p_start<-start(exp.data)-start(viewpoint)
+		
+		exppalette<-rev(brewer.pal(9,"Blues"))
+		
+		exp.data$col[exp.data$q.value <=0.00001]<-exppalette[1]
+		exp.data$col[exp.data$q.value > 0.00001 & exp.data$q.value <=0.0001]<-exppalette[2]
+		exp.data$col[exp.data$q.value > 0.0001 & exp.data$q.value <=0.001]<-exppalette[3]
+		exp.data$col[exp.data$q.value > 0.001 & exp.data$q.value <=0.01]<-exppalette[4]
+		exp.data$col[exp.data$q.value > 0.01 & exp.data$q.value <=0.05]<-exppalette[5]
+		exp.data$col[exp.data$q.value > 0.05 & exp.data$q.value <=0.1]<-exppalette[6]
+		exp.data$col[exp.data$q.value > 0.1 & exp.data$q.value <=0.2]<-exppalette[7]
+		exp.data$col[exp.data$q.value > 0.2 & exp.data$q.value <=0.5]<-exppalette[8]
+		exp.data$col[exp.data$q.value > 0.5]<-exppalette[9]
+		
+		t.names<-c("q-value<=0.00001",
+				"0.00001 >q-value<= 0.0001",
+				"0.0001 >q-value<= 0.001",
+				"0.001 >q-value<= 0.01",
+				"0.01 >q-value<= 0.05",
+				"0.05 >q-value<= 0.1",
+				"0.1 >q-value<= 0.2",
+				"0.2 >q-value<= 0.5",
+				"q-value >0.5"
+		)	
+		par(fig=c(0,1,0.35,0.75),new=T)
+		par(mar=c(4,5,0.1,2))
+		y.exp.max <-max(exp.data$nReads)
+		plot(c(-1*(distance),distance),c(1,y.exp.max), type= "n", ylab="Reads",xaxt="n",xlab="")
+		points(exp.data$p_start,exp.data$nReads,col=exp.data$col,pch=19)	
+		lines(exp.data$p_start,exp.data$nReads,col='black',lty=1)
+		abline(v=0,lty=3,col="red",lwd=2)
+		
+		legend("topleft",legend = t.names, fill=exppalette, cex=0.55,title="q-value",bty="n")
+		
+		###########Draw Domainogram################
+		contrRawReads<-contrRawData(object)
+		contrInteractionMatrix<-makeInteractionMatrixNearCisPerWindow(object,contrRawReads,max.window=maximum_window,viewpoint,distanceFromViewpoint=distance)
+		col.n<-ncol(contrInteractionMatrix)
+		
+		spec = colorRampPalette(c(rev(brewer.pal(5,"Blues")),"gray"))
+		shades = spec(300)
+		
+		par(fig=c(0,1,0,0.45),new=T)
+		par(mar=c(4,5,0.1,2))
+		
+		s.names<-c("very high interaction",
+				"high interaction",
+				"moderate interaction",
+				"moderate-low interaction",
+				"low interaction",
+				"no interaction"
+		)	
+		image(as.matrix(log2(1e-10+contrInteractionMatrix[,2:col.n])),xaxt="n",yaxt="n",ylab="Window (Kb)",col=shades,xlab="Distance (bp) relative to the viewpoint")
+		abline(v=0.5,lty=3,col="red",lwd=2)
+		legend("topleft",legend = s.names, fill=c(rev(brewer.pal(5,"Blues")),"gray"), cex=0.55,title="",bty="n")
+		axis(1, at=c(seq(0,1,by=0.1)),lab=c(seq(-distance,distance,distance/5)),cex.axis=0.8,las=2)
+		axis(2, at=c(0, 1),lab=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)
+	}
+	if(selected_view=="both"){
+		######look around the viewpoint###
+		r.start <-start(viewpoint)-distance
+		r.end 	<-end(viewpoint)+distance
+		
+		r.start <-ifelse(r.start <0,1,r.start)
+		r.end   <-ifelse(r.end <=chr.size,r.end,chr.size)
+		c.vec   <- c(rep(0,r.end-r.start))
+		####Get refGenes######
+		genes<-get3CseqRefGene(object)
+		g.chr<-subset(genes,chromosome==viewpoint.chr)
+		g.r<-subset(g.chr,start>=r.start & end <= r.end)
+		
+		par(fig=c(0,1,0.78,1))
+		par(mar=c(0,5,1,2))
+		
+		if(nrow(g.r)>0){
+			g.r<-g.r[order(g.r$start),]
+			g.r$rel.start <-g.r$start-r.start
+			g.r$rel.end <-g.r$end-r.start
+			g.r$size<-g.r$end-g.r$start+1
+			
+			plot(c(1,2*distance), c(1,60), type= "n", xlab="", ylab="",xaxt='n',yaxt='n')
+			abline(v=start(viewpoint)-r.start, col="red",lty=3,lwd=2)
+			y1.start=30
+			for(i in 1:nrow(g.r)){
+				gx<-g.r[i,]
+				gx.start<-gx$rel.start
+				gx.end <-gx$rel.end
+				gx.size<-gx$size
+				gx.strand<-gx$strand
+				
+				if(c.vec[gx$rel.start]==0){
+					y1.start = y1.start
+					c.vec[gx$rel.start:gx$rel.end]=1
+				}else{
+					y1.start = y1.start+8
+					if(y1.start >50){
+						y1.start=10
+					}
+				}
+				text(gx$rel.start,y1.start+2,gx$name,cex =0.8)
+				
+				if(gx.size >=100){
+					s.q <-ifelse(gx.size <=5000,500,5000)
+					s.q <-ifelse(s.q > gx.size, gx.size-10,s.q)
+					
+					xx<-seq(gx.start,gx.start+gx.size-s.q, by=s.q)
+					yy<-seq(gx.start+s.q,gx.start+gx.size, by=s.q)
+					
+					if(gx.strand==-1){
+						for(i in 1:length(xx)){
+							lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-1))
+							lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-4))
+						}
+					}else{
+						for(i in 1:length(xx)){
+							lines(c(xx[i],yy[i]),c(y1.start-1,y1.start-2))
+							lines(c(xx[i],yy[i]),c(y1.start-4,y1.start-3))
+						}
+					}
+					rect(gx.start,y1.start-3,gx.start+gx.size,(y1.start-2), col="red")
+				}	
+			}
+		}
+		legend("topleft",legend = "Refseq Genes",fill="red", cex=0.55,bty="n")
+		###########Draw Domainogram in the experiment################
+		expRawReads<-expRawData(object)
+		expInteractionMatrix<-makeInteractionMatrixNearCisPerWindow(object,expRawReads,max.window=maximum_window,viewpoint,distanceFromViewpoint=distance)
+		col.n<-ncol(expInteractionMatrix)
+		spec = colorRampPalette(c(rev(brewer.pal(5,"Reds")),"gray"))
+		shades = spec(300)
+		
+		par(fig=c(0,1,0.45,0.78),new=T)
+		par(mar=c(0,5,0.1,2))
+		
+		s.names<-c("very high interaction",
+				"high interaction",
+				"moderate interaction",
+				"moderate-low interaction",
+				"low interaction",
+				"no interaction"
+		)	
+		image(as.matrix(log2(1e-10+expInteractionMatrix[,2:col.n])),xaxt="n",yaxt="n",ylab="Window (Kb)",col=shades,xlab="")
+		abline(v=0.5,lty=3,col="red",lwd=2)
+		legend("topleft",legend = s.names, fill=c(rev(brewer.pal(5,"Reds")),"gray"), cex=0.55,title="experiment",bty="n")
+		axis(2, at=c(0, 1),lab=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)
+		
+		
+		###########Draw Domainogram in the control################
+		contrRawReads<-contrRawData(object)
+		contrInteractionMatrix<-makeInteractionMatrixNearCisPerWindow(object,contrRawReads,max.window=maximum_window,viewpoint,distanceFromViewpoint=distance)
+		col.n<-ncol(contrInteractionMatrix)
+		
+		spec = colorRampPalette(c(rev(brewer.pal(5,"Blues")),"gray"))
+		shades = spec(300)
+		
+		par(fig=c(0,1,0,0.44),new=T)
+		par(mar=c(4,5,0.1,2))
+		
+		image(as.matrix(log2(1e-10+contrInteractionMatrix[,2:col.n])),xaxt="n",yaxt="n",ylab="Window (Kb)",col=shades,xlab="Distance (bp) relative to the viewpoint")
+		abline(v=0.5,lty=3,col="red",lwd=2)
+		legend("topleft",legend = s.names, fill=c(rev(brewer.pal(5,"Blues")),"gray"), cex=0.55,title="control",bty="n")
+		axis(1, at=c(seq(0,1,by=0.1)),lab=c(seq(-distance,distance,distance/5)),cex.axis=0.8,las=2)
+		axis(2, at=c(0, 1),lab=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)	
+	}	
+  }
+)
 setGeneric(
 		name="plot3Cecdf",
 		def=function(object){
 			standardGeneric("plot3Cecdf")
 		}
 )
-
 setMethod("plot3Cecdf",
 		signature(object = "r3Cseq"),
-		
 		function(object){
+			stop( "The function 'plot3Cecdf' has been removed." )
 			
-			if(!is(object,"r3Cseq")){
-				stop("Need the r3Cseq object")
-			}			
-			if(isControlInvolved(object)==FALSE){
-				expInteractions   <-expInteractionRegions(object)
-				
-				if(nrow(expInteractions) >0){
-					expLabeled<-expLabel(object)
-					viewpoint <-getViewpoint(object)
-				
-					index<-which(start(expInteractions)==start(viewpoint))
-					expInteractions<-expInteractions[-(index),]
-					data<-data.frame(expRPMs=expInteractions$expRPMs,p_value=expInteractions$p_value)
-					data  <-data[!is.finite(-log10(data$p_value))==FALSE,]
-					
-					exppalette<-rev(brewer.pal(9,"Reds"))
-					
-					data$col[data$p_value <=0.00001]<-exppalette[1]
-					data$col[data$p_value > 0.00001 & data$p_value <=0.0001]<-exppalette[2]
-					data$col[data$p_value > 0.0001 & data$p_value <=0.001]<-exppalette[3]
-					data$col[data$p_value > 0.001 & data$p_value <=0.01]<-exppalette[4]
-					data$col[data$p_value > 0.01 & data$p_value <=0.05]<-exppalette[5]
-					data$col[data$p_value > 0.05 & data$p_value <=0.1]<-exppalette[6]
-					data$col[data$p_value > 0.1 & data$p_value <=0.2]<-exppalette[7]
-					data$col[data$p_value > 0.2 & data$p_value <=0.5]<-exppalette[8]
-					data$col[data$p_value > 0.5]<-exppalette[9]
-					
-					t.names<-c("p-value<=0.00001",
-							"0.00001 >p-value<= 0.0001",
-							"0.0001 >p-value<= 0.001",
-							"0.001 >p-value<= 0.01",
-							"0.01 >p-value<= 0.05",
-							"0.05 >p-value<= 0.1",
-							"0.1 >p-value<= 0.2",
-							"0.2 >p-value<= 0.5",
-							"p-value >0.5"
-					)							
-					plot(data$expRPMs,1-data$p_value,pch=20,
-							col=data$col,
-							main = expLabeled,
-							ylab = "fraction of reads/million",
-							xlab = "reads/million"
-					)
-					
-					legend("bottomright",legend = t.names, fill=exppalette, cex=0.55,title="p-value",bty="n")
-					
-				}
-			}
-			if(isControlInvolved(object)==TRUE){
-				
-				expInteractions   <-expInteractionRegions(object)
-				contrInteractions <-contrInteractionRegions(object)
-				
-				if(nrow(expInteractions) >0){
-					expLabeled<-expLabel(object)
-					controlLabeled<-contrLabel(object)
-					viewpoint <-getViewpoint(object)
-				
-					exp.index<-which(start(expInteractions)==start(viewpoint))
-					contr.index<-which(start(contrInteractions)==start(viewpoint))
-					expInteractions<-expInteractions[-(exp.index),]
-					contrInteractions<-contrInteractions[-(contr.index),]
-					exp.data<-data.frame(expRPMs=expInteractions$expRPMs,p_value=expInteractions$p_value)
-					contr.data<-data.frame(contrRPMs=contrInteractions$contrRPMs,p_value=contrInteractions$p_value)
-					
-					exp.data  <-exp.data[!is.finite(-log10(exp.data$p_value))==FALSE,]
-					contr.data <-contr.data[!is.finite(-log10(contr.data$p_value))==FALSE,]
-				
-					par(mfrow=c(1,2))
-					
-					exppalette<-rev(brewer.pal(9,"Reds"))
-					
-					exp.data$col[exp.data$p_value <=0.00001]<-exppalette[1]
-					exp.data$col[exp.data$p_value > 0.00001 & exp.data$p_value <=0.0001]<-exppalette[2]
-					exp.data$col[exp.data$p_value > 0.0001 & exp.data$p_value <=0.001]<-exppalette[3]
-					exp.data$col[exp.data$p_value > 0.001 & exp.data$p_value <=0.01]<-exppalette[4]
-					exp.data$col[exp.data$p_value > 0.01 & exp.data$p_value <=0.05]<-exppalette[5]
-					exp.data$col[exp.data$p_value > 0.05 & exp.data$p_value <=0.1]<-exppalette[6]
-					exp.data$col[exp.data$p_value > 0.1 & exp.data$p_value <=0.2]<-exppalette[7]
-					exp.data$col[exp.data$p_value > 0.2 & exp.data$p_value <=0.5]<-exppalette[8]
-					exp.data$col[exp.data$p_value > 0.5]<-exppalette[9]
-					
-					t.names<-c("p-value<=0.00001",
-							"0.00001 >p-value<= 0.0001",
-							"0.0001 >p-value<= 0.001",
-							"0.001 >p-value<= 0.01",
-							"0.01 >p-value<= 0.05",
-							"0.05 >p-value<= 0.1",
-							"0.1 >p-value<= 0.2",
-							"0.2 >p-value<= 0.5",
-							"p-value >0.5"
-					)							
-					plot(exp.data$expRPMs,1-exp.data$p_value,pch=20,
-							col=exp.data$col,
-							main = expLabeled,
-							ylab = "fraction of reads/million",
-							xlab = "reads/million"
-					)
-					
-					legend("bottomright",legend = t.names, fill=exppalette, cex=0.55,title="p-value",bty="n")
-					
-					#####plot control###
-					contrpalette<-rev(brewer.pal(9,"Blues"))
-					
-					contr.data$col[contr.data$p_value <=0.00001]<-contrpalette[1]
-					contr.data$col[contr.data$p_value > 0.00001 & contr.data$p_value <=0.0001]<-contrpalette[2]
-					contr.data$col[contr.data$p_value > 0.0001 & contr.data$p_value <=0.001]<-contrpalette[3]
-					contr.data$col[contr.data$p_value > 0.001 & contr.data$p_value <=0.01]<-contrpalette[4]
-					contr.data$col[contr.data$p_value > 0.01 & contr.data$p_value <=0.05]<-contrpalette[5]
-					contr.data$col[contr.data$p_value > 0.05 & contr.data$p_value <=0.1]<-contrpalette[6]
-					contr.data$col[contr.data$p_value > 0.1 & contr.data$p_value <=0.2]<-contrpalette[7]
-					contr.data$col[contr.data$p_value > 0.2 & contr.data$p_value <=0.5]<-contrpalette[8]
-					contr.data$col[contr.data$p_value > 0.5]<-contrpalette[9]
-					
-					t.names<-c("p-value<=0.00001",
-							"0.00001 >p-value<= 0.0001",
-							"0.0001 >p-value<= 0.001",
-							"0.001 >p-value<= 0.01",
-							"0.01 >p-value<= 0.05",
-							"0.05 >p-value<= 0.1",
-							"0.1 >p-value<= 0.2",
-							"0.2 >p-value<= 0.5",
-							"p-value >0.5"
-					)							
-					plot(contr.data$contrRPMs,1-contr.data$p_value,pch=20,
-							col= contr.data$col,
-							main = controlLabeled,
-							ylab = "fraction of reads/million",
-							xlab = "reads/million"
-					)
-					
-					legend("bottomright",legend = t.names, fill=contrpalette, cex=0.55,title="p-value",bty="n")
-				}
-			}
 		}
 )

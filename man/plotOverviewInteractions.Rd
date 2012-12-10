@@ -1,35 +1,32 @@
 \name{plotOverviewInteractions}
 \alias{plotOverviewInteractions}
 \alias{plotOverviewInteractions,r3Cseq-method}
-\title{Plot the overview of interaction regions for the genome-wide}
+
+
+\title{Plot overview of identified interaction regions for genome-wide}
 
 \description{
-  Plot the distribution of interaction regions across genome with the level of interaction signal
+  Plot the distribution of identified interaction regions across genome
 }
 
 \usage{
-plotOverviewInteractions(object, cutoff.p_value=0.05,cutoff.fold_change=2)
+plotOverviewInteractions(obj, cutoff.qvalue=0.05)
 }
 
 
 \arguments{
 
-	\item{object}{
-		r3Cseq object. The object is the container of interaction regions produced by \code{\link{getInteractions}} function.
+	\item{obj}{
+		obj is r3Cseq or r3CseqInBatch object
 	}
 
-	\item{cutoff.p_value}{
-		Numeric. The cutoff p-value from empirical distribution function (default=0.05)
-	}
-
-	\item{cutoff.fold_change}{
-		Numeric. The cutoff fold change compare between experiment and control (default=2)
+	\item{cutoff.qvalue}{
+		Numeric. The cutoff q-value (default=0.05)
 	}
 }
 
-
 \value{
-	Plots interaction regions genome-wide on the active graphical device.
+	Plots of identified 3C-Seq interaction regions genome-wide
 }
 
 \author{
@@ -38,21 +35,11 @@ plotOverviewInteractions(object, cutoff.p_value=0.05,cutoff.fold_change=2)
 
 \seealso{
 	\code{\link{plotInteractionsNearViewpoint}}, \code{\link{plotInteractionsPerChromosome}}, 
-	\code{\link{plot3Cecdf}}
+	\code{\link{plotDomainogramNearViewpoint}}
 }
 
 
 \examples{
- 	
-####Create the r3Cseq object#############
-	library(BSgenome.Mmusculus.UCSC.mm9)
-    load(system.file("data","example.data.rda",package="r3Cseq"))
-	calculateRPM(my.data)
-	getInteractions(my.data)
-
-####Plot
-	
-	plotOverviewInteractions(my.data)
-	
+ # See the vignette
 }
 %\keyword{plot interaction regions}

@@ -2,19 +2,17 @@
 ####################################
 #########  AllGenerics.R
 #########
-#########  all generics in r3Cseq
-####################################
+############Common methods##########
 setGeneric(
 		name="organismName",
 		def=function(object){
 			standardGeneric("organismName")
 		})
 setMethod("organismName",
-		signature(object = "r3Cseq"),
+		signature(object = "r3CseqCommon"),
 		function (object){
 			object@organismName
-		}
-)
+		})
 ########
 setGeneric(
 		name="restrictionEnzyme",
@@ -22,37 +20,210 @@ setGeneric(
 			standardGeneric("restrictionEnzyme")
 		})
 setMethod("restrictionEnzyme",
-		signature(object = "r3Cseq"),
+		signature(object = "r3CseqCommon"),
 		function (object){
 			object@restrictionEnzyme
 		}
 )
-#######
+########
 setGeneric(
-		name="alignedReadsExpFile",
+		name="viewpoint_chromosome",
 		def=function(object){
-			standardGeneric("alignedReadsExpFile")
+			standardGeneric("viewpoint_chromosome")
 		})
-setMethod("alignedReadsExpFile",
-		signature(object = "r3Cseq"),
+setMethod("viewpoint_chromosome",
+		signature(object = "r3CseqCommon"),
 		function (object){
-			object@alignedReadsExpFile
+			object@viewpoint_chromosome
 		}
 )
-#######
+########
 setGeneric(
-		name="alignedReadsContrFile",
+		name="viewpoint_primer_forward",
 		def=function(object){
-			standardGeneric("alignedReadsContrFile")
+			standardGeneric("viewpoint_primer_forward")
 		})
-
-setMethod("alignedReadsContrFile",
-		signature(object = "r3Cseq"),
+setMethod("viewpoint_primer_forward",
+		signature(object = "r3CseqCommon"),
 		function (object){
-			object@alignedReadsContrFile
+			object@viewpoint_primer_forward
 		}
 )
-#######
+########
+setGeneric(
+		name="viewpoint_primer_reverse",
+		def=function(object){
+			standardGeneric("viewpoint_primer_reverse")
+		})
+setMethod("viewpoint_primer_reverse",
+		signature(object = "r3CseqCommon"),
+		function (object){
+			object@viewpoint_primer_reverse
+		}
+)
+#########
+setGeneric(
+		name="expReadCount",
+		def=function(object){
+			standardGeneric("expReadCount")
+		}
+)
+setGeneric(
+		name="expReadCount<-",
+		def=function(object,value){
+			standardGeneric("expReadCount<-")
+		}
+)
+setMethod("expReadCount",
+		signature(object = "r3CseqCommon"),
+		function (object){
+			object@expReadCount
+		}
+)
+setReplaceMethod(
+		f="expReadCount",
+		signature="r3CseqCommon",
+		definition=function(object,value){
+			initialize(object,expReadCount=value)
+		})
+#########
+setGeneric(
+		name="contrReadCount",
+		def=function(object){
+			standardGeneric("contrReadCount")
+		}
+)
+setGeneric(
+		name="contrReadCount<-",
+		def=function(object,value){
+			standardGeneric("contrReadCount<-")
+		}
+)
+setMethod("contrReadCount",
+		signature(object = "r3CseqCommon"),
+		function (object){
+			object@contrReadCount
+		}
+)
+setReplaceMethod(
+		f="contrReadCount",
+		signature="r3CseqCommon",
+		definition=function(object,value){
+			initialize(object,contrReadCount=value)
+		})
+###########
+setGeneric(
+		name="expRPM",
+		def=function(object){
+			standardGeneric("expRPM")
+		}
+)
+setGeneric(
+		name="expRPM<-",
+		def=function(object,value){
+			standardGeneric("expRPM<-")
+		}
+)
+setMethod("expRPM",
+		signature(object = "r3CseqCommon"),
+		function (object){
+			object@expRPM
+		}
+)
+setReplaceMethod(
+		f="expRPM",
+		signature="r3CseqCommon",
+		definition=function(object,value){
+			initialize(object,expRPM=value)
+		})
+###########
+setGeneric(
+		name="contrRPM",
+		def=function(object){
+			standardGeneric("contrRPM")
+		}
+)
+setGeneric(
+		name="contrRPM<-",
+		def=function(object,value){
+			standardGeneric("contrRPM<-")
+		}
+)
+setMethod("contrRPM",
+		signature(object = "r3CseqCommon"),
+		function (object){
+			object@contrRPM
+		}
+)
+setReplaceMethod(
+		f="contrRPM",
+		signature="r3CseqCommon",
+		definition=function(object,value){
+			initialize(object,contrRPM=value)
+		})
+############
+setGeneric(
+		name="expInteractionRegions",
+		def=function(object){
+			standardGeneric("expInteractionRegions")
+		}
+)
+setGeneric(
+		name="expInteractionRegions<-",
+		def=function(object,value){
+			standardGeneric("expInteractionRegions<-")
+		}
+)
+setMethod("expInteractionRegions",
+		signature(object = "r3CseqCommon"),
+		function (object){
+			object@expInteractionRegions
+		}
+)
+setReplaceMethod(
+		f="expInteractionRegions",
+		signature="r3CseqCommon",
+		definition=function(object,value){
+			initialize(object,expInteractionRegions=value)
+		})
+########
+setGeneric(
+		name="contrInteractionRegions",
+		def=function(object){
+			standardGeneric("contrInteractionRegions")
+		}
+)
+setGeneric(
+		name="contrInteractionRegions<-",
+		def=function(object,value){
+			standardGeneric("contrInteractionRegions<-")
+		}
+)
+setMethod("contrInteractionRegions",
+		signature(object = "r3CseqCommon"),
+		function (object){
+			object@contrInteractionRegions
+		}
+)
+setReplaceMethod(
+		f="contrInteractionRegions",
+		signature="r3CseqCommon",
+		definition=function(object,value){
+			initialize(object,contrInteractionRegions=value)
+		})
+##########
+setGeneric(
+		name="isControlInvolved",
+		def=function(object){
+			standardGeneric("isControlInvolved")
+		})
+setMethod("isControlInvolved",
+		signature(object = "r3CseqCommon"),
+		function (object){
+			object@isControlInvolved
+		}
+)
+############Method for r3seq class###########
 setGeneric(
 		name="alignedReadsBamExpFile",
 		def=function(object){
@@ -77,18 +248,6 @@ setMethod("alignedReadsBamContrFile",
 		}
 )
 
-########
-setGeneric(
-		name="alignedReadsType",
-		def=function(object){
-			standardGeneric("alignedReadsType")
-		})
-setMethod("alignedReadsType",
-		signature(object = "r3Cseq"),
-		function (object){
-			object@alignedReadsType
-		}
-)
 ########
 setGeneric(
 		name="expLabel",
@@ -162,30 +321,7 @@ setReplaceMethod(
 		definition=function(object,value){
 			initialize(object,contrLibrarySize=value)
 		})
-##########
-setGeneric(
-		name="isControlInvolved",
-		def=function(object){
-			standardGeneric("isControlInvolved")
-		})
-setMethod("isControlInvolved",
-		signature(object = "r3Cseq"),
-		function (object){
-			object@isControlInvolved
-		}
-)
-##########
-setGeneric(
-		name="isBamInputFile",
-		def=function(object){
-			standardGeneric("isBamInputFile")
-		})
-setMethod("isBamInputFile",
-		signature(object = "r3Cseq"),
-		function (object){
-			object@isBamInputFile
-		}
-)
+
 ##########
 setGeneric(
 		name="expReadLength",
@@ -238,156 +374,218 @@ setReplaceMethod(
 		})
 ##########
 setGeneric(
-		name="expReadCount",
+		name="expRawData",
 		def=function(object){
-			standardGeneric("expReadCount")
+			standardGeneric("expRawData")
 		}
 )
 setGeneric(
-		name="expReadCount<-",
+		name="expRawData<-",
 		def=function(object,value){
-			standardGeneric("expReadCount<-")
+			standardGeneric("expRawData<-")
 		}
 )
-setMethod("expReadCount",
+setMethod("expRawData",
 		signature(object = "r3Cseq"),
 		function (object){
-			object@expReadCount
+			object@expRawData
 		}
 )
 setReplaceMethod(
-		f="expReadCount",
+		f="expRawData",
 		signature="r3Cseq",
 		definition=function(object,value){
-			initialize(object,expReadCount=value)
+			initialize(object,expRawData=value)
 		})
-#########
+##########
 setGeneric(
-		name="contrReadCount",
+		name="contrRawData",
 		def=function(object){
-			standardGeneric("contrReadCount")
+			standardGeneric("contrRawData")
 		}
 )
 setGeneric(
-		name="contrReadCount<-",
+		name="contrRawData<-",
 		def=function(object,value){
-			standardGeneric("contrReadCount<-")
+			standardGeneric("contrRawData<-")
 		}
 )
-setMethod("contrReadCount",
+setMethod("contrRawData",
 		signature(object = "r3Cseq"),
 		function (object){
-			object@contrReadCount
+			object@contrRawData
 		}
 )
 setReplaceMethod(
-		f="contrReadCount",
+		f="contrRawData",
 		signature="r3Cseq",
 		definition=function(object,value){
-			initialize(object,contrReadCount=value)
-		})
-
-###########
-setGeneric(
-		name="expRPM",
-		def=function(object){
-			standardGeneric("expRPM")
-		}
-)
-setGeneric(
-		name="expRPM<-",
-		def=function(object,value){
-			standardGeneric("expRPM<-")
-		}
-)
-setMethod("expRPM",
-		signature(object = "r3Cseq"),
-		function (object){
-			object@expRPM
-		}
-)
-setReplaceMethod(
-		f="expRPM",
-		signature="r3Cseq",
-		definition=function(object,value){
-			initialize(object,expRPM=value)
-		})
-###########
-setGeneric(
-		name="contrRPM",
-		def=function(object){
-			standardGeneric("contrRPM")
-		}
-)
-setGeneric(
-		name="contrRPM<-",
-		def=function(object,value){
-			standardGeneric("contrRPM<-")
-		}
-)
-setMethod("contrRPM",
-		signature(object = "r3Cseq"),
-		function (object){
-			object@contrRPM
-		}
-)
-setReplaceMethod(
-		f="contrRPM",
-		signature="r3Cseq",
-		definition=function(object,value){
-			initialize(object,contrRPM=value)
-		})
-############
-setGeneric(
-		name="expInteractionRegions",
-		def=function(object){
-			standardGeneric("expInteractionRegions")
-		}
-)
-setGeneric(
-		name="expInteractionRegions<-",
-		def=function(object,value){
-			standardGeneric("expInteractionRegions<-")
-		}
-)
-setMethod("expInteractionRegions",
-		signature(object = "r3Cseq"),
-		function (object){
-			object@expInteractionRegions
-		}
-)
-setReplaceMethod(
-		f="expInteractionRegions",
-		signature="r3Cseq",
-		definition=function(object,value){
-			initialize(object,expInteractionRegions=value)
+			initialize(object,contrRawData=value)
 		})
 
+#######Method for r3CseqInBatch#########
+setGeneric(
+		name="bamFilesDirectory",
+		def=function(object){
+			standardGeneric("bamFilesDirectory")
+		})
+setMethod("bamFilesDirectory",
+		signature(object = "r3CseqInBatch"),
+		function (object){
+			object@bamFilesDirectory
+		}
+)
 ########
 setGeneric(
-		name="contrInteractionRegions",
+		name="BamExpFiles",
 		def=function(object){
-			standardGeneric("contrInteractionRegions")
+			standardGeneric("BamExpFiles")
+		})
+setMethod("BamExpFiles",
+		signature(object = "r3CseqInBatch"),
+		function (object){
+			object@BamExpFiles
+		}
+)
+########
+setGeneric(
+		name="BamContrFiles",
+		def=function(object){
+			standardGeneric("BamContrFiles")
+		})
+setMethod("BamContrFiles",
+		signature(object = "r3CseqInBatch"),
+		function (object){
+			object@BamContrFiles
+		}
+)
+########
+setGeneric(
+		name="expBatchLabel",
+		def=function(object){
+			standardGeneric("expBatchLabel")
+		})
+setMethod("expBatchLabel",
+		signature(object = "r3CseqInBatch"),
+		function (object){
+			object@expBatchLabel
+		}
+)
+########
+setGeneric(
+		name="contrBatchLabel",
+		def=function(object){
+			standardGeneric("contrBatchLabel")
+		})
+setMethod("contrBatchLabel",
+		signature(object = "r3CseqInBatch"),
+		function (object){
+			object@contrBatchLabel
+		}
+)
+###########
+setGeneric(
+		name="readCountTable",
+		def=function(object){
+			standardGeneric("readCountTable")
 		}
 )
 setGeneric(
-		name="contrInteractionRegions<-",
+		name="readCountTable<-",
 		def=function(object,value){
-			standardGeneric("contrInteractionRegions<-")
-		}
-)
-setMethod("contrInteractionRegions",
-		signature(object = "r3Cseq"),
+			standardGeneric("readCountTable<-")
+		})
+setMethod("readCountTable",
+		signature(object = "r3CseqInBatch"),
 		function (object){
-			object@contrInteractionRegions
+			object@readCountTable
 		}
 )
 setReplaceMethod(
-		f="contrInteractionRegions",
-		signature="r3Cseq",
+		f="readCountTable",
+		signature="r3CseqInBatch",
 		definition=function(object,value){
-			initialize(object,contrInteractionRegions=value)
+			initialize(object,readCountTable=value)
+		}
+)
+
+###########
+setGeneric(
+		name="RPMsTable",
+		def=function(object){
+			standardGeneric("RPMsTable")
+		}
+)
+setGeneric(
+		name="RPMsTable<-",
+		def=function(object,value){
+			standardGeneric("RPMsTable<-")
 		})
+setMethod("RPMsTable",
+		signature(object = "r3CseqInBatch"),
+		function (object){
+			object@RPMsTable
+		}
+)
+setReplaceMethod(
+		f="RPMsTable",
+		signature="r3CseqInBatch",
+		definition=function(object,value){
+			initialize(object,RPMsTable=value)
+		}
+)
+########
+setGeneric(
+		name="expBatchLibrarySize",
+		def=function(object){
+			standardGeneric("expBatchLibrarySize")
+		}
+)
+setGeneric(
+		name="expBatchLibrarySize<-",
+		def=function(object,value){
+			standardGeneric("expBatchLibrarySize<-")
+		}
+)
+setMethod("expBatchLibrarySize",
+		signature(object="r3CseqInBatch"),
+		function(object){
+			object@expBatchLibrarySize
+		}
+)
+setReplaceMethod(
+		f="expBatchLibrarySize",
+		signature="r3CseqInBatch",
+		definition=function(object,value){
+			initialize(object,expBatchLibrarySize=value)
+		})
+########
+setGeneric(
+		name="contrBatchLibrarySize",
+		def=function(object){
+			standardGeneric("contrBatchLibrarySize")
+		}
+)
+setGeneric(
+		name="contrBatchLibrarySize<-",
+		def=function(object,value){
+			standardGeneric("contrBatchLibrarySize<-")
+		}
+)
+setMethod("contrBatchLibrarySize",
+		signature(object="r3CseqInBatch"),
+		function(object){
+			object@contrBatchLibrarySize
+		}
+)
+setReplaceMethod(
+		f="contrBatchLibrarySize",
+		signature="r3CseqInBatch",
+		definition=function(object,value){
+			initialize(object,contrBatchLibrarySize=value)
+		})
+
+###Removed functions######
 #########
 setGeneric(
 		name="expCoverage",
@@ -404,7 +602,7 @@ setGeneric(
 setMethod("expCoverage",
 		signature(object = "r3Cseq"),
 		function (object){
-			object@expCoverage
+			stop("This function has been removed.")
 		}
 )
 setReplaceMethod(
@@ -429,7 +627,7 @@ setGeneric(
 setMethod("contrCoverage",
 		signature(object = "r3Cseq"),
 		function (object){
-			object@contrCoverage
+			stop("This function has been removed.")
 		}
 )
 setReplaceMethod(
@@ -438,5 +636,4 @@ setReplaceMethod(
 		definition=function(object,value){
 			initialize(object,contrCoverage=value)
 		})
-
 

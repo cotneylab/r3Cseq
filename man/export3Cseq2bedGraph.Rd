@@ -10,7 +10,7 @@
 }
 
 \usage{
-export3Cseq2bedGraph(object,datatype=c("rpm","raw_read"))
+export3Cseq2bedGraph(object,datatype=c("rpm","read_count"))
 }
 
 
@@ -21,8 +21,8 @@ export3Cseq2bedGraph(object,datatype=c("rpm","raw_read"))
 	}
 	
 	\item{datatype}{
-			raw_read : read count per restriction fragment
-			rpm : read per million per restriction fragment
+			read_count : read count per restriction fragment
+			rpm : normalized read per million per restriction fragment
 	}
 }
 
@@ -32,7 +32,7 @@ export3Cseq2bedGraph(object,datatype=c("rpm","raw_read"))
 
 \seealso{
 
-  \link{getInteractions}
+  \link{exportInteractions2text}
 }
 
 \author{
@@ -40,12 +40,6 @@ export3Cseq2bedGraph(object,datatype=c("rpm","raw_read"))
 }
 
 \examples{
- 	
- ####Create the r3Cseq object#############
-	library(BSgenome.Mmusculus.UCSC.mm9)
-    load(system.file("data","example.data.rda",package="r3Cseq"))
-	calculateRPM(my.data)
-	getInteractions(my.data)
-	export3Cseq2bedGraph(my.data,datatype="rpm")	
+#See the vignette	
 }
-%\keyword{}
+%\keyword{export identified interaction regions}

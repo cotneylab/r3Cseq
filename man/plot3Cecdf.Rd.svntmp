@@ -1,6 +1,6 @@
-\name{expCoverage}
-\alias{expCoverage}
-\alias{expCoverage,r3Cseq-method}
+\name{plot3Cecdf}
+\alias{plot3Cecdf}
+\alias{plot3Cecdf,r3Cseq-method}
 \title{This method has been removed.}
 
 \description{

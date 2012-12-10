@@ -1,14 +1,14 @@
-\name{getReadCountPerRestrictionFragment}
-\alias{getReadCountPerRestrictionFragment}
-\alias{getReadCountPerRestrictionFragment,r3Cseq-method}
-\title{count reads per resitrcition fragment}
+\name{getBatchReadCountPerRestrictionFragment}
+\alias{getBatchReadCountPerRestrictionFragment}
+\alias{getBatchReadCountPerRestrictionFragment,r3CseqInBatch-method}
+\title{count reads for replicates analysis}
 
 \description{
-  Counts the number of reads from 3C-Seq data per each restriction fragment
+  Counts the number of reads from 3C-Seq data per each restriction fragment for replicates analysis
 }
 
 \usage{
-getReadCountPerRestrictionFragment(object,getReadsMethod = c("wholeReads", "adjacentFragmentEndsReads"),
+getBatchReadCountPerRestrictionFragment(object,getReadsMethod = c("wholeReads", "adjacentFragmentEndsReads"),
 			nFragmentExcludedReadsNearViewpoint=2)
 }
 
@@ -16,7 +16,7 @@ getReadCountPerRestrictionFragment(object,getReadsMethod = c("wholeReads", "adja
 \arguments{
 
 	\item{object}{
-		r3Cseq object
+		r3CseqInBatch object
 	}
 	\item{getReadsMethod}{
 		character. To count all reads found in the particular restriction fragment uses wholeReads option.  
@@ -35,7 +35,7 @@ getReadCountPerRestrictionFragment(object,getReadsMethod = c("wholeReads", "adja
 
 \seealso{
   \link{getReadCountPerWindow},
-  \link{getBatchReadCountPerRestrictionFragment}
+  \link{getReadCountPerRestrictionFragment}
 }
 
 \author{

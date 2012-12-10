@@ -120,5 +120,35 @@ setMethod("getRestrictionFragments",
 			return(good.fragments)
 		  }
 )
-
-
+setGeneric(
+		name="getWholeGenomeRestrictionFragments",
+		def=function(object,enzyme.name,genome){
+			standardGeneric("getWholeGenomeRestrictionFragments")
+		})
+setMethod("getWholeGenomeRestrictionFragments",
+		signature = "repbaseEnzyme",
+		definition= function(object,enzyme.name,genome){
+			fragments<-data.frame()
+			if(genome=="hg18"){
+				for (chr in paste('chr',c(seq(1,22),'X','Y'),sep='')){
+					chr.fragments<-getRestrictionFragments(object,enzyme.name,"hg18",chr)
+					fragments<-rbind(fragments,chr.fragments)
+				}
+				return(fragments)
+			}else if(genome=="hg19"){
+				for (chr in paste('chr',c(seq(1,22),'X','Y'),sep='')){
+					chr.fragments<-getRestrictionFragments(object,enzyme.name,"hg19",chr)
+					fragments<-rbind(fragments,chr.fragments)
+				}
+				return(fragments)
+			}else if(genome =="mm9"){
+				for (chr in paste('chr',c(seq(1,19),'X','Y'),sep='')){
+					chr.fragments<-getRestrictionFragments(object,enzyme.name,"mm9",chr)
+					fragments<-rbind(fragments,chr.fragments)
+				}
+				return(fragments)
+			}else{
+				stop("Require the selected genome: hg18, hg19, or mm9.")
+			}
+		}
+)

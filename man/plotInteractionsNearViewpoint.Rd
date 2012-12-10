@@ -1,27 +1,31 @@
 \name{plotInteractionsNearViewpoint}
 \alias{plotInteractionsNearViewpoint}
 \alias{plotInteractionsNearViewpoint,r3Cseq-method}
-\title{Plot candidate interaction regions near the viewpoint}
+
+\title{Plot identified interaction regions near the viewpoint}
 
 \description{
-  Plot candidate interaction regions near the viewpoint by zooming at 10Mb, 1Mb, 500Kb, and 100Kb respectively 
+  Plot identified interaction regions near the viewpoint 
 }
 
 \usage{
-plotInteractionsNearViewpoint(object)
+plotInteractionsNearViewpoint(obj,distance=5e5)
 }
 
 
 \arguments{
 
-	\item{object}{
-		r3Cseq object. The object is the container of interaction regions produced by \code{\link{getInteractions}} function.
+	\item{obj}{
+		obj is r3Cseq or r3CseqInBatch object
+	}
+	\item{distance}{
+		Numeric. The distance relative to the viewpoint (default=5e5)
 	}
 }
 
 
 \value{
-	Plots interaction regions close to the viewpoint on the active graphical device.
+	Plots of identified interaction regions close to the viewpoint
 }
 
 \author{
@@ -30,21 +34,12 @@ plotInteractionsNearViewpoint(object)
 
 \seealso{
 	\code{\link{plotOverviewInteractions}}, \code{\link{plotInteractionsPerChromosome}}, 
-	\code{\link{plot3Cecdf}}
+	\code{\link{plotDomainogramNearViewpoint}}
 }
 
 
 \examples{
- 	
-####Create the r3Cseq object#############
-	library(BSgenome.Mmusculus.UCSC.mm9)
-    load(system.file("data","example.data.rda",package="r3Cseq"))
-	calculateRPM(my.data)
-	getInteractions(my.data)
 
-####Plot
-	
-	plotInteractionsNearViewpoint(my.data)
-	
+	# See the vignette
 }
 %\keyword{plot interaction regions}

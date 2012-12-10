@@ -1,23 +1,41 @@
 exportClasses(
-    "r3Cseq"
+    "r3Cseq","r3CseqInBatch"
 )
 export(
     "getCoverage",
     "expCoverage",
     "contrCoverage",
+    "getRawReads",
+    "expRawData",
+    "expRawData<-",
+    "contrRawData",
+    "contrRawData<-",
+    "getBatchRawReads",
     "getReadCountPerRestrictionFragment",
+    "getBatchReadCountPerRestrictionFragment",
+    "getReadCountPerWindow",
+    "getBatchReadCountPerWindow",
     "getViewpoint",
     "calculateRPM",
+    "calculateBatchRPM",
+    "expReadCount",
+    "contrReadCount",
     "expRPM",
     "contrRPM",
     "getInteractions",
+    "getBatchInteractions",
     "expInteractionRegions",
     "contrInteractionRegions",
     "plotOverviewInteractions",
     "plotInteractionsNearViewpoint",
     "plotInteractionsPerChromosome",
+    "plotDomainogramNearViewpoint",
     "plot3Cecdf",
+    "export3CseqRawReads2bedGraph",
     "export3Cseq2bedGraph",
     "exportInteractions2text",
-    "generate3CseqReport"
+    "exportBatchInteractions2text",
+    "generate3CseqReport",
+    "getExpInteractionsInRefseq",
+    "getContrInteractionsInRefseq"
 )

@@ -1,21 +1,22 @@
 \name{plotInteractionsPerChromosome}
 \alias{plotInteractionsPerChromosome}
 \alias{plotInteractionsPerChromosome,r3Cseq-method}
+
 \title{Plot interaction regions per each chromosome of interest}
 
 \description{
-  Plot the distribution of interaction regions per each interested input chromosome
+  Plot the distribution of interaction regions per each chromosome
 }
 
 \usage{
-plotInteractionsPerChromosome(object, chromosomeName)
+plotInteractionsPerChromosome(obj, chromosomeName)
 }
 
 
 \arguments{
 
-	\item{object}{
-		r3Cseq object. The object is the container of interaction regions produced by \code{\link{getInteractions}} function.
+	\item{obj}{
+		obj is r3Cseq or r3CseqInBatch object. 
 	}
 
 	\item{chromosomeName}{
@@ -25,7 +26,7 @@ plotInteractionsPerChromosome(object, chromosomeName)
 
 
 \value{
-	Plots interaction regions per chromosome on the active graphical device.
+	Plots of interaction regions per chromosome.
 }
 
 \author{
@@ -34,21 +35,13 @@ plotInteractionsPerChromosome(object, chromosomeName)
 
 \seealso{
 	\code{\link{plotInteractionsNearViewpoint}}, \code{\link{plotOverviewInteractions}}, 
-	\code{\link{plot3Cecdf}}
+	\code{\link{plotDomainogramNearViewpoint}}
 }
 
 
 \examples{
- 	
-####Create the r3Cseq object#############
-	library(BSgenome.Mmusculus.UCSC.mm9)
-    load(system.file("data","example.data.rda",package="r3Cseq"))
-	calculateRPM(my.data)
-	getInteractions(my.data)
 
-####Plot
-	
-	plotInteractionsPerChromosome(my.data,"chr10")
-	
+# See the vignette
+
 }
 %\keyword{plot interaction regions}

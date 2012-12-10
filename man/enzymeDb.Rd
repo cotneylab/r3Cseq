@@ -1,5 +1,5 @@
-\name{enzyme.db}
-\alias{enzyme.db}
+\name{enzymeDb}
+\alias{enzymeDb}
 \title{Rebase The Restriction Enzyme Database}
 \description{
   The database includes all restriction enzyme information from the REBASE database.

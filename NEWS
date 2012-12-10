@@ -1,0 +1,11 @@
+version 1.5.0: (2012-10-25)
+- added the new normalization method of 3C-seq analysis
+- added the new statistical analysis for identification of 3C-seq interaction regions
+- added the analysis for both restriction fragment and a user defined non-overlapping window
+- added the analysis for 3C-seq data with replicates
+- added the new visualization "domainograms"
+- updated the existing plots
+- update the exported methods
+- added the options for counting reads per regions
+- fixed the bug of counting reads per regions
+- updated the vignette
