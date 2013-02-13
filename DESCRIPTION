@@ -10,6 +10,6 @@ Suggests: BSgenome.Mmusculus.UCSC.mm9
 Description: This package is an implementation of data analysis for the long-range interactions from 3C-seq assay.
 License: GPL-3
 URL: http://r3cseq.genereg.net
-biocViews: Preprocessing, Sequencing, HighThroughputSequencing,
+biocViews: Preprocessing, Sequencing, HighThroughputSequencing
 Collate: AllClasses.R AllGenerics.R Export.R FunctionInCommon.R FunctionsForBatchAnalysis.R RestrictionEnzymeFunctions.R FunctionsForNoReplicationAnalysis.R Report.R Visualize3Cseq.R Annotation.R
 
