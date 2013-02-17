@@ -998,408 +998,410 @@ plotInteractionsPerChromosome<-function(obj,chromosomeName){
 
 setGeneric(
 		name="plotDomainogramNearViewpoint",
-		def=function(object,distance=5e5,maximum_window=25e3, view=c("experiment","control","both")){
+		def=function(object,smoothing.parameter=0.1,distance=5e5,maximum_window=25e3, view=c("experiment","control","both")){
 			standardGeneric("plotDomainogramNearViewpoint")
 		}
 )
 
 setMethod("plotDomainogramNearViewpoint",
 		signature(object = "r3Cseq"),
-	
-	function (object,distance,maximum_window,view){
 		
-	if(!is(object,"r3Cseq")){
+		function (object,smoothing.parameter,distance,maximum_window,view){
+			
+			if(!is(object,"r3Cseq")){
 				stop("Need to initialize the r3Cseq object")
-			
-	}
-	
-	if(distance < 200000 | distance > 500000){
-		stop("Please select distance between 200Kb - 500Kb")
-	}
-	if(maximum_window > 50e3){
-		stop("The maximum allow for windowing is 50Kb.")
-	}
-	########Get input################################
-	selected_view <- match.arg(view)
-	if(selected_view==""){
-		selected_view<-"experiment"
-	}
-	########Get viewpoint############
-	viewpoint <-getViewpoint(object)
-	viewpoint.chr<-as.character(space(viewpoint))
-	########Get organism#############
-	orgName<-organismName(object)
-	chr.size<-0
-	if(orgName=="hg18"){
-		chr.size<-seqlengths(Hsapiens)[viewpoint.chr]
-	}else if(orgName=="hg19"){
-		chr.size<-seqlengths(Hsapiens)[viewpoint.chr]
-		
-	}else if(orgName =="mm9"){
-		chr.size<-seqlengths(Mmusculus)[viewpoint.chr]
-		
-	}
-	if(selected_view=="experiment"){
-		expInteractions   <-expInteractionRegions(object)
-		######look around the viewpoint###
-		r.start <-start(viewpoint)-distance
-		r.end 	<-end(viewpoint)+distance
-		
-		r.start <-ifelse(r.start <0,1,r.start)
-		r.end   <-ifelse(r.end <=chr.size,r.end,chr.size)
-		c.vec   <- c(rep(0,r.end-r.start))
-		####Get refGenes######
-		genes<-get3CseqRefGene(object)
-		g.chr<-subset(genes,chromosome==viewpoint.chr)
-		g.r<-subset(g.chr,start>=r.start & end <= r.end)
-	
-		par(fig=c(0,1,0.75,1))
-		par(mar=c(0,5,1,2))
-		
-		if(nrow(g.r)>0){
-			g.r<-g.r[order(g.r$start),]
-			g.r$rel.start <-g.r$start-r.start
-			g.r$rel.end <-g.r$end-r.start
-			g.r$size<-g.r$end-g.r$start+1
-			
-			plot(c(1,2*distance), c(1,60), type= "n", xlab="", ylab="",xaxt='n',yaxt='n')
-			abline(v=start(viewpoint)-r.start, col="red",lty=3,lwd=2)
-			y1.start=30
-			for(i in 1:nrow(g.r)){
-				gx<-g.r[i,]
-				gx.start<-gx$rel.start
-				gx.end <-gx$rel.end
-				gx.size<-gx$size
-				gx.strand<-gx$strand
 				
-				if(c.vec[gx$rel.start]==0){
-					y1.start = y1.start
-					c.vec[gx$rel.start:gx$rel.end]=1
-				}else{
-					y1.start = y1.start+8
-					if(y1.start >50){
-						y1.start=10
+			}
+			
+			if(distance < 100000 | distance > 500000){
+				stop("Please select distance between 100Kb - 500Kb")
+			}
+			if(maximum_window > 50e3){
+				stop("The maximum allow for windowing is 50Kb.")
+			}
+			########Get input################################
+			selected_view <- match.arg(view)
+			if(selected_view==""){
+				selected_view<-"experiment"
+			}
+			########Get viewpoint############
+			viewpoint <-getViewpoint(object)
+			viewpoint.chr<-as.character(space(viewpoint))
+			########Get organism#############
+			orgName<-organismName(object)
+			chr.size<-0
+			if(orgName=="hg18"){
+				chr.size<-seqlengths(Hsapiens)[viewpoint.chr]
+			}else if(orgName=="hg19"){
+				chr.size<-seqlengths(Hsapiens)[viewpoint.chr]
+				
+			}else if(orgName =="mm9"){
+				chr.size<-seqlengths(Mmusculus)[viewpoint.chr]
+				
+			}
+			if(selected_view=="experiment"){
+				expInteractions   <-expInteractionRegions(object)
+				######look around the viewpoint###
+				r.start <-start(viewpoint)-distance
+				r.end 	<-end(viewpoint)+distance
+				
+				r.start <-ifelse(r.start <0,1,r.start)
+				r.end   <-ifelse(r.end <=chr.size,r.end,chr.size)
+				c.vec   <- c(rep(0,r.end-r.start))
+				####Get refGenes######
+				genes<-get3CseqRefGene(object)
+				g.chr<-subset(genes,chromosome==viewpoint.chr)
+				g.r<-subset(g.chr,start>=r.start & end <= r.end)
+				
+				par(fig=c(0,1,0.75,1))
+				par(mar=c(0,5,1,2))
+				
+				if(nrow(g.r)>0){
+					g.r<-g.r[order(g.r$start),]
+					g.r$rel.start <-g.r$start-r.start
+					g.r$rel.end <-g.r$end-r.start
+					g.r$size<-g.r$end-g.r$start+1
+					
+					plot(c(1,2*distance), c(1,60), type= "n", xlab="", ylab="",xaxt='n',yaxt='n')
+					abline(v=start(viewpoint)-r.start, col="red",lty=3,lwd=2)
+					y1.start=30
+					for(i in 1:nrow(g.r)){
+						gx<-g.r[i,]
+						gx.start<-gx$rel.start
+						gx.end <-gx$rel.end
+						gx.size<-gx$size
+						gx.strand<-gx$strand
+						
+						if(c.vec[gx$rel.start]==0){
+							y1.start = y1.start
+							c.vec[gx$rel.start:gx$rel.end]=1
+						}else{
+							y1.start = y1.start+8
+							if(y1.start >50){
+								y1.start=10
+							}
+						}
+						text(gx$rel.start,y1.start+2,gx$name,cex =0.8)
+						
+						if(gx.size >=100){
+							s.q <-ifelse(gx.size <=5000,500,5000)
+							s.q <-ifelse(s.q > gx.size, gx.size-10,s.q)
+							
+							xx<-seq(gx.start,gx.start+gx.size-s.q, by=s.q)
+							yy<-seq(gx.start+s.q,gx.start+gx.size, by=s.q)
+							
+							if(gx.strand==-1){
+								for(i in 1:length(xx)){
+									lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-1))
+									lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-4))
+								}
+							}else{
+								for(i in 1:length(xx)){
+									lines(c(xx[i],yy[i]),c(y1.start-1,y1.start-2))
+									lines(c(xx[i],yy[i]),c(y1.start-4,y1.start-3))
+								}
+							}
+							rect(gx.start,y1.start-3,gx.start+gx.size,(y1.start-2), col="red")
+						}	
 					}
 				}
-				text(gx$rel.start,y1.start+2,gx$name,cex =0.8)
+				legend("topleft",legend = "Refseq Genes",fill="red", cex=0.55,bty="n")
+				#######Draw Interaction regions##########
+				exp.data<-expInteractions[start(expInteractions) >=r.start & end(expInteractions) <= r.end & space(expInteractions)==viewpoint.chr,]
+				exp.data$p_start<-start(exp.data)-start(viewpoint)
 				
-				if(gx.size >=100){
-					s.q <-ifelse(gx.size <=5000,500,5000)
-					s.q <-ifelse(s.q > gx.size, gx.size-10,s.q)
-					
-					xx<-seq(gx.start,gx.start+gx.size-s.q, by=s.q)
-					yy<-seq(gx.start+s.q,gx.start+gx.size, by=s.q)
-					
-					if(gx.strand==-1){
-						for(i in 1:length(xx)){
-							lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-1))
-							lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-4))
-						}
-					}else{
-						for(i in 1:length(xx)){
-							lines(c(xx[i],yy[i]),c(y1.start-1,y1.start-2))
-							lines(c(xx[i],yy[i]),c(y1.start-4,y1.start-3))
-						}
-					}
-					rect(gx.start,y1.start-3,gx.start+gx.size,(y1.start-2), col="red")
-				}	
+				exppalette<-rev(brewer.pal(9,"Reds"))
+				
+				exp.data$col[exp.data$q.value <=0.00001]<-exppalette[1]
+				exp.data$col[exp.data$q.value > 0.00001 & exp.data$q.value <=0.0001]<-exppalette[2]
+				exp.data$col[exp.data$q.value > 0.0001 & exp.data$q.value <=0.001]<-exppalette[3]
+				exp.data$col[exp.data$q.value > 0.001 & exp.data$q.value <=0.01]<-exppalette[4]
+				exp.data$col[exp.data$q.value > 0.01 & exp.data$q.value <=0.05]<-exppalette[5]
+				exp.data$col[exp.data$q.value > 0.05 & exp.data$q.value <=0.1]<-exppalette[6]
+				exp.data$col[exp.data$q.value > 0.1 & exp.data$q.value <=0.2]<-exppalette[7]
+				exp.data$col[exp.data$q.value > 0.2 & exp.data$q.value <=0.5]<-exppalette[8]
+				exp.data$col[exp.data$q.value > 0.5]<-exppalette[9]
+				
+				t.names<-c("q-value<=0.00001",
+						"0.00001 >q-value<= 0.0001",
+						"0.0001 >q-value<= 0.001",
+						"0.001 >q-value<= 0.01",
+						"0.01 >q-value<= 0.05",
+						"0.05 >q-value<= 0.1",
+						"0.1 >q-value<= 0.2",
+						"0.2 >q-value<= 0.5",
+						"q-value >0.5"
+				)	
+				par(fig=c(0,1,0.35,0.75),new=T)
+				par(mar=c(4,5,0.1,2))
+				y.exp.max <-max(exp.data$nReads)
+				plot(c(-1*(distance),distance),c(1,y.exp.max), type= "n", ylab="Reads",xaxt="n",xlab="")
+				points(exp.data$p_start,exp.data$nReads,col=exp.data$col,pch=19)	
+				lines(exp.data$p_start,exp.data$nReads,col='black',lty=1)
+				abline(v=0,lty=3,col="red",lwd=2)
+				
+				legend("topleft",legend = t.names, fill=exppalette, cex=0.55,title="q-value",bty="n")
+				
+				###########Draw Domainogram################
+				expRawReads<-expRawData(object)
+				expInteractionMatrix<-makeInteractionMatrixNearCisPerWindow(object,smoothing.parameter,expRawReads,max.window=maximum_window,viewpoint,distanceFromViewpoint=distance)
+				col.n<-ncol(expInteractionMatrix)
+				spec = colorRampPalette(c(rev(brewer.pal(5,"Reds")),"gray"))
+				shades = spec(300)
+				
+				par(fig=c(0,1,0,0.44),new=T)
+				par(mar=c(4,5,0.1,2))
+				
+				s.names<-c("very high interaction",
+						"high interaction",
+						"moderate interaction",
+						"moderate-low interaction",
+						"low interaction",
+						"no interaction"
+				)	
+				image(as.matrix(log2(1e-10+expInteractionMatrix[,2:col.n])),xaxt="n",yaxt="n",ylab="Window (Kb)",col=shades,xlab="Distance (bp) relative to the viewpoint")
+				abline(v=0.5,lty=3,col="red",lwd=2)
+				legend("topleft",legend = s.names, fill=c(rev(brewer.pal(5,"Reds")),"gray"), cex=0.55,title="",bty="n")
+				axis(1, at=c(seq(0,1,by=0.1)),lab=c(seq(-distance,distance,distance/5)),cex.axis=0.8,las=2)
+				axis(2, at=c(0, 1),lab=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)
 			}
-		}
-		legend("topleft",legend = "Refseq Genes",fill="red", cex=0.55,bty="n")
-		#######Draw Interaction regions##########
-		exp.data<-expInteractions[start(expInteractions) >=r.start & end(expInteractions) <= r.end & space(expInteractions)==viewpoint.chr,]
-		exp.data$p_start<-start(exp.data)-start(viewpoint)
-		
-		exppalette<-rev(brewer.pal(9,"Reds"))
-		
-		exp.data$col[exp.data$q.value <=0.00001]<-exppalette[1]
-		exp.data$col[exp.data$q.value > 0.00001 & exp.data$q.value <=0.0001]<-exppalette[2]
-		exp.data$col[exp.data$q.value > 0.0001 & exp.data$q.value <=0.001]<-exppalette[3]
-		exp.data$col[exp.data$q.value > 0.001 & exp.data$q.value <=0.01]<-exppalette[4]
-		exp.data$col[exp.data$q.value > 0.01 & exp.data$q.value <=0.05]<-exppalette[5]
-		exp.data$col[exp.data$q.value > 0.05 & exp.data$q.value <=0.1]<-exppalette[6]
-		exp.data$col[exp.data$q.value > 0.1 & exp.data$q.value <=0.2]<-exppalette[7]
-		exp.data$col[exp.data$q.value > 0.2 & exp.data$q.value <=0.5]<-exppalette[8]
-		exp.data$col[exp.data$q.value > 0.5]<-exppalette[9]
-		
-		t.names<-c("q-value<=0.00001",
-				"0.00001 >q-value<= 0.0001",
-				"0.0001 >q-value<= 0.001",
-				"0.001 >q-value<= 0.01",
-				"0.01 >q-value<= 0.05",
-				"0.05 >q-value<= 0.1",
-				"0.1 >q-value<= 0.2",
-				"0.2 >q-value<= 0.5",
-				"q-value >0.5"
-		)	
-		par(fig=c(0,1,0.35,0.75),new=T)
-		par(mar=c(4,5,0.1,2))
-		y.exp.max <-max(exp.data$nReads)
-		plot(c(-1*(distance),distance),c(1,y.exp.max), type= "n", ylab="Reads",xaxt="n",xlab="")
-		points(exp.data$p_start,exp.data$nReads,col=exp.data$col,pch=19)	
-		lines(exp.data$p_start,exp.data$nReads,col='black',lty=1)
-		abline(v=0,lty=3,col="red",lwd=2)
-		
-		legend("topleft",legend = t.names, fill=exppalette, cex=0.55,title="q-value",bty="n")
-		
-		###########Draw Domainogram################
-		expRawReads<-expRawData(object)
-		expInteractionMatrix<-makeInteractionMatrixNearCisPerWindow(object,expRawReads,max.window=maximum_window,viewpoint,distanceFromViewpoint=distance)
-		col.n<-ncol(expInteractionMatrix)
-		spec = colorRampPalette(c(rev(brewer.pal(5,"Reds")),"gray"))
-		shades = spec(300)
-		
-		par(fig=c(0,1,0,0.45),new=T)
-		par(mar=c(4,5,0.1,2))
-		
-		s.names<-c("very high interaction",
-				"high interaction",
-				"moderate interaction",
-				"moderate-low interaction",
-				"low interaction",
-				"no interaction"
-		)	
-		image(as.matrix(log2(1e-10+expInteractionMatrix[,2:col.n])),xaxt="n",yaxt="n",ylab="Window (Kb)",col=shades,xlab="Distance (bp) relative to the viewpoint")
-		abline(v=0.5,lty=3,col="red",lwd=2)
-		legend("topleft",legend = s.names, fill=c(rev(brewer.pal(5,"Reds")),"gray"), cex=0.55,title="",bty="n")
-		axis(1, at=c(seq(0,1,by=0.1)),lab=c(seq(-distance,distance,distance/5)),cex.axis=0.8,las=2)
-		axis(2, at=c(0, 1),lab=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)
-	}
-	if(selected_view=="control"){
-		contrInteractions <-contrInteractionRegions(object)	
-		######look around the viewpoint###
-		r.start <-start(viewpoint)-distance
-		r.end 	<-end(viewpoint)+distance
-		
-		r.start <-ifelse(r.start <0,1,r.start)
-		r.end   <-ifelse(r.end <=chr.size,r.end,chr.size)
-		c.vec   <- c(rep(0,r.end-r.start))
-		####Get refGenes######
-		genes<-get3CseqRefGene(object)
-		g.chr<-subset(genes,chromosome==viewpoint.chr)
-		g.r<-subset(g.chr,start>=r.start & end <= r.end)
-		
-		par(fig=c(0,1,0.75,1))
-		par(mar=c(0,5,1,2))
-		
-		if(nrow(g.r)>0){
-			g.r<-g.r[order(g.r$start),]
-			g.r$rel.start <-g.r$start-r.start
-			g.r$rel.end <-g.r$end-r.start
-			g.r$size<-g.r$end-g.r$start+1
-			
-			plot(c(1,2*distance), c(1,60), type= "n", xlab="", ylab="",xaxt='n',yaxt='n')
-			abline(v=start(viewpoint)-r.start, col="red",lty=3,lwd=2)
-			y1.start=30
-			for(i in 1:nrow(g.r)){
-				gx<-g.r[i,]
-				gx.start<-gx$rel.start
-				gx.end <-gx$rel.end
-				gx.size<-gx$size
-				gx.strand<-gx$strand
+			if(selected_view=="control"){
+				contrInteractions <-contrInteractionRegions(object)	
+				######look around the viewpoint###
+				r.start <-start(viewpoint)-distance
+				r.end 	<-end(viewpoint)+distance
 				
-				if(c.vec[gx$rel.start]==0){
-					y1.start = y1.start
-					c.vec[gx$rel.start:gx$rel.end]=1
-				}else{
-					y1.start = y1.start+8
-					if(y1.start >50){
-						y1.start=10
+				r.start <-ifelse(r.start <0,1,r.start)
+				r.end   <-ifelse(r.end <=chr.size,r.end,chr.size)
+				c.vec   <- c(rep(0,r.end-r.start))
+				####Get refGenes######
+				genes<-get3CseqRefGene(object)
+				g.chr<-subset(genes,chromosome==viewpoint.chr)
+				g.r<-subset(g.chr,start>=r.start & end <= r.end)
+				
+				par(fig=c(0,1,0.75,1))
+				par(mar=c(0,5,1,2))
+				
+				if(nrow(g.r)>0){
+					g.r<-g.r[order(g.r$start),]
+					g.r$rel.start <-g.r$start-r.start
+					g.r$rel.end <-g.r$end-r.start
+					g.r$size<-g.r$end-g.r$start+1
+					
+					plot(c(1,2*distance), c(1,60), type= "n", xlab="", ylab="",xaxt='n',yaxt='n')
+					abline(v=start(viewpoint)-r.start, col="red",lty=3,lwd=2)
+					y1.start=30
+					for(i in 1:nrow(g.r)){
+						gx<-g.r[i,]
+						gx.start<-gx$rel.start
+						gx.end <-gx$rel.end
+						gx.size<-gx$size
+						gx.strand<-gx$strand
+						
+						if(c.vec[gx$rel.start]==0){
+							y1.start = y1.start
+							c.vec[gx$rel.start:gx$rel.end]=1
+						}else{
+							y1.start = y1.start+8
+							if(y1.start >50){
+								y1.start=10
+							}
+						}
+						text(gx$rel.start,y1.start+2,gx$name,cex =0.8)
+						
+						if(gx.size >=100){
+							s.q <-ifelse(gx.size <=5000,500,5000)
+							s.q <-ifelse(s.q > gx.size, gx.size-10,s.q)
+							
+							xx<-seq(gx.start,gx.start+gx.size-s.q, by=s.q)
+							yy<-seq(gx.start+s.q,gx.start+gx.size, by=s.q)
+							
+							if(gx.strand==-1){
+								for(i in 1:length(xx)){
+									lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-1))
+									lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-4))
+								}
+							}else{
+								for(i in 1:length(xx)){
+									lines(c(xx[i],yy[i]),c(y1.start-1,y1.start-2))
+									lines(c(xx[i],yy[i]),c(y1.start-4,y1.start-3))
+								}
+							}
+							rect(gx.start,y1.start-3,gx.start+gx.size,(y1.start-2), col="red")
+						}	
 					}
 				}
-				text(gx$rel.start,y1.start+2,gx$name,cex =0.8)
+				legend("topleft",legend = "Refseq Genes",fill="red", cex=0.55,bty="n")
+				#######Draw Interaction regions##########
+				exp.data<-expInteractions[start(expInteractions) >=r.start & end(expInteractions) <= r.end & space(expInteractions)==viewpoint.chr,]
+				exp.data$p_start<-start(exp.data)-start(viewpoint)
 				
-				if(gx.size >=100){
-					s.q <-ifelse(gx.size <=5000,500,5000)
-					s.q <-ifelse(s.q > gx.size, gx.size-10,s.q)
-					
-					xx<-seq(gx.start,gx.start+gx.size-s.q, by=s.q)
-					yy<-seq(gx.start+s.q,gx.start+gx.size, by=s.q)
-					
-					if(gx.strand==-1){
-						for(i in 1:length(xx)){
-							lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-1))
-							lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-4))
-						}
-					}else{
-						for(i in 1:length(xx)){
-							lines(c(xx[i],yy[i]),c(y1.start-1,y1.start-2))
-							lines(c(xx[i],yy[i]),c(y1.start-4,y1.start-3))
-						}
-					}
-					rect(gx.start,y1.start-3,gx.start+gx.size,(y1.start-2), col="red")
-				}	
+				exppalette<-rev(brewer.pal(9,"Blues"))
+				
+				exp.data$col[exp.data$q.value <=0.00001]<-exppalette[1]
+				exp.data$col[exp.data$q.value > 0.00001 & exp.data$q.value <=0.0001]<-exppalette[2]
+				exp.data$col[exp.data$q.value > 0.0001 & exp.data$q.value <=0.001]<-exppalette[3]
+				exp.data$col[exp.data$q.value > 0.001 & exp.data$q.value <=0.01]<-exppalette[4]
+				exp.data$col[exp.data$q.value > 0.01 & exp.data$q.value <=0.05]<-exppalette[5]
+				exp.data$col[exp.data$q.value > 0.05 & exp.data$q.value <=0.1]<-exppalette[6]
+				exp.data$col[exp.data$q.value > 0.1 & exp.data$q.value <=0.2]<-exppalette[7]
+				exp.data$col[exp.data$q.value > 0.2 & exp.data$q.value <=0.5]<-exppalette[8]
+				exp.data$col[exp.data$q.value > 0.5]<-exppalette[9]
+				
+				t.names<-c("q-value<=0.00001",
+						"0.00001 >q-value<= 0.0001",
+						"0.0001 >q-value<= 0.001",
+						"0.001 >q-value<= 0.01",
+						"0.01 >q-value<= 0.05",
+						"0.05 >q-value<= 0.1",
+						"0.1 >q-value<= 0.2",
+						"0.2 >q-value<= 0.5",
+						"q-value >0.5"
+				)	
+				par(fig=c(0,1,0.35,0.75),new=T)
+				par(mar=c(4,5,0.1,2))
+				y.exp.max <-max(exp.data$nReads)
+				plot(c(-1*(distance),distance),c(1,y.exp.max), type= "n", ylab="Reads",xaxt="n",xlab="")
+				points(exp.data$p_start,exp.data$nReads,col=exp.data$col,pch=19)	
+				lines(exp.data$p_start,exp.data$nReads,col='black',lty=1)
+				abline(v=0,lty=3,col="red",lwd=2)
+				
+				legend("topleft",legend = t.names, fill=exppalette, cex=0.55,title="q-value",bty="n")
+				
+				###########Draw Domainogram################
+				contrRawReads<-contrRawData(object)
+				contrInteractionMatrix<-makeInteractionMatrixNearCisPerWindow(object,smoothing.parameter,contrRawReads,max.window=maximum_window,viewpoint,distanceFromViewpoint=distance)
+				col.n<-ncol(contrInteractionMatrix)
+				
+				spec = colorRampPalette(c(rev(brewer.pal(5,"Blues")),"gray"))
+				shades = spec(300)
+				
+				par(fig=c(0,1,0,0.44),new=T)
+				par(mar=c(4,5,0.1,2))
+				
+				s.names<-c("very high interaction",
+						"high interaction",
+						"moderate interaction",
+						"moderate-low interaction",
+						"low interaction",
+						"no interaction"
+				)	
+				image(as.matrix(log2(1e-10+contrInteractionMatrix[,2:col.n])),xaxt="n",yaxt="n",ylab="Window (Kb)",col=shades,xlab="Distance (bp) relative to the viewpoint")
+				abline(v=0.5,lty=3,col="red",lwd=2)
+				legend("topleft",legend = s.names, fill=c(rev(brewer.pal(5,"Blues")),"gray"), cex=0.55,title="",bty="n")
+				axis(1, at=c(seq(0,1,by=0.1)),lab=c(seq(-distance,distance,distance/5)),cex.axis=0.8,las=2)
+				axis(2, at=c(0, 1),lab=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)
 			}
-		}
-		legend("topleft",legend = "Refseq Genes",fill="red", cex=0.55,bty="n")
-		#######Draw Interaction regions##########
-		exp.data<-expInteractions[start(expInteractions) >=r.start & end(expInteractions) <= r.end & space(expInteractions)==viewpoint.chr,]
-		exp.data$p_start<-start(exp.data)-start(viewpoint)
-		
-		exppalette<-rev(brewer.pal(9,"Blues"))
-		
-		exp.data$col[exp.data$q.value <=0.00001]<-exppalette[1]
-		exp.data$col[exp.data$q.value > 0.00001 & exp.data$q.value <=0.0001]<-exppalette[2]
-		exp.data$col[exp.data$q.value > 0.0001 & exp.data$q.value <=0.001]<-exppalette[3]
-		exp.data$col[exp.data$q.value > 0.001 & exp.data$q.value <=0.01]<-exppalette[4]
-		exp.data$col[exp.data$q.value > 0.01 & exp.data$q.value <=0.05]<-exppalette[5]
-		exp.data$col[exp.data$q.value > 0.05 & exp.data$q.value <=0.1]<-exppalette[6]
-		exp.data$col[exp.data$q.value > 0.1 & exp.data$q.value <=0.2]<-exppalette[7]
-		exp.data$col[exp.data$q.value > 0.2 & exp.data$q.value <=0.5]<-exppalette[8]
-		exp.data$col[exp.data$q.value > 0.5]<-exppalette[9]
-		
-		t.names<-c("q-value<=0.00001",
-				"0.00001 >q-value<= 0.0001",
-				"0.0001 >q-value<= 0.001",
-				"0.001 >q-value<= 0.01",
-				"0.01 >q-value<= 0.05",
-				"0.05 >q-value<= 0.1",
-				"0.1 >q-value<= 0.2",
-				"0.2 >q-value<= 0.5",
-				"q-value >0.5"
-		)	
-		par(fig=c(0,1,0.35,0.75),new=T)
-		par(mar=c(4,5,0.1,2))
-		y.exp.max <-max(exp.data$nReads)
-		plot(c(-1*(distance),distance),c(1,y.exp.max), type= "n", ylab="Reads",xaxt="n",xlab="")
-		points(exp.data$p_start,exp.data$nReads,col=exp.data$col,pch=19)	
-		lines(exp.data$p_start,exp.data$nReads,col='black',lty=1)
-		abline(v=0,lty=3,col="red",lwd=2)
-		
-		legend("topleft",legend = t.names, fill=exppalette, cex=0.55,title="q-value",bty="n")
-		
-		###########Draw Domainogram################
-		contrRawReads<-contrRawData(object)
-		contrInteractionMatrix<-makeInteractionMatrixNearCisPerWindow(object,contrRawReads,max.window=maximum_window,viewpoint,distanceFromViewpoint=distance)
-		col.n<-ncol(contrInteractionMatrix)
-		
-		spec = colorRampPalette(c(rev(brewer.pal(5,"Blues")),"gray"))
-		shades = spec(300)
-		
-		par(fig=c(0,1,0,0.45),new=T)
-		par(mar=c(4,5,0.1,2))
-		
-		s.names<-c("very high interaction",
-				"high interaction",
-				"moderate interaction",
-				"moderate-low interaction",
-				"low interaction",
-				"no interaction"
-		)	
-		image(as.matrix(log2(1e-10+contrInteractionMatrix[,2:col.n])),xaxt="n",yaxt="n",ylab="Window (Kb)",col=shades,xlab="Distance (bp) relative to the viewpoint")
-		abline(v=0.5,lty=3,col="red",lwd=2)
-		legend("topleft",legend = s.names, fill=c(rev(brewer.pal(5,"Blues")),"gray"), cex=0.55,title="",bty="n")
-		axis(1, at=c(seq(0,1,by=0.1)),lab=c(seq(-distance,distance,distance/5)),cex.axis=0.8,las=2)
-		axis(2, at=c(0, 1),lab=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)
-	}
-	if(selected_view=="both"){
-		######look around the viewpoint###
-		r.start <-start(viewpoint)-distance
-		r.end 	<-end(viewpoint)+distance
-		
-		r.start <-ifelse(r.start <0,1,r.start)
-		r.end   <-ifelse(r.end <=chr.size,r.end,chr.size)
-		c.vec   <- c(rep(0,r.end-r.start))
-		####Get refGenes######
-		genes<-get3CseqRefGene(object)
-		g.chr<-subset(genes,chromosome==viewpoint.chr)
-		g.r<-subset(g.chr,start>=r.start & end <= r.end)
-		
-		par(fig=c(0,1,0.78,1))
-		par(mar=c(0,5,1,2))
-		
-		if(nrow(g.r)>0){
-			g.r<-g.r[order(g.r$start),]
-			g.r$rel.start <-g.r$start-r.start
-			g.r$rel.end <-g.r$end-r.start
-			g.r$size<-g.r$end-g.r$start+1
-			
-			plot(c(1,2*distance), c(1,60), type= "n", xlab="", ylab="",xaxt='n',yaxt='n')
-			abline(v=start(viewpoint)-r.start, col="red",lty=3,lwd=2)
-			y1.start=30
-			for(i in 1:nrow(g.r)){
-				gx<-g.r[i,]
-				gx.start<-gx$rel.start
-				gx.end <-gx$rel.end
-				gx.size<-gx$size
-				gx.strand<-gx$strand
+			if(selected_view=="both"){
+				######look around the viewpoint###
+				r.start <-start(viewpoint)-distance
+				r.end 	<-end(viewpoint)+distance
 				
-				if(c.vec[gx$rel.start]==0){
-					y1.start = y1.start
-					c.vec[gx$rel.start:gx$rel.end]=1
-				}else{
-					y1.start = y1.start+8
-					if(y1.start >50){
-						y1.start=10
+				r.start <-ifelse(r.start <0,1,r.start)
+				r.end   <-ifelse(r.end <=chr.size,r.end,chr.size)
+				c.vec   <- c(rep(0,r.end-r.start))
+				####Get refGenes######
+				genes<-get3CseqRefGene(object)
+				g.chr<-subset(genes,chromosome==viewpoint.chr)
+				g.r<-subset(g.chr,start>=r.start & end <= r.end)
+				
+				par(fig=c(0,1,0.78,1))
+				par(mar=c(0,5,1,2))
+				
+				if(nrow(g.r)>0){
+					g.r<-g.r[order(g.r$start),]
+					g.r$rel.start <-g.r$start-r.start
+					g.r$rel.end <-g.r$end-r.start
+					g.r$size<-g.r$end-g.r$start+1
+					
+					plot(c(1,2*distance), c(1,60), type= "n", xlab="", ylab="",xaxt='n',yaxt='n')
+					abline(v=start(viewpoint)-r.start, col="red",lty=3,lwd=2)
+					y1.start=30
+					for(i in 1:nrow(g.r)){
+						gx<-g.r[i,]
+						gx.start<-gx$rel.start
+						gx.end <-gx$rel.end
+						gx.size<-gx$size
+						gx.strand<-gx$strand
+						
+						if(c.vec[gx$rel.start]==0){
+							y1.start = y1.start
+							c.vec[gx$rel.start:gx$rel.end]=1
+						}else{
+							y1.start = y1.start+8
+							if(y1.start >50){
+								y1.start=10
+							}
+						}
+						text(gx$rel.start,y1.start+2,gx$name,cex =0.8)
+						
+						if(gx.size >=100){
+							s.q <-ifelse(gx.size <=5000,500,5000)
+							s.q <-ifelse(s.q > gx.size, gx.size-10,s.q)
+							
+							xx<-seq(gx.start,gx.start+gx.size-s.q, by=s.q)
+							yy<-seq(gx.start+s.q,gx.start+gx.size, by=s.q)
+							
+							if(gx.strand==-1){
+								for(i in 1:length(xx)){
+									lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-1))
+									lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-4))
+								}
+							}else{
+								for(i in 1:length(xx)){
+									lines(c(xx[i],yy[i]),c(y1.start-1,y1.start-2))
+									lines(c(xx[i],yy[i]),c(y1.start-4,y1.start-3))
+								}
+							}
+							rect(gx.start,y1.start-3,gx.start+gx.size,(y1.start-2), col="red")
+						}	
 					}
 				}
-				text(gx$rel.start,y1.start+2,gx$name,cex =0.8)
+				legend("topleft",legend = "Refseq Genes",fill="red", cex=0.55,bty="n")
+				###########Draw Domainogram in the experiment################
+				expRawReads<-expRawData(object)
+				expInteractionMatrix<-makeInteractionMatrixNearCisPerWindow(object,smoothing.parameter,expRawReads,max.window=maximum_window,viewpoint,distanceFromViewpoint=distance)
+				col.n<-ncol(expInteractionMatrix)
+				spec = colorRampPalette(c(rev(brewer.pal(5,"Reds")),"gray"))
+				shades = spec(300)
 				
-				if(gx.size >=100){
-					s.q <-ifelse(gx.size <=5000,500,5000)
-					s.q <-ifelse(s.q > gx.size, gx.size-10,s.q)
-					
-					xx<-seq(gx.start,gx.start+gx.size-s.q, by=s.q)
-					yy<-seq(gx.start+s.q,gx.start+gx.size, by=s.q)
-					
-					if(gx.strand==-1){
-						for(i in 1:length(xx)){
-							lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-1))
-							lines(c(xx[i],yy[i]),c(y1.start-2,y1.start-4))
-						}
-					}else{
-						for(i in 1:length(xx)){
-							lines(c(xx[i],yy[i]),c(y1.start-1,y1.start-2))
-							lines(c(xx[i],yy[i]),c(y1.start-4,y1.start-3))
-						}
-					}
-					rect(gx.start,y1.start-3,gx.start+gx.size,(y1.start-2), col="red")
-				}	
-			}
+				par(fig=c(0,1,0.45,0.78),new=T)
+				par(mar=c(0,5,0.1,2))
+				
+				s.names<-c("very high interaction",
+						"high interaction",
+						"moderate interaction",
+						"moderate-low interaction",
+						"low interaction",
+						"no interaction"
+				)	
+				image(as.matrix(log2(1e-10+expInteractionMatrix[,2:col.n])),xaxt="n",yaxt="n",ylab="Window (Kb)",col=shades,xlab="")
+				abline(v=0.5,lty=3,col="red",lwd=2)
+				legend("topleft",legend = s.names, fill=c(rev(brewer.pal(5,"Reds")),"gray"), cex=0.55,title="experiment",bty="n")
+				axis(2, at=c(0, 1),lab=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)
+				
+				
+				###########Draw Domainogram in the control################
+				contrRawReads<-contrRawData(object)
+				contrInteractionMatrix<-makeInteractionMatrixNearCisPerWindow(object,smoothing.parameter,contrRawReads,max.window=maximum_window,viewpoint,distanceFromViewpoint=distance)
+				col.n<-ncol(contrInteractionMatrix)
+				
+				spec = colorRampPalette(c(rev(brewer.pal(5,"Blues")),"gray"))
+				shades = spec(300)
+				
+				par(fig=c(0,1,0,0.44),new=T)
+				par(mar=c(4,5,0.1,2))
+				
+				image(as.matrix(log2(1e-10+contrInteractionMatrix[,2:col.n])),xaxt="n",yaxt="n",ylab="Window (Kb)",col=shades,xlab="Distance (bp) relative to the viewpoint")
+				abline(v=0.5,lty=3,col="red",lwd=2)
+				legend("topleft",legend = s.names, fill=c(rev(brewer.pal(5,"Blues")),"gray"), cex=0.55,title="control",bty="n")
+				axis(1, at=c(seq(0,1,by=0.1)),lab=c(seq(-distance,distance,distance/5)),cex.axis=0.8,las=2)
+				axis(2, at=c(0, 1),lab=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)	
+			}	
 		}
-		legend("topleft",legend = "Refseq Genes",fill="red", cex=0.55,bty="n")
-		###########Draw Domainogram in the experiment################
-		expRawReads<-expRawData(object)
-		expInteractionMatrix<-makeInteractionMatrixNearCisPerWindow(object,expRawReads,max.window=maximum_window,viewpoint,distanceFromViewpoint=distance)
-		col.n<-ncol(expInteractionMatrix)
-		spec = colorRampPalette(c(rev(brewer.pal(5,"Reds")),"gray"))
-		shades = spec(300)
-		
-		par(fig=c(0,1,0.45,0.78),new=T)
-		par(mar=c(0,5,0.1,2))
-		
-		s.names<-c("very high interaction",
-				"high interaction",
-				"moderate interaction",
-				"moderate-low interaction",
-				"low interaction",
-				"no interaction"
-		)	
-		image(as.matrix(log2(1e-10+expInteractionMatrix[,2:col.n])),xaxt="n",yaxt="n",ylab="Window (Kb)",col=shades,xlab="")
-		abline(v=0.5,lty=3,col="red",lwd=2)
-		legend("topleft",legend = s.names, fill=c(rev(brewer.pal(5,"Reds")),"gray"), cex=0.55,title="experiment",bty="n")
-		axis(2, at=c(0, 1),lab=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)
-		
-		
-		###########Draw Domainogram in the control################
-		contrRawReads<-contrRawData(object)
-		contrInteractionMatrix<-makeInteractionMatrixNearCisPerWindow(object,contrRawReads,max.window=maximum_window,viewpoint,distanceFromViewpoint=distance)
-		col.n<-ncol(contrInteractionMatrix)
-		
-		spec = colorRampPalette(c(rev(brewer.pal(5,"Blues")),"gray"))
-		shades = spec(300)
-		
-		par(fig=c(0,1,0,0.44),new=T)
-		par(mar=c(4,5,0.1,2))
-		
-		image(as.matrix(log2(1e-10+contrInteractionMatrix[,2:col.n])),xaxt="n",yaxt="n",ylab="Window (Kb)",col=shades,xlab="Distance (bp) relative to the viewpoint")
-		abline(v=0.5,lty=3,col="red",lwd=2)
-		legend("topleft",legend = s.names, fill=c(rev(brewer.pal(5,"Blues")),"gray"), cex=0.55,title="control",bty="n")
-		axis(1, at=c(seq(0,1,by=0.1)),lab=c(seq(-distance,distance,distance/5)),cex.axis=0.8,las=2)
-		axis(2, at=c(0, 1),lab=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)	
-	}	
-  }
 )
+
+###########
 setGeneric(
 		name="plot3Cecdf",
 		def=function(object){

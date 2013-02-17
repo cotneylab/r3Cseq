@@ -261,14 +261,14 @@ setMethod("getReadCountPerRestrictionFragment",
 ##########
 setGeneric(
 		name="getReadCountPerWindow",
-		def=function(object,windowSize=5e3,nFragmentExcludedReadsNearViewpoint=2){
+		def=function(object,windowSize=5e3,nFragmentExcludedReadsNearViewpoint=2,mode=c("non-overlapping", "overlapping")){
 			standardGeneric("getReadCountPerWindow")
 		}
 )
 
 setMethod("getReadCountPerWindow",
 		signature(object = "r3Cseq"),
-		function (object,windowSize,nFragmentExcludedReadsNearViewpoint){
+		function (object,windowSize,nFragmentExcludedReadsNearViewpoint,mode){
 			objName <- deparse(substitute(object))
 			if(!is(object,"r3Cseq")){
 				stop("Need to initialize the r3Cseq object")
@@ -281,10 +281,16 @@ setMethod("getReadCountPerWindow",
 			if(length(expRawData(object))==0){
 				stop("No reads found, please run getRawReads function to process BAM file.")
 			}
+			#####Select the read count methods#########
+			mode <- match.arg(mode)
+			if(mode==""){
+				mode<-"non-overlapping"
+			}
+			
 			#####Select the read count methods#########			
 			if(isControlInvolved(object)==FALSE){
 				
-				wholeFragments.RagedData<-getFragmentsPerWindow(object,windowSize)
+				wholeFragments.RagedData<-getFragmentsPerWindow(object,windowSize,mode)
 				##########Count all reads located inside the fragments######
 				exp.GRanges<-expRawData(object)
 				exp.GRanges<-excludeReadsNearViewpoint(object,exp.GRanges,nExcludedFragments)
@@ -299,7 +305,7 @@ setMethod("getReadCountPerWindow",
 				invisible(1)
 			}
 			if(isControlInvolved(object)==TRUE){
-				wholeFragments.RagedData<-getFragmentsPerWindow(object,windowSize)
+				wholeFragments.RagedData<-getFragmentsPerWindow(object,windowSize,mode)
 				##########Count all reads located inside the fragments######
 				exp.GRanges<-expRawData(object)
 				exp.GRanges<-excludeReadsNearViewpoint(object,exp.GRanges,nExcludedFragments)
@@ -432,22 +438,25 @@ setMethod("calculateRPM",
 ##################
 setGeneric(
 		name="getInteractions",
-		def=function(object,fdr=0.05){
+		def=function(object,smoothing.parameter=0.1,fdr=0.05){
 			standardGeneric("getInteractions")
 		}
 )
 setMethod("getInteractions",
 		signature(object = "r3Cseq"),
-		function (object,fdr){
+		function (object,smoothing.parameter,fdr){
 			
 			if(!is(object,"r3Cseq")){
 				stop("Need the r3Cseq object")
+			}
+			if(smoothing.parameter <0.06 | smoothing.parameter>0.4){
+				stop("The smoothing parameter must be 0.06-0.4 (default=0.1).")
 			}
 			if(isControlInvolved(object)==FALSE){
 				expRPM.RangedData <-expRPM(object)
 				if(nrow(expRPM.RangedData)>0){
 					objName <- deparse(substitute(object))
-					expInteraction<-assign3CseqSigContact(object,expRPM.RangedData,fdr)	
+					expInteraction<-assign3CseqSigContact(object,expRPM.RangedData,smoothing.parameter,fdr)	
 					expInteractionRegions(object) <-expInteraction
 					assign(objName,object,envir=parent.frame())
 					invisible(1)
@@ -462,10 +471,10 @@ setMethod("getInteractions",
 				
 				if(nrow(expRPM.RangedData)>0){
 					objName <- deparse(substitute(object))
-					expInteraction<-assign3CseqSigContact(object,expRPM.RangedData,fdr)	
+					expInteraction<-assign3CseqSigContact(object,expRPM.RangedData,smoothing.parameter,fdr)	
 					expInteractionRegions(object) <-expInteraction
 					##calculate in the control##
-					contrInteraction<-assign3CseqSigContact(object,contrRPM.RangedData,fdr)	
+					contrInteraction<-assign3CseqSigContact(object,contrRPM.RangedData,smoothing.parameter,fdr)	
 					contrInteractionRegions(object) <-contrInteraction
 					assign(objName,object,envir=parent.frame())
 					invisible(1)

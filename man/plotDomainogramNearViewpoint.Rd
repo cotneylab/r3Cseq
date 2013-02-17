@@ -9,7 +9,7 @@
 }
 
 \usage{
-plotDomainogramNearViewpoint(object,distance=5e5,maximum_window=25e3,view=c("experiment","control","both"))
+plotDomainogramNearViewpoint(object,smoothing.parameter=0.1,distance=5e5,maximum_window=25e3,view=c("experiment","control","both"))
 }
 
 
@@ -17,6 +17,9 @@ plotDomainogramNearViewpoint(object,distance=5e5,maximum_window=25e3,view=c("exp
 
 	\item{object}{
 		r3Cseq or r3CseqInBatch object
+	}
+	\item{smoothing.parameter}{
+		A level at which cubic smoothing spline for the spar (see vsmooth.spline) input parameter. Must be in (0.06,0.4] (default=0.1)
 	}
 	\item{distance}{
 		Numeric. The distance relative to the viewpoint (default=5e5)

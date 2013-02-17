@@ -414,13 +414,13 @@ setMethod("calculateBatchRPM",
 
 setGeneric(
 		name="getBatchInteractions",
-		def=function(object,method=c("union","intersection"),fdr=0.05){
+		def=function(object,method=c("union","intersection"),smoothing.parameter=0.1,fdr=0.05){
 			standardGeneric("getBatchInteractions")
 		}
 )
 setMethod("getBatchInteractions",
 		signature(object = "r3CseqInBatch"),
-		function (object,method,fdr){
+		function (object,method,smoothing.parameter,fdr){
 			if(!is(object,"r3CseqInBatch")){
 				stop("Need the r3CseqInBatch object")
 			}
@@ -428,6 +428,9 @@ setMethod("getBatchInteractions",
 			selected_methods <- match.arg(method)
 			if(selected_methods==""){
 				selected_methods<-"union"
+			}
+			if(smoothing.parameter <0.06 | smoothing.parameter>0.4){
+				stop("The smoothing parameter must be 0.06-0.4 (default=0.1).")
 			}
 			##########################################
 			objName <- deparse(substitute(object))
@@ -455,7 +458,7 @@ setMethod("getBatchInteractions",
 				colnames(rpm.i)<-"RPMs"
 				count.i$RPMs<-rpm.i$RPMs
 				count.i<-count.i[count.i$RPMs>1,]
-				expInt.i<-assign3CseqSigContact(object,count.i,fdr)	
+				expInt.i<-assign3CseqSigContact(object,count.i,smoothing.parameter,fdr)	
 				
 				expInt.i.frame<-data.frame(chromosome=space(expInt.i),start=start(expInt.i),end=end(expInt.i),nReads=expInt.i$nReads,RPMs=expInt.i$RPMs,p.value=expInt.i$p.value,q.value=expInt.i$q.value)
 				
@@ -477,7 +480,7 @@ setMethod("getBatchInteractions",
 				colnames(rpm.i)<-"RPMs"
 				count.i$RPMs<-rpm.i$RPMs
 				count.i<-count.i[count.i$RPMs>1,]
-				contrInt.i<-assign3CseqSigContact(object,count.i,fdr)	
+				contrInt.i<-assign3CseqSigContact(object,count.i,smoothing.parameter,fdr)	
 				
 				contrInt.i.frame<-data.frame(chromosome=space(contrInt.i),start=start(contrInt.i),end=end(contrInt.i),nReads=contrInt.i$nReads,RPMs=contrInt.i$RPMs,p.value=contrInt.i$p.value,q.value=contrInt.i$q.value)
 				
@@ -501,7 +504,7 @@ setMethod("getBatchInteractions",
 				exp.fisher.pvalue<-apply(exp.pvalue,1,fishersMethod)
 				exp.fisher.qvalue<-qvalue(exp.fisher.pvalue, fdr.level=fdr, pi0.method="bootstrap")$qvalues
 				exp.intersec.interaction<-RangedData(space=exp.intersec$chromosome,IRanges(start=exp.intersec$start,end=exp.intersec$end),nReads=exp.nReads.mean,RPMs=exp.RPMs.mean,p.value=exp.fisher.pvalue,q.value=exp.fisher.qvalue)
-		 	    ##############################################
+				##############################################
 				contr.intersec<-na.omit(contrInteraction.filtered)
 				contr.readCounts<-contr.intersec[,c(seq(from=4,to=n.col,by=4))]
 				contr.RPMs<-contr.intersec[,c(seq(from=5,to=n.col,by=4))]

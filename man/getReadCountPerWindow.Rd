@@ -8,7 +8,7 @@
 }
 
 \usage{
-getReadCountPerWindow(object,windowSize=5e3,nFragmentExcludedReadsNearViewpoint=2)
+getReadCountPerWindow(object,windowSize=5e3,nFragmentExcludedReadsNearViewpoint=2,mode=c("non-overlapping", "overlapping"))
 }
 
 
@@ -23,6 +23,9 @@ getReadCountPerWindow(object,windowSize=5e3,nFragmentExcludedReadsNearViewpoint=
 	\item{nFragmentExcludedReadsNearViewpoint}{
 		Numeric. The number of excluded fragments around the viewpoint, reads found in these fragments
 		will be removed from the analysis (default=2)
+	}
+	\item{mode}{
+		character. The window-based modes analysis (default="non-overlapping")
 	}
 }
 

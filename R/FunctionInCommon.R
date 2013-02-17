@@ -3,78 +3,178 @@
 # Contact : supat.thongjuea@bccs.uib.no 
 
 getViewpoint<-function (obj){
-			stopifnot( is( obj, "r3Cseq" ) |is( obj, "r3CseqInBatch" ) )
-			#######get organism name ############
-			genome<-organismName(obj)
-			#######get forward primer############
-			primer_f<-viewpoint_primer_forward(obj)
-			primer_r<-viewpoint_primer_reverse(obj)
-			#######get viewpoint chromosome######
-			viewpoint_chr<-viewpoint_chromosome(obj)
-			#####################################
-			if('BSgenome.Hsapiens.UCSC.hg19' %in% loadedNamespaces()==TRUE){
-				detach(package:BSgenome.Hsapiens.UCSC.hg19,unload=TRUE)
+	stopifnot( is( obj, "r3Cseq" ) |is( obj, "r3CseqInBatch" ) )
+	#######get organism name ############
+	genome<-organismName(obj)
+	#######get forward primer############
+	primer_f<-viewpoint_primer_forward(obj)
+	primer_r<-viewpoint_primer_reverse(obj)
+	#######get viewpoint chromosome######
+	viewpoint_chr<-viewpoint_chromosome(obj)
+	#####################################
+	if('BSgenome.Hsapiens.UCSC.hg19' %in% loadedNamespaces()==TRUE){
+		detach(package:BSgenome.Hsapiens.UCSC.hg19,unload=TRUE)
+	}
+	if('BSgenome.Hsapiens.UCSC.hg18' %in% loadedNamespaces()==TRUE){
+		detach(package:BSgenome.Hsapiens.UCSC.hg18,unload=TRUE)
+	}
+	if('BSgenome.Mmusculus.UCSC.mm9' %in% loadedNamespaces()==TRUE){
+		detach(package:BSgenome.Mmusculus.UCSC.mm9,unload=TRUE)
+	}
+	if(genome=="hg18"){
+		library(BSgenome.Hsapiens.UCSC.hg18)
+		hits_f_f<-matchPattern(DNAString(primer_f),Hsapiens[[viewpoint_chr]],fixed=FALSE)
+		hits_f_r<-matchPattern(reverseComplement(DNAString(primer_f)),Hsapiens[[viewpoint_chr]],fixed=FALSE)
+		hits_f_positions<-c(start(hits_f_f),end(hits_f_f),start(hits_f_r),end(hits_f_r))
+		
+		if(length(hits_f_positions)==0){
+			stop(paste("Could not find the forward primer position in",genome," :",viewpoint_chr, ". Please check the input forward primer"))
+		}
+		
+		hits_r_f<-matchPattern(DNAString(primer_r),Hsapiens[[viewpoint_chr]],fixed=FALSE)
+		hits_r_r<-matchPattern(reverseComplement(DNAString(primer_r)),Hsapiens[[viewpoint_chr]],fixed=FALSE)
+		
+		hits_r_positions<-c(start(hits_r_f),end(hits_r_f),start(hits_r_r),end(hits_r_r))
+		
+		if(length(hits_r_positions)==0){
+			stop(paste("Could not find the reverse primer position in",genome," :",viewpoint_chr, ". Please check the input reverse primer"))
+		}
+		
+		hit_positions<-c(hits_f_positions,hits_r_positions)
+		
+		if(length(hit_positions)==4){
+			start_p<-min(hit_positions)
+			end_p<-max(hit_positions)
+			viewpoint<-RangedData(space=as.character(viewpoint_chr),IRanges(start=start_p,end=end_p))
+			return(viewpoint)
+		}
+		if(length(hit_positions) > 4){
+			
+			if(length(hits_r_positions) > 2 & length(hits_f_positions)==2){
+				rank.id<-order(abs(hits_r_positions-hits_f_positions))
+				hit_positions<-c(hits_f_positions,hits_r_positions[rank.id==1],hits_r_positions[rank.id==2])
+				start_p<-min(hit_positions)
+				end_p<-max(hit_positions)
+				viewpoint<-RangedData(space=as.character(viewpoint_chr),IRanges(start=start_p,end=end_p))
+				return(viewpoint)
+				
 			}
-			if('BSgenome.Hsapiens.UCSC.hg18' %in% loadedNamespaces()==TRUE){
-				detach(package:BSgenome.Hsapiens.UCSC.hg18,unload=TRUE)
+			if(length(hits_f_positions) > 2 & length(hits_r_positions)==2){
+				rank.id<-order(abs(hits_f_positions-hits_r_positions))
+				hit_positions<-c(hits_f_positions[rank.id==1],hits_f_positions[rank.id==2],hits_r_positions)
+				start_p<-min(hit_positions)
+				end_p<-max(hit_positions)
+				viewpoint<-RangedData(space=as.character(viewpoint_chr),IRanges(start=start_p,end=end_p))
+				return(viewpoint)
 			}
-			if('BSgenome.Mmusculus.UCSC.mm9' %in% loadedNamespaces()==TRUE){
-				detach(package:BSgenome.Mmusculus.UCSC.mm9,unload=TRUE)
+			if(length(hits_f_positions) > 2 & length(hits_r_positions) > 2){
+				stop(paste("The position of your input primers are not unique. We detected multiple positions of your input primers!!!"))
 			}
-			if(genome=="hg18"){
-				library(BSgenome.Hsapiens.UCSC.hg18)
-				hits_f_f<-matchPattern(DNAString(primer_f),Hsapiens[[viewpoint_chr]],fixed=FALSE)
-				hits_f_r<-matchPattern(reverseComplement(DNAString(primer_f)),Hsapiens[[viewpoint_chr]],fixed=FALSE)
+		}
+	}else if(genome=="hg19"){
+		library(BSgenome.Hsapiens.UCSC.hg19)
+		hits_f_f<-matchPattern(DNAString(primer_f),Hsapiens[[viewpoint_chr]],fixed=FALSE)
+		hits_f_r<-matchPattern(reverseComplement(DNAString(primer_f)),Hsapiens[[viewpoint_chr]],fixed=FALSE)
+		hits_f_positions<-c(start(hits_f_f),end(hits_f_f),start(hits_f_r),end(hits_f_r))
+		
+		if(length(hits_f_positions)==0){
+			stop(paste("Could not find the forward primer position in",genome," :",viewpoint_chr, ". Please check the input forward primer"))
+		}
+		
+		hits_r_f<-matchPattern(DNAString(primer_r),Hsapiens[[viewpoint_chr]],fixed=FALSE)
+		hits_r_r<-matchPattern(reverseComplement(DNAString(primer_r)),Hsapiens[[viewpoint_chr]],fixed=FALSE)
+		
+		hits_r_positions<-c(start(hits_r_f),end(hits_r_f),start(hits_r_r),end(hits_r_r))
+		
+		if(length(hits_r_positions)==0){
+			stop(paste("Could not find the reverse primer position in",genome," :",viewpoint_chr, ". Please check the input reverse primer"))
+		}
+		
+		hit_positions<-c(hits_f_positions,hits_r_positions)
+		
+		if(length(hit_positions)==4){
+			start_p<-min(hit_positions)
+			end_p<-max(hit_positions)
+			viewpoint<-RangedData(space=as.character(viewpoint_chr),IRanges(start=start_p,end=end_p))
+			return(viewpoint)
+		}
+		if(length(hit_positions) > 4){
+			
+			if(length(hits_r_positions) > 2 & length(hits_f_positions)==2){
+				rank.id<-order(abs(hits_r_positions-hits_f_positions))
+				hit_positions<-c(hits_f_positions,hits_r_positions[rank.id==1],hits_r_positions[rank.id==2])
+				start_p<-min(hit_positions)
+				end_p<-max(hit_positions)
+				viewpoint<-RangedData(space=as.character(viewpoint_chr),IRanges(start=start_p,end=end_p))
+				return(viewpoint)
 				
-				hits_r_f<-matchPattern(DNAString(primer_r),Hsapiens[[viewpoint_chr]],fixed=FALSE)
-				hits_r_r<-matchPattern(reverseComplement(DNAString(primer_r)),Hsapiens[[viewpoint_chr]],fixed=FALSE)
-				
-				hit_positions<-c(start(hits_f_f),end(hits_f_f),start(hits_f_r),end(hits_f_r),start(hits_r_f),end(hits_r_f),start(hits_r_r),end(hits_r_r))
-				if(length(hit_positions)==0){
-					stop(paste("Could not find the primer position in",genome," :",viewpoint_chr))
-				}else{
-					start_p<-min(hit_positions)
-					end_p<-max(hit_positions)
-					viewpoint<-RangedData(space=as.character(viewpoint_chr),IRanges(start=start_p,end=end_p))
-					return(viewpoint)
-				}
-			}else if(genome=="hg19"){
-				library(BSgenome.Hsapiens.UCSC.hg19)
-				hits_f_f<-matchPattern(DNAString(primer_f),Hsapiens[[viewpoint_chr]],fixed=FALSE)
-				hits_f_r<-matchPattern(reverseComplement(DNAString(primer_f)),Hsapiens[[viewpoint_chr]],fixed=FALSE)
-				
-				hits_r_f<-matchPattern(DNAString(primer_r),Hsapiens[[viewpoint_chr]],fixed=FALSE)
-				hits_r_r<-matchPattern(reverseComplement(DNAString(primer_r)),Hsapiens[[viewpoint_chr]],fixed=FALSE)
-				
-				hit_positions<-c(start(hits_f_f),end(hits_f_f),start(hits_f_r),end(hits_f_r),start(hits_r_f),end(hits_r_f),start(hits_r_r),end(hits_r_r))
-				if(length(hit_positions)==0){
-					stop(paste("Could not find the primer position in",genome," :",viewpoint_chr))
-				}else{
-					start_p<-min(hit_positions)
-					end_p<-max(hit_positions)
-					viewpoint<-RangedData(space=as.character(viewpoint_chr),IRanges(start=start_p,end=end_p))
-					return(viewpoint)
-				}
-			}else if(genome =="mm9"){
-				library(BSgenome.Mmusculus.UCSC.mm9)
-				hits_f_f<-matchPattern(DNAString(primer_f),Mmusculus[[viewpoint_chr]],fixed=FALSE)
-				hits_f_r<-matchPattern(reverseComplement(DNAString(primer_f)),Mmusculus[[viewpoint_chr]],fixed=FALSE)
-				
-				hits_r_f<-matchPattern(DNAString(primer_r),Mmusculus[[viewpoint_chr]],fixed=FALSE)
-				hits_r_r<-matchPattern(reverseComplement(DNAString(primer_r)),Mmusculus[[viewpoint_chr]],fixed=FALSE)
-				
-				hit_positions<-c(start(hits_f_f),end(hits_f_f),start(hits_f_r),end(hits_f_r),start(hits_r_f),end(hits_r_f),start(hits_r_r),end(hits_r_r))
-				if(length(hit_positions)==0){
-					stop(paste("Could not find the primer position in",genome," :",viewpoint_chr))
-				}else{
-					start_p<-min(hit_positions)
-					end_p<-max(hit_positions)
-					viewpoint<-RangedData(space=as.character(viewpoint_chr),IRanges(start=start_p,end=end_p))
-					return(viewpoint)
-				}
-			}else{
-				stop("Require the selected genome: hg18, hg19, or mm9.")
 			}
+			if(length(hits_f_positions) > 2 & length(hits_r_positions)==2){
+				rank.id<-order(abs(hits_f_positions-hits_r_positions))
+				hit_positions<-c(hits_f_positions[rank.id==1],hits_f_positions[rank.id==2],hits_r_positions)
+				start_p<-min(hit_positions)
+				end_p<-max(hit_positions)
+				viewpoint<-RangedData(space=as.character(viewpoint_chr),IRanges(start=start_p,end=end_p))
+				return(viewpoint)
+			}
+			if(length(hits_f_positions) > 2 & length(hits_r_positions) > 2){
+				stop(paste("The position of your input primers are not unique. We detected multiple positions of your input primers!!!"))
+			}
+		}
+	}else if(genome =="mm9"){
+		library(BSgenome.Mmusculus.UCSC.mm9)
+		hits_f_f<-matchPattern(DNAString(primer_f),Mmusculus[[viewpoint_chr]],fixed=FALSE)
+		hits_f_r<-matchPattern(reverseComplement(DNAString(primer_f)),Mmusculus[[viewpoint_chr]],fixed=FALSE)
+		hits_f_positions<-c(start(hits_f_f),end(hits_f_f),start(hits_f_r),end(hits_f_r))
+		
+		if(length(hits_f_positions)==0){
+			stop(paste("Could not find the forward primer position in",genome," :",viewpoint_chr, ". Please check the input forward primer"))
+		}
+		
+		hits_r_f<-matchPattern(DNAString(primer_r),Mmusculus[[viewpoint_chr]],fixed=FALSE)
+		hits_r_r<-matchPattern(reverseComplement(DNAString(primer_r)),Mmusculus[[viewpoint_chr]],fixed=FALSE)
+		
+		hits_r_positions<-c(start(hits_r_f),end(hits_r_f),start(hits_r_r),end(hits_r_r))
+		
+		if(length(hits_r_positions)==0){
+			stop(paste("Could not find the reverse primer position in",genome," :",viewpoint_chr, ". Please check the input reverse primer"))
+		}
+		
+		hit_positions<-c(hits_f_positions,hits_r_positions)
+		
+		if(length(hit_positions)==4){
+			start_p<-min(hit_positions)
+			end_p<-max(hit_positions)
+			viewpoint<-RangedData(space=as.character(viewpoint_chr),IRanges(start=start_p,end=end_p))
+			return(viewpoint)
+		}
+		if(length(hit_positions) > 4){
+			
+			if(length(hits_r_positions) > 2 & length(hits_f_positions)==2){
+				rank.id<-order(abs(hits_r_positions-hits_f_positions))
+				hit_positions<-c(hits_f_positions,hits_r_positions[rank.id==1],hits_r_positions[rank.id==2])
+				start_p<-min(hit_positions)
+				end_p<-max(hit_positions)
+				viewpoint<-RangedData(space=as.character(viewpoint_chr),IRanges(start=start_p,end=end_p))
+				return(viewpoint)
+				
+			}
+			if(length(hits_f_positions) > 2 & length(hits_r_positions)==2){
+				rank.id<-order(abs(hits_f_positions-hits_r_positions))
+				hit_positions<-c(hits_f_positions[rank.id==1],hits_f_positions[rank.id==2],hits_r_positions)
+				start_p<-min(hit_positions)
+				end_p<-max(hit_positions)
+				viewpoint<-RangedData(space=as.character(viewpoint_chr),IRanges(start=start_p,end=end_p))
+				return(viewpoint)
+			}
+			if(length(hits_f_positions) > 2 & length(hits_r_positions) > 2){
+				stop(paste("The position of your input primers are not unique. We detected multiple positions of your input primers!!!"))
+			}
+		}
+		
+	}else{
+		stop("Require the selected genome: hg18, hg19, or mm9.")
+	}
 }
 
 excludeReadsNearViewpoint<-function (object,rawReadsGRanges,span_fragment=1){
@@ -105,71 +205,108 @@ excludeReadsNearViewpoint<-function (object,rawReadsGRanges,span_fragment=1){
 	return(new.GRanges)
 }
 
-getFragmentsPerWindow<-function (obj,windowSize=5e3){
-	        stopifnot( is( obj, "r3Cseq" ) |is( obj, "r3CseqInBatch" ) )
-		    if(windowSize <2000 | windowSize >100000){
-				stop("Please select window size between 2Kb - 100Kb")
+getFragmentsPerWindow<-function (obj,windowSize=5e3,mode){
+	stopifnot( is( obj, "r3Cseq" ) |is( obj, "r3CseqInBatch" ) )
+	if(windowSize <2000 | windowSize >100000){
+		stop("Please select window size between 2Kb - 100Kb")
+	}
+	if(mode==""){
+		mode<-"non-overlapping"
+	}
+	#######get organism name ############
+	genome<-organismName(obj)
+	#####################################
+	if('BSgenome.Hsapiens.UCSC.hg19' %in% loadedNamespaces()==TRUE){
+		detach(package:BSgenome.Hsapiens.UCSC.hg19,unload=TRUE)
+	}
+	if('BSgenome.Hsapiens.UCSC.hg18' %in% loadedNamespaces()==TRUE){
+		detach(package:BSgenome.Hsapiens.UCSC.hg18,unload=TRUE)
+	}
+	if('BSgenome.Mmusculus.UCSC.mm9' %in% loadedNamespaces()==TRUE){
+		detach(package:BSgenome.Mmusculus.UCSC.mm9,unload=TRUE)
+	}
+	if(genome=="hg18"){
+		library(BSgenome.Hsapiens.UCSC.hg18)
+		fragment<-data.frame()
+		for (chr in paste('chr',c(seq(1,22),'X','Y'),sep='')){
+			chr.size<-seqlengths(Hsapiens)[chr]
+			if(mode=="non-overlapping"){
+				##Now getting the fragment#####		
+				window.size=windowSize
+				step.size = window.size
+				ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
+				starts <- seq(from=1,to=chr.size,by=step.size)
+				fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
+				fragment<-rbind(fragment,fragment.chr)
 			}
-			#######get organism name ############
-			genome<-organismName(obj)
-			#####################################
-			if('BSgenome.Hsapiens.UCSC.hg19' %in% loadedNamespaces()==TRUE){
-				detach(package:BSgenome.Hsapiens.UCSC.hg19,unload=TRUE)
+			if(mode=="overlapping"){
+				##Now getting the fragment#####		
+				window.size=windowSize
+				step.size = window.size/2
+				ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
+				starts <- seq(from=window.size-step.size+1,to=chr.size,by=step.size)
+				fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
+				fragment<-rbind(fragment,fragment.chr)
 			}
-			if('BSgenome.Hsapiens.UCSC.hg18' %in% loadedNamespaces()==TRUE){
-				detach(package:BSgenome.Hsapiens.UCSC.hg18,unload=TRUE)
+		}
+		fragment.RangedData<-RangedData(space=fragment$chromosome,IRanges(start=fragment$start,end=fragment$end))
+		return(fragment.RangedData)
+	}else if(genome=="hg19"){
+		library(BSgenome.Hsapiens.UCSC.hg19)
+		fragment<-data.frame()
+		for (chr in paste('chr',c(seq(1,22),'X','Y'),sep='')){
+			chr.size<-seqlengths(Hsapiens)[chr]
+			if(mode=="non-overlapping"){
+				##Now getting the fragment#####		
+				window.size=windowSize
+				step.size = window.size
+				ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
+				starts <- seq(from=1,to=chr.size,by=step.size)
+				fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
+				fragment<-rbind(fragment,fragment.chr)
 			}
-			if('BSgenome.Mmusculus.UCSC.mm9' %in% loadedNamespaces()==TRUE){
-				detach(package:BSgenome.Mmusculus.UCSC.mm9,unload=TRUE)
+			if(mode=="overlapping"){
+				##Now getting the fragment#####		
+				window.size=windowSize
+				step.size = window.size/2
+				ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
+				starts <- seq(from=window.size-step.size+1,to=chr.size,by=step.size)
+				fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
+				fragment<-rbind(fragment,fragment.chr)
 			}
-			if(genome=="hg18"){
-				library(BSgenome.Hsapiens.UCSC.hg18)
-				fragment<-data.frame()
-				for (chr in paste('chr',c(seq(1,22),'X','Y'),sep='')){
-							chr.size<-seqlengths(Hsapiens)[chr]
-							##Now getting the fragment#####		
-							window.size=windowSize
-							step.size = window.size
-							ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
-							starts <- seq(from=1,to=chr.size,by=step.size)
-							fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
-							fragment<-rbind(fragment,fragment.chr)
-				}
-				fragment.RangedData<-RangedData(space=fragment$chromosome,IRanges(start=fragment$start,end=fragment$end))
-				return(fragment.RangedData)
-			}else if(genome=="hg19"){
-				library(BSgenome.Hsapiens.UCSC.hg19)
-				fragment<-data.frame()
-				for (chr in paste('chr',c(seq(1,22),'X','Y'),sep='')){
-					chr.size<-seqlengths(Hsapiens)[chr]
-					##Now getting the fragment#####		
-					window.size=windowSize
-					step.size = window.size
-					ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
-					starts <- seq(from=1,to=chr.size,by=step.size)
-					fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
-					fragment<-rbind(fragment,fragment.chr)
-				}
-				fragment.RangedData<-RangedData(space=fragment$chromosome,IRanges(start=fragment$start,end=fragment$end))
-				return(fragment.RangedData)
-			}else if(genome =="mm9"){
-				library(BSgenome.Mmusculus.UCSC.mm9)
-				fragment<-data.frame()
-				for (chr in paste('chr',c(seq(1,19),'X','Y'),sep='')){
-					chr.size<-seqlengths(Mmusculus)[chr]
-					##Now getting the fragment#####		
-					window.size=windowSize
-					step.size = window.size
-					ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
-					starts <- seq(from=1,to=chr.size,by=step.size)
-					fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
-					fragment<-rbind(fragment,fragment.chr)
-				}
-				fragment.RangedData<-RangedData(space=fragment$chromosome,IRanges(start=fragment$start,end=fragment$end))
-				return(fragment.RangedData)
-			}else{
-				stop("Require the selected genome: hg18, hg19, or mm9.")
+		}
+		fragment.RangedData<-RangedData(space=fragment$chromosome,IRanges(start=fragment$start,end=fragment$end))
+		return(fragment.RangedData)
+	}else if(genome =="mm9"){
+		library(BSgenome.Mmusculus.UCSC.mm9)
+		fragment<-data.frame()
+		for (chr in paste('chr',c(seq(1,19),'X','Y'),sep='')){
+			chr.size<-seqlengths(Mmusculus)[chr]
+			
+			if(mode=="non-overlapping"){
+				##Now getting the fragment#####		
+				window.size=windowSize
+				step.size = window.size
+				ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
+				starts <- seq(from=1,to=chr.size,by=step.size)
+				fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
+				fragment<-rbind(fragment,fragment.chr)
 			}
+			if(mode=="overlapping"){
+				##Now getting the fragment#####		
+				window.size=windowSize
+				step.size = window.size/2
+				ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
+				starts <- seq(from=window.size-step.size+1,to=chr.size,by=step.size)
+				fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
+				fragment<-rbind(fragment,fragment.chr)
+			}
+		}
+		fragment.RangedData<-RangedData(space=fragment$chromosome,IRanges(start=fragment$start,end=fragment$end))
+		return(fragment.RangedData)
+	}else{
+		stop("Require the selected genome: hg18, hg19, or mm9.")
+	}
 }
 
 normalcalRPM<-function (x, lib.size){
@@ -214,67 +351,41 @@ powerLawFittedRPM <- function(values,lin.reg.coef,alpha = 1.35, T = 10^6) {
 	return(values.norm)
 }
 
-assign3CseqSigContact<-function(obj,readcount.ranges,fdr){
+assign3CseqSigContact<-function(obj,readcount.ranges,smoothing.parameter,fdr){
 	stopifnot( is( obj, "r3Cseq" ) |is( obj, "r3CseqInBatch" ) )
 	if(nrow(readcount.ranges)>0){
+		viewpoint<-getViewpoint(obj)
 		viewpoint.chr<-viewpoint_chromosome(obj)
 		cis.ranges<-readcount.ranges[space(readcount.ranges)==viewpoint.chr,]
-		cis<-data.frame(chromosome=space(cis.ranges),start=start(cis.ranges),end=end(cis.ranges),observed=cis.ranges$nReads,rpm=cis.ranges$RPMs)
+		cis<-data.frame(chromosome=space(cis.ranges),start=start(cis.ranges),end=end(cis.ranges),relative.position=start(cis.ranges)-start(viewpoint),observed=cis.ranges$nReads,rpm=cis.ranges$RPMs)
 		#######Smooth the data############
-		e.smooth<-smooth.spline(cis$observed,spar=0.4)
+		e.smooth<-vsmooth.spline(cis$relative.position,cis$observed,spar=smoothing.parameter)
 		e.fitted<-fitted(e.smooth)
-		cis$expected_0.4<-e.fitted
-		e.smooth<-smooth.spline(cis$observed,spar=0.5)
-		e.fitted<-fitted(e.smooth)
-		cis$expected_0.5<-e.fitted
-		e.smooth<-smooth.spline(cis$observed,spar=0.6)
-		e.fitted<-fitted(e.smooth)
-		cis$expected_0.6<-e.fitted
-		cis$expected<-rowMeans(cis[,6:8])
+		cis$expected<-as.numeric(e.fitted)
 		######Calculate z-score and assign p-value in cis
-		cis$z<-(cis$observed-mean(cis$expected))/sd(cis$expected)
+		cis$z<-(cis$observed-cis$expected)/sd(cis$observed-cis$expected)
 		cis$p.value<-2*pnorm(-abs(cis$z))
-		cis$p.value[cis$rpm < 1]<-1
+		cis$p.value[cis$z < 0]<-1
 		cis$q.value<-qvalue(cis$p.value, fdr.level=fdr, pi0.method="bootstrap")$qvalues
 		cis.interaction<-data.frame(chromosome=cis$chromosome,start=cis$start,end=cis$end,nReads=cis$observed,RPMs=cis$rpm,z=cis$z,p.value=cis$p.value,q.value=cis$q.value)
 		########Calculate interaction in trans#####
-		viewpoint<-getViewpoint(obj)
-		start.p<-start(viewpoint)-100000
-		end.p<-end(viewpoint)+100000
-		ref1<-subset(cis,start<start.p)
-		ref2<-subset(cis,end > end.p)
+		ref1<-subset(cis,relative.position< -100000)
+		ref2<-subset(cis,relative.position> 100000)
 		ref_cis<-rbind(ref1,ref2)
-		ref_cis<-ref_cis[,c(1:5)]
+		ref_cis<-ref_cis[,c(1:3,5:6)]
 		
-		ref_cis<-ref_cis[sample(1:nrow(ref_cis),0.8*nrow(ref_cis)),]
-		ref_cis<-ref_cis[order(ref_cis$start),]
-		
+		ref_cis<-ref_cis[sample(1:nrow(ref_cis),0.5*nrow(ref_cis)),]
 		ref.trans.ranges<-readcount.ranges[space(readcount.ranges)!=viewpoint.chr,]
 		ref.trans<-data.frame(chromosome=space(ref.trans.ranges),start=start(ref.trans.ranges),end=end(ref.trans.ranges),observed=ref.trans.ranges$nReads,rpm=ref.trans.ranges$RPMs)
 		
-		ref<-rbind(ref_cis,ref.trans)
-		ref<-ref[order(ref$observed,decreasing=T),]
-		
-		
-		e.smooth<-smooth.spline(ref$observed,spar=0.4)
-		e.fitted<-fitted(e.smooth)
-		ref$expected_0.4<-e.fitted
-		e.smooth<-smooth.spline(ref$observed,spar=0.5)
-		e.fitted<-fitted(e.smooth)
-		ref$expected_0.5<-e.fitted
-		e.smooth<-smooth.spline(ref$observed,spar=0.6)
-		e.fitted<-fitted(e.smooth)
-		ref$expected_0.6<-e.fitted
-		ref$expected<-rowMeans(ref[,6:8])
-		
-		trans<-ref
-		trans$z<-(trans$observed-mean(trans$expected))/sd(trans$expected)
+		trans<-rbind(ref_cis,ref.trans)
+		trans$z<-(trans$observed-mean(trans$observed))/sd(trans$observed)
 		trans$p.value<-2*pnorm(-abs(trans$z))
-		trans$p.value[trans$rpm < 1]<-1
+		trans$p.value[trans$z< 0]<-1
 		trans$q.value<-qvalue(trans$p.value, fdr.level=fdr, pi0.method="bootstrap")$qvalues
 		trans<-subset(trans,chromosome !=viewpoint.chr)
 		trans.interaction<-data.frame(chromosome=trans$chromosome,start=trans$start,end=trans$end,nReads=trans$observed,RPMs=trans$rpm,z=trans$z,p.value=trans$p.value,q.value=trans$q.value)
-		
+		#######combined bothcis and trans results########
 		all.int<-rbind(cis.interaction,trans.interaction)
 		all.RangedData<-RangedData(space=all.int$chromosome,IRanges(start=all.int$start,end=all.int$end),nReads=all.int$nReads,RPMs=all.int$RPMs,z=all.int$z,p.value=all.int$p.value,q.value=all.int$q.value)
 		###Return RangedData object#######
@@ -321,7 +432,7 @@ get3CseqRefGene<-function(obj){
 	}
 }
 
-makeInteractionMatrixNearCisPerWindow<-function(obj,rawReads.Ranged,max.window=25e3,viewpoint,distanceFromViewpoint=5e5){
+makeInteractionMatrixNearCisPerWindow<-function(obj,smoothing.parameter,rawReads.Ranged,max.window=25e3,viewpoint,distanceFromViewpoint=5e5){
 	stopifnot( is( obj, "r3Cseq" ) |is( obj, "r3CseqInBatch" ) )
 	if('BSgenome.Hsapiens.UCSC.hg19' %in% loadedNamespaces()==TRUE){
 		detach(package:BSgenome.Hsapiens.UCSC.hg19,unload=TRUE)
@@ -339,6 +450,7 @@ makeInteractionMatrixNearCisPerWindow<-function(obj,rawReads.Ranged,max.window=2
 	if(nrow(viewpoint)==0){
 		stop("No viewpoint, please run getVeiwpoint function to get the viewpoint !!!.")
 	}
+	viewpoint<-getViewpoint(obj)
 	viewpoint.chr <-as.character(space(viewpoint))
 	rawReads.chr<-rawReads.Ranged[seqnames(rawReads.Ranged)==viewpoint.chr]
 	rawReads.filted<-excludeReadsNearViewpoint(obj,rawReads.chr,span_fragment=2)
@@ -371,34 +483,28 @@ makeInteractionMatrixNearCisPerWindow<-function(obj,rawReads.Ranged,max.window=2
 		starts <- seq(from=min(start(rawReads.filted)),to=chr.size,by=step.size)
 		fragment<-data.frame(chromosome=viewpoint.chr,start=starts,end=ends-1)
 		fragment.RangedData<-RangedData(space=fragment$chromosome,IRanges(start=fragment$start,end=fragment$end))
-	
+		
 		readsPerFragment <- countOverlaps(fragment.RangedData,subject=rawReads.filted)
 		reads<-data.frame(nReads=readsPerFragment)
 		countTable<-RangedData(space=space(fragment.RangedData),IRanges(start=start(fragment.RangedData),end=end(fragment.RangedData)),reads)
 		countTable<-countTable[countTable$nReads >0,]
-	
-		cis<-data.frame(chromosome=space(countTable),start=start(countTable),end=end(countTable),observed=countTable$nReads)
+		
+		cis<-data.frame(chromosome=space(countTable),start=start(countTable),end=end(countTable),relative.position=start(countTable)-start(viewpoint),observed=countTable$nReads)
 		#######Smooth the data############
-		e.smooth<-smooth.spline(cis$observed,spar=0.4)
+		e.smooth<-vsmooth.spline(cis$relative.position,cis$observed,spar=smoothing.parameter)
 		e.fitted<-fitted(e.smooth)
-		cis$expected_0.4<-e.fitted
-		e.smooth<-smooth.spline(cis$observed,spar=0.5)
-		e.fitted<-fitted(e.smooth)
-		cis$expected_0.5<-e.fitted
-		e.smooth<-smooth.spline(cis$observed,spar=0.6)
-		e.fitted<-fitted(e.smooth)
-		cis$expected_0.6<-e.fitted
-		cis$expected<-rowMeans(cis[,5:7])
+		cis$expected<-as.numeric(e.fitted)
+		
 		######Calculate z-score and assign p-value in cis
-		cis$z<-(cis$observed-mean(cis$expected))/sd(cis$expected)
+		cis$z<-(cis$observed-cis$expected)/sd(cis$observed-cis$expected)
 		cis$p.value<-2*pnorm(-abs(cis$z))
-		cis$p.value[cis$observed < cis$expected]<-1
+		cis$p.value[cis$z < 0]<-1
 		cis$q.value<-qvalue(cis$p.value, fdr.level=0.05, pi0.method="bootstrap")$qvalues
 		cis.in<-RangedData(space=cis$chromosome,IRanges(start=cis$start,end=cis$end),nReads=cis$observed,z=cis$z,p.value=cis$p.value,q.value=cis$q.value)
 		cis.in<-cis.in[start(cis.in) >=r.start & end(cis.in) <= r.end,]
 		cis.in$rel.start<-start(cis.in)-r.start
 		cis.in$rel.end<-end(cis.in)-r.start
-	
+		
 		##Creat vector of q-value##
 		my_vector<-rep(1,r.size)
 		my.IRanges<-IRanges(start=cis.in$rel.start,end=cis.in$rel.end)
