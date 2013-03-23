@@ -1,6 +1,7 @@
 \name{expRawData}
 \docType{methods}
 \alias{expRawData}
+\alias{expRawData<-}
 \alias{expRawData,r3Cseq-method}
 \alias{expRawData<-,r3Cseq-method}
 

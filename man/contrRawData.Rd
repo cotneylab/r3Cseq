@@ -1,6 +1,7 @@
 \name{contrRawData}
 \docType{methods}
 \alias{contrRawData}
+\alias{contrRawData<-}
 \alias{contrRawData,r3Cseq-method}
 \alias{contrRawData<-,r3Cseq-method}
 
