@@ -6,7 +6,7 @@ Title: Analysis of Chromosome Conformation Capture and Next-generation
 Author: Supat Thongjuea, Bergen Center for Computational Science, Norway <supat.thongjuea@bccs.uib.no>
 Maintainer: Supat Thongjuea <supat.thongjuea@bccs.uib.no>
 Depends: GenomicRanges,Rsamtools,data.table,rtracklayer,VGAM,qvalue,RColorBrewer,sqldf,methods
-Suggests: BSgenome.Mmusculus.UCSC.mm9
+Suggests: BSgenome.Mmusculus.UCSC.mm9,BSgenome.Hsapiens.UCSC.hg18,BSgenome.Hsapiens.UCSC.hg19
 Description: This package is an implementation of data analysis for the long-range interactions from 3C-seq assay.
 License: GPL-3
 URL: http://r3cseq.genereg.net
