@@ -111,7 +111,9 @@ setClass(
 				readCountTable="RangedData",
 				RPMsTable="RangedData",
 				expBatchLibrarySize="vector",
-				contrBatchLibrarySize="vector"
+				contrBatchLibrarySize="vector",
+				expBatchReadLength="vector",
+				contrBatchReadLength="vector"
 		),
 		prototype(
 				bamFilesDirectory=character(1),
@@ -122,7 +124,9 @@ setClass(
 			    readCountTable=RangedData(),
 				RPMsTable=RangedData(),
 				expBatchLibrarySize=vector(),
-				contrBatchLibrarySize=vector()
+				contrBatchLibrarySize=vector(),
+				expBatchReadLength=vector(),
+				contrBatchReadLength=vector()
 		),
 		validity = function(object) {
 			if(length(object@bamFilesDirectory)==0)

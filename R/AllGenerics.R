@@ -585,6 +585,57 @@ setReplaceMethod(
 			initialize(object,contrBatchLibrarySize=value)
 		})
 
+########
+setGeneric(
+		name="expBatchReadLength",
+		def=function(object){
+			standardGeneric("expBatchReadLength")
+		}
+)
+setGeneric(
+		name="expBatchReadLength<-",
+		def=function(object,value){
+			standardGeneric("expBatchReadLength<-")
+		}
+)
+setMethod("expBatchReadLength",
+		signature(object="r3CseqInBatch"),
+		function(object){
+			object@expBatchReadLength
+		}
+)
+setReplaceMethod(
+		f="expBatchReadLength",
+		signature="r3CseqInBatch",
+		definition=function(object,value){
+			initialize(object,expBatchReadLength=value)
+		})
+########
+setGeneric(
+		name="contrBatchReadLength",
+		def=function(object){
+			standardGeneric("contrBatchReadLength")
+		}
+)
+setGeneric(
+		name="contrBatchReadLength<-",
+		def=function(object,value){
+			standardGeneric("contrBatchReadLength<-")
+		}
+)
+setMethod("contrBatchReadLength",
+		signature(object="r3CseqInBatch"),
+		function(object){
+			object@contrBatchReadLength
+		}
+)
+setReplaceMethod(
+		f="contrBatchReadLength",
+		signature="r3CseqInBatch",
+		definition=function(object,value){
+			initialize(object,contrBatchReadLength=value)
+		})
+
 ###Removed functions######
 #########
 setGeneric(

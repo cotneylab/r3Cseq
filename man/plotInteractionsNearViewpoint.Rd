@@ -9,7 +9,7 @@
 }
 
 \usage{
-plotInteractionsNearViewpoint(obj,distance=5e5)
+plotInteractionsNearViewpoint(obj,distance=5e5,log2fc_cutoff=1,yLim=0)
 }
 
 
@@ -20,6 +20,12 @@ plotInteractionsNearViewpoint(obj,distance=5e5)
 	}
 	\item{distance}{
 		Numeric. The distance relative to the viewpoint (default=5e5)
+	}
+	\item{log2fc_cutoff}{
+		Numeric. The log2 cutoff ratio between the experiment and control (default=1)
+	}
+	\item{yLim}{
+		Numeric. The limited height of y-axis (default=0)
 	}
 }
 

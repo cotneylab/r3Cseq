@@ -1,3 +1,10 @@
+version 1.9.0: (2013-10-21)
+- added the yLim input parameter of plotInteractionsNearViewpoint
+- added the log2 cutoff ratio for the function plotInteractionsNearViewpoint
+- fixed the shift of interaction in the viewpoint chromosome found in the function getFragmentsPerWindow
+- fixed the missing input parameter for the function getBatchReadCountPerWindow
+- fixed the class of r3CseqInBatch
+
 version 1.5.0: (2012-10-25)
 - added the new normalization method of 3C-seq analysis
 - added the new statistical analysis for identification of 3C-seq interaction regions

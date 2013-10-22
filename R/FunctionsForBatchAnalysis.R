@@ -40,20 +40,24 @@ setMethod("getBatchRawReads",
 				}		
 			}
 			exp.lib.size<-c()
+			exp.read.length<-c()
 			for(i in 1:length(exp.bam.files)){
+				
 					input.bam<-exp.bam.files[i]		    
 					print(paste("start reading in...",input.bam, "....file in the experiment"))
 					what    <- c("rname", "strand", "pos", "qwidth","seq")
 					param   <- ScanBamParam(what=what,flag = scanBamFlag(isUnmappedQuery = FALSE))
 					exp.bam <- scanBam(input.bam, param=param)
-					exp.read.length <-width(exp.bam[[1]]$seq[1])
-					exp.GRanges<-GRanges(seqnames=as.vector(exp.bam[[1]]$rname),IRanges(start=exp.bam[[1]]$pos,width=exp.read.length),strand=exp.bam[[1]]$strand)
+					exp.length <-width(exp.bam[[1]]$seq[1])
+					exp.GRanges<-GRanges(seqnames=as.vector(exp.bam[[1]]$rname),IRanges(start=exp.bam[[1]]$pos,width=exp.length),strand=exp.bam[[1]]$strand)
 					fileName<-gsub(".bam","",expFiles[i])
 					lib.size <-length(exp.GRanges)
 					exp.lib.size<-append(exp.lib.size,lib.size)
+					exp.read.length<-append(exp.read.length,exp.length)
 					save(exp.GRanges,file=paste(fileName,".rData",sep=""))
 			}
 			contr.lib.size<-c()
+			contr.read.length<-c()
 			###########Make count table for each bam file in the controls########
 			for(i in 1:length(contr.bam.files)){
 					input.bam<-contr.bam.files[i]		    
@@ -61,16 +65,21 @@ setMethod("getBatchRawReads",
 					what    <- c("rname", "strand", "pos", "qwidth","seq")
 					param   <- ScanBamParam(what=what,flag = scanBamFlag(isUnmappedQuery = FALSE))
 					contr.bam <- scanBam(input.bam, param=param)
-					contr.read.length <-width(contr.bam[[1]]$seq[1])
-					contr.GRanges<-GRanges(seqnames=as.vector(contr.bam[[1]]$rname),IRanges(start=contr.bam[[1]]$pos,width=contr.read.length),strand=contr.bam[[1]]$strand)	
+					contr.length <-width(contr.bam[[1]]$seq[1])
+					contr.GRanges<-GRanges(seqnames=as.vector(contr.bam[[1]]$rname),IRanges(start=contr.bam[[1]]$pos,width=contr.length),strand=contr.bam[[1]]$strand)	
 					
 					fileName<-gsub(".bam","",contrFiles[i])
 					lib.size <-length(contr.GRanges)
 					contr.lib.size<-append(contr.lib.size,lib.size)
+					contr.read.length<-append(contr.read.length,contr.length)
 					save(contr.GRanges,file=paste(fileName,".rData",sep=""))
 			}
 				expBatchLibrarySize(object)<-exp.lib.size
 				contrBatchLibrarySize(object)<-contr.lib.size
+				
+				expBatchReadLength(object)<-exp.read.length
+				contrBatchReadLength(object)<-contr.read.length
+				
 				assign(objName,object,envir=parent.frame())
 				invisible(1)
 				print("The raw read files are created!!!.")
@@ -137,6 +146,9 @@ setMethod("getBatchReadCountPerRestrictionFragment",
 			expFiles<-BamExpFiles(object)
 			contrFiles<-BamContrFiles(object)
 			###########################################
+			exp.read.length<-expBatchReadLength(object)
+			contr.read.length<-contrBatchReadLength(object)
+			
 			if(selected_methods=="wholeReads"){
 				###########Making GRange Object############
 				wholeFragments.RagedData<-RangedData(space=as.character(wholeFragments$chromosome),IRanges(start=wholeFragments$start,end=wholeFragments$end))
@@ -188,8 +200,8 @@ setMethod("getBatchReadCountPerRestrictionFragment",
 					load(fileName)
 					exp.GRanges<-excludeReadsNearViewpoint(object,exp.GRanges,nExcludedFragments)
 					########Make RangedData for the 5' and 3' of RE#######
-					wholeFragments_5_prime.RangedData<-RangedData(space=space(wholeFragments.RagedData),IRanges(start=start(wholeFragments.RagedData),end=start(wholeFragments.RagedData)+exp.read.length))
-					wholeFragments_3_prime.RangedData<-RangedData(space=space(wholeFragments.RagedData),IRanges(start=end(wholeFragments.RagedData)-exp.read.length,end=end(wholeFragments.RagedData)))
+					wholeFragments_5_prime.RangedData<-RangedData(space=space(wholeFragments.RagedData),IRanges(start=start(wholeFragments.RagedData),end=start(wholeFragments.RagedData)+exp.read.length[i]))
+					wholeFragments_3_prime.RangedData<-RangedData(space=space(wholeFragments.RagedData),IRanges(start=end(wholeFragments.RagedData)-exp.read.length[i],end=end(wholeFragments.RagedData)))
 					
 					readsPerFragment_5 <- countOverlaps(wholeFragments_5_prime.RangedData,subject=exp.GRanges)
 					readsPerFragment_3 <- countOverlaps(wholeFragments_3_prime.RangedData,subject=exp.GRanges)
@@ -206,8 +218,8 @@ setMethod("getBatchReadCountPerRestrictionFragment",
 					load(fileName)	
 					contr.GRanges<-excludeReadsNearViewpoint(object,contr.GRanges,nExcludedFragments)
 					########Make RangedData for the 5' and 3' of RE#######
-					wholeFragments_5_prime.RangedData<-RangedData(space=space(wholeFragments.RagedData),IRanges(start=start(wholeFragments.RagedData),end=start(wholeFragments.RagedData)+exp.read.length))
-					wholeFragments_3_prime.RangedData<-RangedData(space=space(wholeFragments.RagedData),IRanges(start=end(wholeFragments.RagedData)-exp.read.length,end=end(wholeFragments.RagedData)))
+					wholeFragments_5_prime.RangedData<-RangedData(space=space(wholeFragments.RagedData),IRanges(start=start(wholeFragments.RagedData),end=start(wholeFragments.RagedData)+contr.read.length[i]))
+					wholeFragments_3_prime.RangedData<-RangedData(space=space(wholeFragments.RagedData),IRanges(start=end(wholeFragments.RagedData)-contr.read.length[i],end=end(wholeFragments.RagedData)))
 					
 					readsPerFragment_5 <- countOverlaps(wholeFragments_5_prime.RangedData,subject=contr.GRanges)
 					readsPerFragment_3 <- countOverlaps(wholeFragments_3_prime.RangedData,subject=contr.GRanges)
@@ -232,14 +244,14 @@ setMethod("getBatchReadCountPerRestrictionFragment",
 
 setGeneric(
 		name="getBatchReadCountPerWindow",
-		def=function(object,windowSize=5e3,nFragmentExcludedReadsNearViewpoint=2){
+		def=function(object,windowSize=5e3,nFragmentExcludedReadsNearViewpoint=2,mode=c("non-overlapping", "overlapping")){
 			standardGeneric("getBatchReadCountPerWindow")
 		}
 )
 
 setMethod("getBatchReadCountPerWindow",
 		signature(object = "r3CseqInBatch"),
-		function (object,windowSize,nFragmentExcludedReadsNearViewpoint){
+		function (object,windowSize,nFragmentExcludedReadsNearViewpoint,mode){
 			objName <- deparse(substitute(object))
 			if(!is(object,"r3CseqInBatch")){
 				stop("Need to initialize the r3CseqInBatch object")
@@ -248,6 +260,11 @@ setMethod("getBatchReadCountPerWindow",
 			nExcludedFragments <- nFragmentExcludedReadsNearViewpoint
 			if(nExcludedFragments <0 | nExcludedFragments>5){
 				stop("The number of fragment that uses for removing reads around the viewpoint must be 0-5 restriction fragments.")
+			}
+			#####Select the read count methods#########
+			mode <- match.arg(mode)
+			if(mode==""){
+				mode<-"non-overlapping"
 			}
 			######check files########################
 			objName <- deparse(substitute(object))
@@ -280,7 +297,7 @@ setMethod("getBatchReadCountPerWindow",
 			expFiles<-BamExpFiles(object)
 			contrFiles<-BamContrFiles(object)
 			###########################################
-			wholeFragments.RagedData<-getFragmentsPerWindow(object,windowSize)
+			wholeFragments.RagedData<-getFragmentsPerWindow(object,windowSize,mode)
 			###########Make count table for each bam file in the experiments########
 				readCountTable<-data.frame(chromosome=space(wholeFragments.RagedData),start=start(wholeFragments.RagedData),end=end(wholeFragments.RagedData))
 				for(i in 1:length(exp.bam.files)){   

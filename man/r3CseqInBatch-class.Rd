@@ -82,6 +82,12 @@ Class \code{r3CseqCommon}, directly.
     
     \item{\code{contrBatchLibrarySize}}{Object of class \code{"vector"}
       the library size of each control} 
+    
+    \item{\code{expBatchReadLength}}{Object of class \code{"vector"}
+      the read length of experiments}  
+      
+    \item{\code{contrBatchReadLength}}{Object of class \code{"vector"}
+      the read length of controls} 
   }
 }
 

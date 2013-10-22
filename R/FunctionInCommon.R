@@ -216,6 +216,9 @@ getFragmentsPerWindow<-function (obj,windowSize=5e3,mode){
 	#######get organism name ############
 	genome<-organismName(obj)
 	#####################################
+	viewpoint<-getViewpoint(obj)
+	viewpoint.chr<-viewpoint_chromosome(obj)
+	#####################################
 	if('BSgenome.Hsapiens.UCSC.hg19' %in% loadedNamespaces()==TRUE){
 		detach(package:BSgenome.Hsapiens.UCSC.hg19,unload=TRUE)
 	}
@@ -230,23 +233,64 @@ getFragmentsPerWindow<-function (obj,windowSize=5e3,mode){
 		fragment<-data.frame()
 		for (chr in paste('chr',c(seq(1,22),'X','Y'),sep='')){
 			chr.size<-seqlengths(Hsapiens)[chr]
-			if(mode=="non-overlapping"){
-				##Now getting the fragment#####		
-				window.size=windowSize
-				step.size = window.size
-				ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
-				starts <- seq(from=1,to=chr.size,by=step.size)
-				fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
-				fragment<-rbind(fragment,fragment.chr)
-			}
-			if(mode=="overlapping"){
-				##Now getting the fragment#####		
-				window.size=windowSize
-				step.size = window.size/2
-				ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
-				starts <- seq(from=window.size-step.size+1,to=chr.size,by=step.size)
-				fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
-				fragment<-rbind(fragment,fragment.chr)
+			if(chr==viewpoint.chr){
+				if(mode=="non-overlapping"){
+					##Now getting the fragment#####		
+					window.size=windowSize
+					step.size = window.size
+					start.p<-start(viewpoint)
+					end.p<-end(viewpoint)
+					
+					f.ends<-(rev(seq(-start.p, -window.size,by=step.size)))*-1
+					f.starts <- c(1,(rev(seq(-start.p+window.size,1,by=step.size)))*-1)
+					f.starts<-f.starts[-(2)]
+					
+					s.ends <- c(seq(from=end.p+window.size,to=chr.size,by=step.size),as.integer(chr.size))
+					s.starts <- seq(from=end.p,to=chr.size,by=step.size)
+					
+					f.fragment<-data.frame(chromosome=chr,start=f.starts,end=f.ends)
+					s.fragment<-data.frame(chromosome=chr,start=s.starts,end=s.ends)
+					fragment.chr<-rbind(f.fragment,s.fragment)
+					fragment<-rbind(fragment,fragment.chr)
+				}
+				if(mode=="overlapping"){
+					##Now getting the fragment#####		
+					window.size=windowSize
+					step.size = window.size/2
+					start.p<-start(viewpoint)
+					end.p<-end(viewpoint)
+					
+					f.ends<-(rev(seq(-start.p, -window.size,by=step.size)))*-1
+					f.starts <- c(1,(rev(seq(-start.p+window.size,1,by=step.size)))*-1)
+					f.starts<-f.starts[-(2)]
+					
+					s.ends <- c(seq(from=end.p+window.size,to=chr.size,by=step.size),as.integer(chr.size))
+					s.starts <- seq(from=end.p,to=chr.size,by=step.size)
+					
+					f.fragment<-data.frame(chromosome=chr,start=f.starts,end=f.ends)
+					s.fragment<-data.frame(chromosome=chr,start=s.starts,end=s.ends)
+					fragment.chr<-rbind(f.fragment,s.fragment)
+					fragment<-rbind(fragment,fragment.chr)
+				}
+			}else{	
+				if(mode=="non-overlapping"){
+					##Now getting the fragment#####		
+					window.size=windowSize
+					step.size = window.size
+					ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
+					starts <- seq(from=1,to=chr.size,by=step.size)
+					fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
+					fragment<-rbind(fragment,fragment.chr)
+				}
+				if(mode=="overlapping"){
+					##Now getting the fragment#####		
+					window.size=windowSize
+					step.size = window.size/2
+					ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
+					starts <- seq(from=window.size-step.size+1,to=chr.size,by=step.size)
+					fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
+					fragment<-rbind(fragment,fragment.chr)
+				}
 			}
 		}
 		fragment.RangedData<-RangedData(space=fragment$chromosome,IRanges(start=fragment$start,end=fragment$end))
@@ -256,23 +300,65 @@ getFragmentsPerWindow<-function (obj,windowSize=5e3,mode){
 		fragment<-data.frame()
 		for (chr in paste('chr',c(seq(1,22),'X','Y'),sep='')){
 			chr.size<-seqlengths(Hsapiens)[chr]
-			if(mode=="non-overlapping"){
-				##Now getting the fragment#####		
-				window.size=windowSize
-				step.size = window.size
-				ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
-				starts <- seq(from=1,to=chr.size,by=step.size)
-				fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
-				fragment<-rbind(fragment,fragment.chr)
-			}
-			if(mode=="overlapping"){
-				##Now getting the fragment#####		
-				window.size=windowSize
-				step.size = window.size/2
-				ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
-				starts <- seq(from=window.size-step.size+1,to=chr.size,by=step.size)
-				fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
-				fragment<-rbind(fragment,fragment.chr)
+				
+			if(chr==viewpoint.chr){
+				if(mode=="non-overlapping"){
+					##Now getting the fragment#####		
+					window.size=windowSize
+					step.size = window.size
+					start.p<-start(viewpoint)
+					end.p<-end(viewpoint)
+					
+					f.ends<-(rev(seq(-start.p, -window.size,by=step.size)))*-1
+					f.starts <- c(1,(rev(seq(-start.p+window.size,1,by=step.size)))*-1)
+					f.starts<-f.starts[-(2)]
+					
+					s.ends <- c(seq(from=end.p+window.size,to=chr.size,by=step.size),as.integer(chr.size))
+					s.starts <- seq(from=end.p,to=chr.size,by=step.size)
+					
+					f.fragment<-data.frame(chromosome=chr,start=f.starts,end=f.ends)
+					s.fragment<-data.frame(chromosome=chr,start=s.starts,end=s.ends)
+					fragment.chr<-rbind(f.fragment,s.fragment)
+					fragment<-rbind(fragment,fragment.chr)
+				}
+				if(mode=="overlapping"){
+					##Now getting the fragment#####		
+					window.size=windowSize
+					step.size = window.size/2
+					start.p<-start(viewpoint)
+					end.p<-end(viewpoint)
+					
+					f.ends<-(rev(seq(-start.p, -window.size,by=step.size)))*-1
+					f.starts <- c(1,(rev(seq(-start.p+window.size,1,by=step.size)))*-1)
+					f.starts<-f.starts[-(2)]
+					
+					s.ends <- c(seq(from=end.p+window.size,to=chr.size,by=step.size),as.integer(chr.size))
+					s.starts <- seq(from=end.p,to=chr.size,by=step.size)
+					
+					f.fragment<-data.frame(chromosome=chr,start=f.starts,end=f.ends)
+					s.fragment<-data.frame(chromosome=chr,start=s.starts,end=s.ends)
+					fragment.chr<-rbind(f.fragment,s.fragment)
+					fragment<-rbind(fragment,fragment.chr)
+				}
+			}else{
+				if(mode=="non-overlapping"){
+					##Now getting the fragment#####		
+					window.size=windowSize
+					step.size = window.size
+					ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
+					starts <- seq(from=1,to=chr.size,by=step.size)
+					fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
+					fragment<-rbind(fragment,fragment.chr)
+				}
+				if(mode=="overlapping"){
+					##Now getting the fragment#####		
+					window.size=windowSize
+					step.size = window.size/2
+					ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
+					starts <- seq(from=window.size-step.size+1,to=chr.size,by=step.size)
+					fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
+					fragment<-rbind(fragment,fragment.chr)
+				}
 			}
 		}
 		fragment.RangedData<-RangedData(space=fragment$chromosome,IRanges(start=fragment$start,end=fragment$end))
@@ -282,24 +368,64 @@ getFragmentsPerWindow<-function (obj,windowSize=5e3,mode){
 		fragment<-data.frame()
 		for (chr in paste('chr',c(seq(1,19),'X','Y'),sep='')){
 			chr.size<-seqlengths(Mmusculus)[chr]
-			
-			if(mode=="non-overlapping"){
-				##Now getting the fragment#####		
-				window.size=windowSize
-				step.size = window.size
-				ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
-				starts <- seq(from=1,to=chr.size,by=step.size)
-				fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
-				fragment<-rbind(fragment,fragment.chr)
-			}
-			if(mode=="overlapping"){
-				##Now getting the fragment#####		
-				window.size=windowSize
-				step.size = window.size/2
-				ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
-				starts <- seq(from=window.size-step.size+1,to=chr.size,by=step.size)
-				fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
-				fragment<-rbind(fragment,fragment.chr)
+			if(chr==viewpoint.chr){
+				if(mode=="non-overlapping"){
+					##Now getting the fragment#####		
+					window.size=windowSize
+					step.size = window.size
+					start.p<-start(viewpoint)
+					end.p<-end(viewpoint)
+					
+					f.ends<-(rev(seq(-start.p, -window.size,by=step.size)))*-1
+					f.starts <- c(1,(rev(seq(-start.p+window.size,1,by=step.size)))*-1)
+					f.starts<-f.starts[-(2)]
+					
+					s.ends <- c(seq(from=end.p+window.size,to=chr.size,by=step.size),as.integer(chr.size))
+					s.starts <- seq(from=end.p,to=chr.size,by=step.size)
+					
+					f.fragment<-data.frame(chromosome=chr,start=f.starts,end=f.ends)
+					s.fragment<-data.frame(chromosome=chr,start=s.starts,end=s.ends)
+					fragment.chr<-rbind(f.fragment,s.fragment)
+					fragment<-rbind(fragment,fragment.chr)
+				}
+				if(mode=="overlapping"){
+					##Now getting the fragment#####		
+					window.size=windowSize
+					step.size = window.size/2
+					start.p<-start(viewpoint)
+					end.p<-end(viewpoint)
+					
+					f.ends<-(rev(seq(-start.p, -window.size,by=step.size)))*-1
+					f.starts <- c(1,(rev(seq(-start.p+window.size,1,by=step.size)))*-1)
+					f.starts<-f.starts[-(2)]
+					
+					s.ends <- c(seq(from=end.p+window.size,to=chr.size,by=step.size),as.integer(chr.size))
+					s.starts <- seq(from=end.p,to=chr.size,by=step.size)
+					
+					f.fragment<-data.frame(chromosome=chr,start=f.starts,end=f.ends)
+					s.fragment<-data.frame(chromosome=chr,start=s.starts,end=s.ends)
+					fragment.chr<-rbind(f.fragment,s.fragment)
+					fragment<-rbind(fragment,fragment.chr)
+				}
+			}else{
+				if(mode=="non-overlapping"){
+					##Now getting the fragment#####		
+					window.size=windowSize
+					step.size = window.size
+					ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
+					starts <- seq(from=1,to=chr.size,by=step.size)
+					fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
+					fragment<-rbind(fragment,fragment.chr)
+				}
+				if(mode=="overlapping"){
+					##Now getting the fragment#####		
+					window.size=windowSize
+					step.size = window.size/2
+					ends <- c(seq(from=window.size,to=chr.size,by=step.size),as.integer(chr.size))
+					starts <- seq(from=window.size-step.size+1,to=chr.size,by=step.size)
+					fragment.chr<-data.frame(chromosome=chr,start=starts,end=ends)
+					fragment<-rbind(fragment,fragment.chr)
+				}
 			}
 		}
 		fragment.RangedData<-RangedData(space=fragment$chromosome,IRanges(start=fragment$start,end=fragment$end))

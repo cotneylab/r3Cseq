@@ -332,11 +332,11 @@ plotOverviewInteractions<-function (obj,cutoff.qvalue=0.05){
 			}
 }
 
-plotInteractionsNearViewpoint<-function(obj,distance=5e5){
+plotInteractionsNearViewpoint<-function(obj,distance=5e5,log2fc_cutoff=1,yLim=0){
 			
 			stopifnot( is(obj, "r3Cseq") | is(obj,"r3CseqInBatch"))
 			if(distance < 50000 | distance > 500000){
-				stop("Please select distance between 50Kb - 500Kb")
+				print("You distance is too high or too low!!!. Please input the distance between 50Kb - 500Kb")
 			}
 			########Get viewpoint############
 			viewpoint <-getViewpoint(obj)
@@ -478,7 +478,8 @@ plotInteractionsNearViewpoint<-function(obj,distance=5e5){
 				)	
 				par(fig=c(0,1,0.12,0.60),new=T)
 				par(mar=c(4,5,0.1,2))
-				y.exp.max <-max(exp.data$nReads)
+				y.exp.max <-ifelse(yLim >0,yLim,max(exp.data$nReads))
+				
 				plot(c(-1*(distance),distance),c(1,y.exp.max), type= "n", ylab="Reads",xlab="Distance (bp) relative to the viewpoint")
 				points(exp.data$p_start,exp.data$nReads,col=exp.data$col,pch=19)	
 				lines(exp.data$p_start,exp.data$nReads,col='black',lty=1)
@@ -630,7 +631,7 @@ plotInteractionsNearViewpoint<-function(obj,distance=5e5){
 				)	
 				par(fig=c(0,1,0.50,0.75),new=T)
 				par(mar=c(0,5,0.1,2))
-				y.exp.max <-max(exp.data$RPMs)
+				y.exp.max <-ifelse(yLim >0,yLim,max(exp.data$RPMs))
 		
 				plot(c(-1*(distance),distance),c(1,y.exp.max), type= "n", ylab="RPMs",xaxt='n')
 				points(exp.data$p_start,exp.data$RPMs,col=exp.data$col,pch=19)
@@ -642,7 +643,7 @@ plotInteractionsNearViewpoint<-function(obj,distance=5e5){
 				
 				par(fig=c(0,1,0.25,0.50),new=T)
 				par(mar=c(0,5,0.1,2))
-				y.exp.max <-max(exp.data$RPMs)
+				y.exp.max <-ifelse(yLim >0,yLim,max(exp.data$RPMs))
 				plot(c(-1*(distance),distance),c(1,y.exp.max), type= "n", ylab="RPMs",xaxt='n')				
 				points(contr.data$p_start,contr.data$RPMs,col=contr.data$col,pch=19)	
 				lines(contr.data$p_start,contr.data$RPMs,col='black',lty=1)
@@ -657,14 +658,15 @@ plotInteractionsNearViewpoint<-function(obj,distance=5e5){
 				contr.rpm<-subset(contr.rpm,contr_RPMs>=1)
 				combined.rpm<-merge(exp.rpm,contr.rpm,by.x=c("start","end"),by.y=c("start","end"),all=T)
 				combined.rpm[is.na(combined.rpm)==TRUE]<-0
-				combined.rpm$log2fold<-log2((combined.rpm$exp_RPMs+1)/(combined.rpm$contr_RPMs+1))
+				combined.rpm$log2fold<-log2(combined.rpm$exp_RPMs+1)-log2(combined.rpm$contr_RPMs+1)
+				combined.rpm<-subset(combined.rpm,abs(log2fold) >=log2fc_cutoff)
 				combined.rpm$p_start<-combined.rpm$start-start(viewpoint)
 				combined.rpm$p_end<-combined.rpm$end-start(viewpoint)
 				
 				par(fig=c(0,1,0,0.25),new=T)
 				par(mar=c(4,5,0.1,2))
 				
-				plot(c(-1*(distance),distance),c(min(combined.rpm$log2fold),max(combined.rpm$log2fold)), type= "n", ylab="Exp/Cont (log2)",xlab="Distance (bp) from the viewpoint")
+				plot(c(-1*(distance),distance),c(min(combined.rpm$log2fold),max(combined.rpm$log2fold)), type= "n", ylab="log2(Exp/Cont)",xlab="Distance (bp) from the viewpoint")
 				
 				for(i in 1:nrow(combined.rpm)){
 					start<-combined.rpm$p_start[i]
@@ -673,11 +675,14 @@ plotInteractionsNearViewpoint<-function(obj,distance=5e5){
 					if(log2.fold >0){
 						rect(start,0,end,log2.fold, col="red")
 					}else{
-						rect(start,0,end,log2.fold, col="blue")
+						rect(start,0,end,log2.fold, col="green")
 					}
 				}
 				abline(v=0,lty=3,col="red",lwd=2)
-				abline(h=0,lty=3,col="black",lwd=2)
+				abline(h=0,lty=1,col="black",lwd=1)
+				abline(h=log2fc_cutoff,lty=3,col="black",lwd=1)
+				abline(h=-log2fc_cutoff,lty=3,col="black",lwd=1)
+				legend("bottomleft",legend =paste("log2fc >=",log2fc_cutoff,"& log2fc <=",-log2fc_cutoff), cex=0.7,bty="n")
 			}
 }
 
