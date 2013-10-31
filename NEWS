@@ -1,4 +1,4 @@
-version 1.9.0: (2013-10-21)
+version 1.9.1: (2013-10-21)
 - added the yLim input parameter of plotInteractionsNearViewpoint
 - added the log2 cutoff ratio for the function plotInteractionsNearViewpoint
 - fixed the shift of interaction in the viewpoint chromosome found in the function getFragmentsPerWindow
