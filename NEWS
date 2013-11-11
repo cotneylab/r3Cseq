@@ -1,3 +1,7 @@
+version 1.9.2: (2013-11-11)
+
+- fixed the bugs in function getFragmentsPerWindow for "overlapping window"
+
 version 1.9.1: (2013-10-21)
 - added the yLim input parameter of plotInteractionsNearViewpoint
 - added the log2 cutoff ratio for the function plotInteractionsNearViewpoint

@@ -343,7 +343,7 @@ head(detected_genes)
 \Robject{RangedData} to the bedGraph format, which simply upload to the UCSC 
 genome browser.
 <<>>=
-export3Cseq2bedGraph(my3Cseq.obj)	
+#export3Cseq2bedGraph(my3Cseq.obj)	
 @
 \subsection{Summary report}
 \Rfunction{generate3CseqReport} function generates the summary report

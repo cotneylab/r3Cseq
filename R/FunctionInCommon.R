@@ -266,9 +266,12 @@ getFragmentsPerWindow<-function (obj,windowSize=5e3,mode){
 					
 					s.ends <- c(seq(from=end.p+window.size,to=chr.size,by=step.size),as.integer(chr.size))
 					s.starts <- seq(from=end.p,to=chr.size,by=step.size)
+					s.starts<-s.starts[-(length(s.starts))]
 					
 					f.fragment<-data.frame(chromosome=chr,start=f.starts,end=f.ends)
 					s.fragment<-data.frame(chromosome=chr,start=s.starts,end=s.ends)
+					
+					
 					fragment.chr<-rbind(f.fragment,s.fragment)
 					fragment<-rbind(fragment,fragment.chr)
 				}
@@ -334,9 +337,12 @@ getFragmentsPerWindow<-function (obj,windowSize=5e3,mode){
 					
 					s.ends <- c(seq(from=end.p+window.size,to=chr.size,by=step.size),as.integer(chr.size))
 					s.starts <- seq(from=end.p,to=chr.size,by=step.size)
+					s.starts<-s.starts[-(length(s.starts))]
 					
 					f.fragment<-data.frame(chromosome=chr,start=f.starts,end=f.ends)
 					s.fragment<-data.frame(chromosome=chr,start=s.starts,end=s.ends)
+					
+					
 					fragment.chr<-rbind(f.fragment,s.fragment)
 					fragment<-rbind(fragment,fragment.chr)
 				}
@@ -401,6 +407,7 @@ getFragmentsPerWindow<-function (obj,windowSize=5e3,mode){
 					
 					s.ends <- c(seq(from=end.p+window.size,to=chr.size,by=step.size),as.integer(chr.size))
 					s.starts <- seq(from=end.p,to=chr.size,by=step.size)
+					s.starts<-s.starts[-(length(s.starts))]
 					
 					f.fragment<-data.frame(chromosome=chr,start=f.starts,end=f.ends)
 					s.fragment<-data.frame(chromosome=chr,start=s.starts,end=s.ends)
