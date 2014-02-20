@@ -12,17 +12,17 @@ getViewpoint<-function (obj){
 	#######get viewpoint chromosome######
 	viewpoint_chr<-viewpoint_chromosome(obj)
 	#####################################
-	if('BSgenome.Hsapiens.UCSC.hg19' %in% loadedNamespaces()==TRUE){
-		detach(package:BSgenome.Hsapiens.UCSC.hg19,unload=TRUE)
+	if('BSgenome.Hsapiens.UCSC.hg19.masked' %in% loadedNamespaces()==TRUE){
+		detach(package:BSgenome.Hsapiens.UCSC.hg19.masked,unload=TRUE)
 	}
-	if('BSgenome.Hsapiens.UCSC.hg18' %in% loadedNamespaces()==TRUE){
-		detach(package:BSgenome.Hsapiens.UCSC.hg18,unload=TRUE)
+	if('BSgenome.Hsapiens.UCSC.hg18.masked' %in% loadedNamespaces()==TRUE){
+		detach(package:BSgenome.Hsapiens.UCSC.hg18.masked,unload=TRUE)
 	}
-	if('BSgenome.Mmusculus.UCSC.mm9' %in% loadedNamespaces()==TRUE){
-		detach(package:BSgenome.Mmusculus.UCSC.mm9,unload=TRUE)
+	if('BSgenome.Mmusculus.UCSC.mm9.masked' %in% loadedNamespaces()==TRUE){
+		detach(package:BSgenome.Mmusculus.UCSC.mm9.masked,unload=TRUE)
 	}
 	if(genome=="hg18"){
-		library(BSgenome.Hsapiens.UCSC.hg18)
+		library(BSgenome.Hsapiens.UCSC.hg18.masked)
 		hits_f_f<-matchPattern(DNAString(primer_f),Hsapiens[[viewpoint_chr]],fixed=FALSE)
 		hits_f_r<-matchPattern(reverseComplement(DNAString(primer_f)),Hsapiens[[viewpoint_chr]],fixed=FALSE)
 		hits_f_positions<-c(start(hits_f_f),end(hits_f_f),start(hits_f_r),end(hits_f_r))
@@ -72,7 +72,7 @@ getViewpoint<-function (obj){
 			}
 		}
 	}else if(genome=="hg19"){
-		library(BSgenome.Hsapiens.UCSC.hg19)
+		library(BSgenome.Hsapiens.UCSC.hg19.masked)
 		hits_f_f<-matchPattern(DNAString(primer_f),Hsapiens[[viewpoint_chr]],fixed=FALSE)
 		hits_f_r<-matchPattern(reverseComplement(DNAString(primer_f)),Hsapiens[[viewpoint_chr]],fixed=FALSE)
 		hits_f_positions<-c(start(hits_f_f),end(hits_f_f),start(hits_f_r),end(hits_f_r))
@@ -122,7 +122,7 @@ getViewpoint<-function (obj){
 			}
 		}
 	}else if(genome =="mm9"){
-		library(BSgenome.Mmusculus.UCSC.mm9)
+		library(BSgenome.Mmusculus.UCSC.mm9.masked)
 		hits_f_f<-matchPattern(DNAString(primer_f),Mmusculus[[viewpoint_chr]],fixed=FALSE)
 		hits_f_r<-matchPattern(reverseComplement(DNAString(primer_f)),Mmusculus[[viewpoint_chr]],fixed=FALSE)
 		hits_f_positions<-c(start(hits_f_f),end(hits_f_f),start(hits_f_r),end(hits_f_r))
@@ -219,17 +219,17 @@ getFragmentsPerWindow<-function (obj,windowSize=5e3,mode){
 	viewpoint<-getViewpoint(obj)
 	viewpoint.chr<-viewpoint_chromosome(obj)
 	#####################################
-	if('BSgenome.Hsapiens.UCSC.hg19' %in% loadedNamespaces()==TRUE){
-		detach(package:BSgenome.Hsapiens.UCSC.hg19,unload=TRUE)
+	if('BSgenome.Hsapiens.UCSC.hg19.masked' %in% loadedNamespaces()==TRUE){
+		detach(package:BSgenome.Hsapiens.UCSC.hg19.masked,unload=TRUE)
 	}
-	if('BSgenome.Hsapiens.UCSC.hg18' %in% loadedNamespaces()==TRUE){
-		detach(package:BSgenome.Hsapiens.UCSC.hg18,unload=TRUE)
+	if('BSgenome.Hsapiens.UCSC.hg18.masked' %in% loadedNamespaces()==TRUE){
+		detach(package:BSgenome.Hsapiens.UCSC.hg18.masked,unload=TRUE)
 	}
-	if('BSgenome.Mmusculus.UCSC.mm9' %in% loadedNamespaces()==TRUE){
-		detach(package:BSgenome.Mmusculus.UCSC.mm9,unload=TRUE)
+	if('BSgenome.Mmusculus.UCSC.mm9.masked' %in% loadedNamespaces()==TRUE){
+		detach(package:BSgenome.Mmusculus.UCSC.mm9.masked,unload=TRUE)
 	}
 	if(genome=="hg18"){
-		library(BSgenome.Hsapiens.UCSC.hg18)
+		library(BSgenome.Hsapiens.UCSC.hg18.masked)
 		fragment<-data.frame()
 		for (chr in paste('chr',c(seq(1,22),'X','Y'),sep='')){
 			chr.size<-seqlengths(Hsapiens)[chr]
@@ -299,7 +299,7 @@ getFragmentsPerWindow<-function (obj,windowSize=5e3,mode){
 		fragment.RangedData<-RangedData(space=fragment$chromosome,IRanges(start=fragment$start,end=fragment$end))
 		return(fragment.RangedData)
 	}else if(genome=="hg19"){
-		library(BSgenome.Hsapiens.UCSC.hg19)
+		library(BSgenome.Hsapiens.UCSC.hg19.masked)
 		fragment<-data.frame()
 		for (chr in paste('chr',c(seq(1,22),'X','Y'),sep='')){
 			chr.size<-seqlengths(Hsapiens)[chr]
@@ -370,7 +370,7 @@ getFragmentsPerWindow<-function (obj,windowSize=5e3,mode){
 		fragment.RangedData<-RangedData(space=fragment$chromosome,IRanges(start=fragment$start,end=fragment$end))
 		return(fragment.RangedData)
 	}else if(genome =="mm9"){
-		library(BSgenome.Mmusculus.UCSC.mm9)
+		library(BSgenome.Mmusculus.UCSC.mm9.masked)
 		fragment<-data.frame()
 		for (chr in paste('chr',c(seq(1,19),'X','Y'),sep='')){
 			chr.size<-seqlengths(Mmusculus)[chr]
@@ -567,14 +567,14 @@ get3CseqRefGene<-function(obj){
 
 makeInteractionMatrixNearCisPerWindow<-function(obj,smoothing.parameter,rawReads.Ranged,max.window=25e3,viewpoint,distanceFromViewpoint=5e5){
 	stopifnot( is( obj, "r3Cseq" ) |is( obj, "r3CseqInBatch" ) )
-	if('BSgenome.Hsapiens.UCSC.hg19' %in% loadedNamespaces()==TRUE){
-		detach(package:BSgenome.Hsapiens.UCSC.hg19,unload=TRUE)
+	if('BSgenome.Hsapiens.UCSC.hg19.masked' %in% loadedNamespaces()==TRUE){
+		detach(package:BSgenome.Hsapiens.UCSC.hg19.masked,unload=TRUE)
 	}
-	if('BSgenome.Hsapiens.UCSC.hg18' %in% loadedNamespaces()==TRUE){
-		detach(package:BSgenome.Hsapiens.UCSC.hg18,unload=TRUE)
+	if('BSgenome.Hsapiens.UCSC.hg18.masked' %in% loadedNamespaces()==TRUE){
+		detach(package:BSgenome.Hsapiens.UCSC.hg18.masked,unload=TRUE)
 	}
-	if('BSgenome.Mmusculus.UCSC.mm9' %in% loadedNamespaces()==TRUE){
-		detach(package:BSgenome.Mmusculus.UCSC.mm9,unload=TRUE)
+	if('BSgenome.Mmusculus.UCSC.mm9.masked' %in% loadedNamespaces()==TRUE){
+		detach(package:BSgenome.Mmusculus.UCSC.mm9.masked,unload=TRUE)
 	}
 	###get raw reads
 	if(length(rawReads.Ranged)==0){
@@ -592,13 +592,13 @@ makeInteractionMatrixNearCisPerWindow<-function(obj,smoothing.parameter,rawReads
 	#####################################
 	chr.size<-0
 	if(genome=="hg19"){
-		library(BSgenome.Hsapiens.UCSC.hg19)
+		library(BSgenome.Hsapiens.UCSC.hg19.masked)
 		chr.size<-seqlengths(Hsapiens)[viewpoint.chr]
 	}else if(genome=="hg18"){
-		library(BSgenome.Hsapiens.UCSC.hg18)
+		library(BSgenome.Hsapiens.UCSC.hg18.masked)
 		chr.size<-seqlengths(Hsapiens)[viewpoint.chr]
 	}else if(genome =="mm9"){
-		library(BSgenome.Mmusculus.UCSC.mm9)
+		library(BSgenome.Mmusculus.UCSC.mm9.masked)
 		chr.size<-seqlengths(Mmusculus)[viewpoint.chr]
 	}else{
 		stop("Require the selected genome: hg18, hg19, or mm9.")

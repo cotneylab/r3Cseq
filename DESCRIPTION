@@ -1,12 +1,12 @@
 Package: r3Cseq
-Version: 1.9.2
+Version: 1.9.3
 Date: 10-22-2013
 Title: Analysis of Chromosome Conformation Capture and Next-generation
         Sequencing (3C-seq)
 Author: Supat Thongjuea, MRC Molecular Haematology Unit, Weatherall Institute of Molecular Medicine, University of Oxford, UK <supat.thongjuea@ndcls.ox.ac.uk>
 Maintainer: Supat Thongjuea <supat.thongjuea@ndcls.ox.ac.uk>
 Depends: GenomicRanges,Rsamtools,data.table,rtracklayer,VGAM,qvalue,RColorBrewer,sqldf,methods
-Suggests: BSgenome.Mmusculus.UCSC.mm9,BSgenome.Hsapiens.UCSC.hg18,BSgenome.Hsapiens.UCSC.hg19
+Suggests: BSgenome.Mmusculus.UCSC.mm9.masked,BSgenome.Hsapiens.UCSC.hg18.masked,BSgenome.Hsapiens.UCSC.hg19.masked
 Description: This package is an implementation of data analysis for the long-range interactions from 3C-seq assay.
 License: GPL-3
 URL: http://r3cseq.genereg.net

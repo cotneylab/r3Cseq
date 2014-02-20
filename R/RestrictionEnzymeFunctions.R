@@ -74,27 +74,27 @@ setMethod("getEnzymeRestrictionPositionInSelectedGenome",
 			stop("Require the correct format chromosome name : 'chr1','chrX','chrY'")
 		}
 		sequences<-getEnzymeRestrictionSequences(object,enzyme.name)	
-		if('BSgenome.Hsapiens.UCSC.hg19' %in% loadedNamespaces()==TRUE){
-			detach(package:BSgenome.Hsapiens.UCSC.hg19,unload=TRUE)
+		if('BSgenome.Hsapiens.UCSC.hg19.masked' %in% loadedNamespaces()==TRUE){
+			detach(package:BSgenome.Hsapiens.UCSC.hg19.masked,unload=TRUE)
 		}
-		if('BSgenome.Hsapiens.UCSC.hg18' %in% loadedNamespaces()==TRUE){
-			detach(package:BSgenome.Hsapiens.UCSC.hg18,unload=TRUE)
+		if('BSgenome.Hsapiens.UCSC.hg18.masked' %in% loadedNamespaces()==TRUE){
+			detach(package:BSgenome.Hsapiens.UCSC.hg18.masked,unload=TRUE)
 		}
-		if('BSgenome.Mmusculus.UCSC.mm9' %in% loadedNamespaces()==TRUE){
-			detach(package:BSgenome.Mmusculus.UCSC.mm9,unload=TRUE)
+		if('BSgenome.Mmusculus.UCSC.mm9.masked' %in% loadedNamespaces()==TRUE){
+			detach(package:BSgenome.Mmusculus.UCSC.mm9.masked,unload=TRUE)
 		}
 		if(genome=="hg18"){
-			library(BSgenome.Hsapiens.UCSC.hg18)
+			library(BSgenome.Hsapiens.UCSC.hg18.masked)
 			hits<-matchPattern(sequences,Hsapiens[[chromosome]],fixed=FALSE)
 			hits.frame<-data.frame(chromosome=chromosome,start=start(hits),end=end(hits))
 			return(hits.frame)
 		}else if(genome=="hg19"){
-			library(BSgenome.Hsapiens.UCSC.hg19)
+			library(BSgenome.Hsapiens.UCSC.hg19.masked)
 			hits<-matchPattern(sequences,Hsapiens[[chromosome]],fixed=FALSE)
 			hits.frame<-data.frame(chromosome=chromosome,start=start(hits),end=end(hits))
 			return(hits.frame)
 		}else if(genome =="mm9"){
-			library(BSgenome.Mmusculus.UCSC.mm9)
+			library(BSgenome.Mmusculus.UCSC.mm9.masked)
 			hits<-matchPattern(sequences,Mmusculus[[chromosome]],fixed=FALSE)
 			hits.frame<-data.frame(chromosome=chromosome,start=start(hits),end=end(hits))
 			return(hits.frame)
