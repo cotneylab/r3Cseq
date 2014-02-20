@@ -23,16 +23,17 @@ getViewpoint<-function (obj){
 	}
 	if(genome=="hg18"){
 		library(BSgenome.Hsapiens.UCSC.hg18.masked)
-		hits_f_f<-matchPattern(DNAString(primer_f),Hsapiens[[viewpoint_chr]],fixed=FALSE)
-		hits_f_r<-matchPattern(reverseComplement(DNAString(primer_f)),Hsapiens[[viewpoint_chr]],fixed=FALSE)
+		genome <- BSgenome.Hsapiens.UCSC.hg18.masked
+		hits_f_f<-matchPattern(DNAString(primer_f),genome[[viewpoint_chr]],fixed=FALSE)
+		hits_f_r<-matchPattern(reverseComplement(DNAString(primer_f)),genome[[viewpoint_chr]],fixed=FALSE)
 		hits_f_positions<-c(start(hits_f_f),end(hits_f_f),start(hits_f_r),end(hits_f_r))
 		
 		if(length(hits_f_positions)==0){
 			stop(paste("Could not find the forward primer position in",genome," :",viewpoint_chr, ". Please check the input forward primer"))
 		}
 		
-		hits_r_f<-matchPattern(DNAString(primer_r),Hsapiens[[viewpoint_chr]],fixed=FALSE)
-		hits_r_r<-matchPattern(reverseComplement(DNAString(primer_r)),Hsapiens[[viewpoint_chr]],fixed=FALSE)
+		hits_r_f<-matchPattern(DNAString(primer_r),genome[[viewpoint_chr]],fixed=FALSE)
+		hits_r_r<-matchPattern(reverseComplement(DNAString(primer_r)),genome[[viewpoint_chr]],fixed=FALSE)
 		
 		hits_r_positions<-c(start(hits_r_f),end(hits_r_f),start(hits_r_r),end(hits_r_r))
 		
@@ -73,16 +74,17 @@ getViewpoint<-function (obj){
 		}
 	}else if(genome=="hg19"){
 		library(BSgenome.Hsapiens.UCSC.hg19.masked)
-		hits_f_f<-matchPattern(DNAString(primer_f),Hsapiens[[viewpoint_chr]],fixed=FALSE)
-		hits_f_r<-matchPattern(reverseComplement(DNAString(primer_f)),Hsapiens[[viewpoint_chr]],fixed=FALSE)
+		genome <- BSgenome.Hsapiens.UCSC.hg19.masked
+		hits_f_f<-matchPattern(DNAString(primer_f),genome[[viewpoint_chr]],fixed=FALSE)
+		hits_f_r<-matchPattern(reverseComplement(DNAString(primer_f)),genome[[viewpoint_chr]],fixed=FALSE)
 		hits_f_positions<-c(start(hits_f_f),end(hits_f_f),start(hits_f_r),end(hits_f_r))
 		
 		if(length(hits_f_positions)==0){
 			stop(paste("Could not find the forward primer position in",genome," :",viewpoint_chr, ". Please check the input forward primer"))
 		}
 		
-		hits_r_f<-matchPattern(DNAString(primer_r),Hsapiens[[viewpoint_chr]],fixed=FALSE)
-		hits_r_r<-matchPattern(reverseComplement(DNAString(primer_r)),Hsapiens[[viewpoint_chr]],fixed=FALSE)
+		hits_r_f<-matchPattern(DNAString(primer_r),genome[[viewpoint_chr]],fixed=FALSE)
+		hits_r_r<-matchPattern(reverseComplement(DNAString(primer_r)),genome[[viewpoint_chr]],fixed=FALSE)
 		
 		hits_r_positions<-c(start(hits_r_f),end(hits_r_f),start(hits_r_r),end(hits_r_r))
 		
@@ -123,16 +125,17 @@ getViewpoint<-function (obj){
 		}
 	}else if(genome =="mm9"){
 		library(BSgenome.Mmusculus.UCSC.mm9.masked)
-		hits_f_f<-matchPattern(DNAString(primer_f),Mmusculus[[viewpoint_chr]],fixed=FALSE)
-		hits_f_r<-matchPattern(reverseComplement(DNAString(primer_f)),Mmusculus[[viewpoint_chr]],fixed=FALSE)
+		genome <- BSgenome.Mmusculus.UCSC.mm9.masked
+		hits_f_f<-matchPattern(DNAString(primer_f),genome[[viewpoint_chr]],fixed=FALSE)
+		hits_f_r<-matchPattern(reverseComplement(DNAString(primer_f)),genome[[viewpoint_chr]],fixed=FALSE)
 		hits_f_positions<-c(start(hits_f_f),end(hits_f_f),start(hits_f_r),end(hits_f_r))
 		
 		if(length(hits_f_positions)==0){
 			stop(paste("Could not find the forward primer position in",genome," :",viewpoint_chr, ". Please check the input forward primer"))
 		}
 		
-		hits_r_f<-matchPattern(DNAString(primer_r),Mmusculus[[viewpoint_chr]],fixed=FALSE)
-		hits_r_r<-matchPattern(reverseComplement(DNAString(primer_r)),Mmusculus[[viewpoint_chr]],fixed=FALSE)
+		hits_r_f<-matchPattern(DNAString(primer_r),genome[[viewpoint_chr]],fixed=FALSE)
+		hits_r_r<-matchPattern(reverseComplement(DNAString(primer_r)),genome[[viewpoint_chr]],fixed=FALSE)
 		
 		hits_r_positions<-c(start(hits_r_f),end(hits_r_f),start(hits_r_r),end(hits_r_r))
 		
@@ -230,9 +233,10 @@ getFragmentsPerWindow<-function (obj,windowSize=5e3,mode){
 	}
 	if(genome=="hg18"){
 		library(BSgenome.Hsapiens.UCSC.hg18.masked)
+		genome <- BSgenome.Hsapiens.UCSC.hg18.masked
 		fragment<-data.frame()
 		for (chr in paste('chr',c(seq(1,22),'X','Y'),sep='')){
-			chr.size<-seqlengths(Hsapiens)[chr]
+			chr.size<-seqlengths(genome)[chr]
 			if(chr==viewpoint.chr){
 				if(mode=="non-overlapping"){
 					##Now getting the fragment#####		
@@ -300,9 +304,10 @@ getFragmentsPerWindow<-function (obj,windowSize=5e3,mode){
 		return(fragment.RangedData)
 	}else if(genome=="hg19"){
 		library(BSgenome.Hsapiens.UCSC.hg19.masked)
+		genome <- BSgenome.Hsapiens.UCSC.hg19.masked
 		fragment<-data.frame()
 		for (chr in paste('chr',c(seq(1,22),'X','Y'),sep='')){
-			chr.size<-seqlengths(Hsapiens)[chr]
+			chr.size<-seqlengths(genome)[chr]
 				
 			if(chr==viewpoint.chr){
 				if(mode=="non-overlapping"){
@@ -371,9 +376,10 @@ getFragmentsPerWindow<-function (obj,windowSize=5e3,mode){
 		return(fragment.RangedData)
 	}else if(genome =="mm9"){
 		library(BSgenome.Mmusculus.UCSC.mm9.masked)
+		genome <- BSgenome.Mmusculus.UCSC.mm9.masked
 		fragment<-data.frame()
 		for (chr in paste('chr',c(seq(1,19),'X','Y'),sep='')){
-			chr.size<-seqlengths(Mmusculus)[chr]
+			chr.size<-seqlengths(genome)[chr]
 			if(chr==viewpoint.chr){
 				if(mode=="non-overlapping"){
 					##Now getting the fragment#####		
@@ -593,13 +599,16 @@ makeInteractionMatrixNearCisPerWindow<-function(obj,smoothing.parameter,rawReads
 	chr.size<-0
 	if(genome=="hg19"){
 		library(BSgenome.Hsapiens.UCSC.hg19.masked)
-		chr.size<-seqlengths(Hsapiens)[viewpoint.chr]
+		genome <- BSgenome.Hsapiens.UCSC.hg19.masked
+		chr.size<-seqlengths(genome)[viewpoint.chr]
 	}else if(genome=="hg18"){
 		library(BSgenome.Hsapiens.UCSC.hg18.masked)
-		chr.size<-seqlengths(Hsapiens)[viewpoint.chr]
+		genome <- BSgenome.Hsapiens.UCSC.hg18.masked
+		chr.size<-seqlengths(genome)[viewpoint.chr]
 	}else if(genome =="mm9"){
 		library(BSgenome.Mmusculus.UCSC.mm9.masked)
-		chr.size<-seqlengths(Mmusculus)[viewpoint.chr]
+		genome <- BSgenome.Mmusculus.UCSC.mm9.masked
+		chr.size<-seqlengths(genome)[viewpoint.chr]
 	}else{
 		stop("Require the selected genome: hg18, hg19, or mm9.")
 	}

@@ -85,17 +85,20 @@ setMethod("getEnzymeRestrictionPositionInSelectedGenome",
 		}
 		if(genome=="hg18"){
 			library(BSgenome.Hsapiens.UCSC.hg18.masked)
-			hits<-matchPattern(sequences,Hsapiens[[chromosome]],fixed=FALSE)
+			genome <- BSgenome.Hsapiens.UCSC.hg18.masked
+			hits<-matchPattern(sequences,genome[[chromosome]],fixed=FALSE)
 			hits.frame<-data.frame(chromosome=chromosome,start=start(hits),end=end(hits))
 			return(hits.frame)
 		}else if(genome=="hg19"){
 			library(BSgenome.Hsapiens.UCSC.hg19.masked)
-			hits<-matchPattern(sequences,Hsapiens[[chromosome]],fixed=FALSE)
+			genome <- BSgenome.Hsapiens.UCSC.hg19.masked
+			hits<-matchPattern(sequences,genome[[chromosome]],fixed=FALSE)
 			hits.frame<-data.frame(chromosome=chromosome,start=start(hits),end=end(hits))
 			return(hits.frame)
 		}else if(genome =="mm9"){
 			library(BSgenome.Mmusculus.UCSC.mm9.masked)
-			hits<-matchPattern(sequences,Mmusculus[[chromosome]],fixed=FALSE)
+			genome <- BSgenome.Mmusculus.UCSC.mm9.masked
+			hits<-matchPattern(sequences,genome[[chromosome]],fixed=FALSE)
 			hits.frame<-data.frame(chromosome=chromosome,start=start(hits),end=end(hits))
 			return(hits.frame)
 		}else{

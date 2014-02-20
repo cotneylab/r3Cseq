@@ -35,21 +35,24 @@ setMethod("export3CseqRawReads2bedGraph",
 					exp.read.cov      <- RleList()
 					if(orgName=="hg18"){		
 						library(BSgenome.Hsapiens.UCSC.hg18.masked)
-						hg18.chromlens <- seqlengths(Hsapiens)
+						genome <- BSgenome.Hsapiens.UCSC.hg18.masked
+						hg18.chromlens <- seqlengths(genome)
 						seqlevels(expRawReads.GRanges)<-names(hg18.chromlens)
 						seqlengths(expRawReads.GRanges)<-hg18.chromlens		
 						exp.read.cov   <- coverage(expRawReads.GRanges)
 						exp.read.cov   <-exp.read.cov[names(exp.read.cov) %in% paste('chr',c(seq(1,22),'X','Y'),sep='')]
 					}else if(orgName=="hg19"){
 						library(BSgenome.Hsapiens.UCSC.hg19.masked)
-						hg19.chromlens <- seqlengths(Hsapiens)
+						genome <- BSgenome.Hsapiens.UCSC.hg19.masked
+						hg19.chromlens <- seqlengths(genome)
 						seqlevels(expRawReads.GRanges)<-names(hg19.chromlens)
 						seqlengths(expRawReads.GRanges)<-hg19.chromlens			
 						exp.read.cov   <- coverage(expRawReads.GRanges)
 						exp.read.cov   <-exp.read.cov[names(exp.read.cov) %in% paste('chr',c(seq(1,22),'X','Y'),sep='')]
 					}else if(orgName =="mm9"){
-				    	library(BSgenome.Mmusculus.UCSC.mm9.masked)
-						mm9.chromlens <- seqlengths(Mmusculus)
+						library(BSgenome.Mmusculus.UCSC.mm9.masked)
+						genome <- BSgenome.Mmusculus.UCSC.mm9.masked
+						mm9.chromlens <- seqlengths(genome)
 						seqlevels(expRawReads.GRanges)<-names(mm9.chromlens)
 						seqlengths(expRawReads.GRanges)<-mm9.chromlens		
 						exp.read.cov   <- coverage(expRawReads.GRanges)
@@ -81,7 +84,8 @@ setMethod("export3CseqRawReads2bedGraph",
 					contr.read.cov      <- RleList()
 					if(orgName=="hg18"){		
 						library(BSgenome.Hsapiens.UCSC.hg18.masked)
-						hg18.chromlens <- seqlengths(Hsapiens)
+						genome <- BSgenome.Hsapiens.UCSC.hg18.masked
+						hg18.chromlens <- seqlengths(genome)
 						seqlevels(expRawReads.GRanges)<-names(hg18.chromlens)
 						seqlengths(expRawReads.GRanges)<-hg18.chromlens		
 						exp.read.cov   <- coverage(expRawReads.GRanges)
@@ -94,7 +98,8 @@ setMethod("export3CseqRawReads2bedGraph",
 						contr.read.cov   <-contr.read.cov[names(contr.read.cov) %in% paste('chr',c(seq(1,22),'X','Y'),sep='')]
 					}else if(orgName=="hg19"){
 						library(BSgenome.Hsapiens.UCSC.hg19.masked)
-						hg19.chromlens <- seqlengths(Hsapiens)
+						genome <- BSgenome.Hsapiens.UCSC.hg19.masked
+						hg19.chromlens <- seqlengths(genome)
 						seqlevels(expRawReads.GRanges)<-names(hg19.chromlens)
 						seqlengths(expRawReads.GRanges)<-hg19.chromlens			
 						exp.read.cov   <- coverage(expRawReads.GRanges)
@@ -108,7 +113,8 @@ setMethod("export3CseqRawReads2bedGraph",
 						
 					}else if(orgName =="mm9"){
 						library(BSgenome.Mmusculus.UCSC.mm9.masked)
-						mm9.chromlens <- seqlengths(Mmusculus)
+						genome <- BSgenome.Mmusculus.UCSC.mm9.masked
+						mm9.chromlens <- seqlengths(genome)
 						seqlevels(expRawReads.GRanges)<-names(mm9.chromlens)
 						seqlengths(expRawReads.GRanges)<-mm9.chromlens		
 						exp.read.cov   <- coverage(expRawReads.GRanges)

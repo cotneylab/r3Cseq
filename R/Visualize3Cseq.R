@@ -10,20 +10,23 @@ plotOverviewInteractions<-function (obj,cutoff.qvalue=0.05){
 				orgName<-organismName(obj)
 				chr.data=c()
 				if(orgName=="hg18"){
-					for (chr in c(paste('chr',seq(1,22),sep=''),'chrX','chrY')){	
-						chr.size<-seqlengths(Hsapiens)[chr]
+					for (chr in c(paste('chr',seq(1,22),sep=''),'chrX','chrY')){
+						genome <- BSgenome.Hsapiens.UCSC.hg18.masked
+						chr.size<-seqlengths(genome)[chr]
 						chr.info<-data.frame(name=chr,size=chr.size)
 						chr.data<-rbind(chr.data,chr.info)
 					}
 				}else if(orgName=="hg19"){
-					for (chr in c(paste('chr',seq(1,22),sep=''),'chrX','chrY')){	
-						chr.size<-seqlengths(Hsapiens)[chr]
+					for (chr in c(paste('chr',seq(1,22),sep=''),'chrX','chrY')){
+						genome <- BSgenome.Hsapiens.UCSC.hg19.masked
+						chr.size<-seqlengths(genome)[chr]
 						chr.info<-data.frame(name=chr,size=chr.size)
 						chr.data<-rbind(chr.data,chr.info)
 					}
 				}else if(orgName =="mm9"){
-					for (chr in c(paste('chr',seq(1,19),sep=''),'chrX','chrY')){	
-						chr.size<-seqlengths(Mmusculus)[chr]
+					for (chr in c(paste('chr',seq(1,19),sep=''),'chrX','chrY')){
+						genome <- BSgenome.Mmusculus.UCSC.mm9.masked
+						chr.size<-seqlengths(genome)[chr]
 						chr.info<-data.frame(name=chr,size=chr.size)
 						chr.data<-rbind(chr.data,chr.info)
 					}
@@ -158,20 +161,23 @@ plotOverviewInteractions<-function (obj,cutoff.qvalue=0.05){
 				orgName<-organismName(obj)
 				chr.data=c()
 				if(orgName=="hg18"){
-					for (chr in c(paste('chr',seq(1,22),sep=''),'chrX','chrY')){	
-						chr.size<-seqlengths(Hsapiens)[chr]
+					for (chr in c(paste('chr',seq(1,22),sep=''),'chrX','chrY')){
+						genome <- BSgenome.Hsapiens.UCSC.hg18.masked
+						chr.size<-seqlengths(genome)[chr]
 						chr.info<-data.frame(name=chr,size=chr.size)
 						chr.data<-rbind(chr.data,chr.info)
 					}
 				}else if(orgName=="hg19"){
-					for (chr in c(paste('chr',seq(1,22),sep=''),'chrX','chrY')){	
-						chr.size<-seqlengths(Hsapiens)[chr]
+					for (chr in c(paste('chr',seq(1,22),sep=''),'chrX','chrY')){
+						genome <- BSgenome.Hsapiens.UCSC.hg19.masked
+						chr.size<-seqlengths(genome)[chr]
 						chr.info<-data.frame(name=chr,size=chr.size)
 						chr.data<-rbind(chr.data,chr.info)
 					}
 				}else if(orgName =="mm9"){
-					for (chr in c(paste('chr',seq(1,19),sep=''),'chrX','chrY')){	
-						chr.size<-seqlengths(Mmusculus)[chr]
+					for (chr in c(paste('chr',seq(1,19),sep=''),'chrX','chrY')){
+						genome <- BSgenome.Mmusculus.UCSC.mm9.masked
+						chr.size<-seqlengths(genome)[chr]
 						chr.info<-data.frame(name=chr,size=chr.size)
 						chr.data<-rbind(chr.data,chr.info)
 					}
@@ -345,13 +351,14 @@ plotInteractionsNearViewpoint<-function(obj,distance=5e5,log2fc_cutoff=1,yLim=0)
 			orgName<-organismName(obj)
 			chr.size<-0
 			if(orgName=="hg18"){
-					chr.size<-seqlengths(Hsapiens)[viewpoint.chr]
+					genome <- BSgenome.Hsapiens.UCSC.hg18.masked
+					chr.size<-seqlengths(genome)[viewpoint.chr]
 			}else if(orgName=="hg19"){
-					chr.size<-seqlengths(Hsapiens)[viewpoint.chr]
-					
+					genome <- BSgenome.Hsapiens.UCSC.hg19.masked
+					chr.size<-seqlengths(genome)[viewpoint.chr]
 			}else if(orgName =="mm9"){
-					chr.size<-seqlengths(Mmusculus)[viewpoint.chr]
-					
+					genome <- BSgenome.Mmusculus.UCSC.mm9.masked
+					chr.size<-seqlengths(genome)[viewpoint.chr]
 			}
 			
 			if(isControlInvolved(obj)==FALSE){
@@ -701,11 +708,14 @@ plotInteractionsPerChromosome<-function(obj,chromosomeName){
 				chr.size=c()
 				
 				if(orgName=="hg18"){
-					chr.size<-seqlengths(Hsapiens)[chromosomeName]
+					genome <- BSgenome.Hsapiens.UCSC.hg18.masked
+					chr.size<-seqlengths(genome)[chromosomeName]
 				}else if(orgName=="hg19"){
-					chr.size<-seqlengths(Hsapiens)[chromosomeName]
-				}else if(orgName =="mm9"){	
-					chr.size<-seqlengths(Mmusculus)[chromosomeName]
+					genome <- BSgenome.Hsapiens.UCSC.hg19.masked
+					chr.size<-seqlengths(genome)[chromosomeName]
+				}else if(orgName =="mm9"){
+					genome <- BSgenome.Mmusculus.UCSC.mm9.masked
+					chr.size<-seqlengths(genome)[chromosomeName]
 				}else{
 					stop("Your input organism name is not in the list ('mm9','hg18',and 'hg19')")
 				}
@@ -809,11 +819,14 @@ plotInteractionsPerChromosome<-function(obj,chromosomeName){
 				chr.size=c()
 				
 				if(orgName=="hg18"){
-					chr.size<-seqlengths(Hsapiens)[chromosomeName]
+					genome <- BSgenome.Hsapiens.UCSC.hg18.masked
+					chr.size<-seqlengths(genome)[chromosomeName]
 				}else if(orgName=="hg19"){
-					chr.size<-seqlengths(Hsapiens)[chromosomeName]
-				}else if(orgName =="mm9"){	
-					chr.size<-seqlengths(Mmusculus)[chromosomeName]
+					genome <- BSgenome.Hsapiens.UCSC.hg19.masked
+					chr.size<-seqlengths(genome)[chromosomeName]
+				}else if(orgName =="mm9"){
+					genome <- BSgenome.Mmusculus.UCSC.mm9.masked
+					chr.size<-seqlengths(genome)[chromosomeName]
 				}else{
 					stop("Your input organism name is not in the list ('mm9','hg18',and 'hg19')")
 				}
@@ -1036,13 +1049,14 @@ setMethod("plotDomainogramNearViewpoint",
 			orgName<-organismName(object)
 			chr.size<-0
 			if(orgName=="hg18"){
-				chr.size<-seqlengths(Hsapiens)[viewpoint.chr]
+				genome <- BSgenome.Hsapiens.UCSC.hg18.masked
+				chr.size<-seqlengths(genome)[viewpoint.chr]
 			}else if(orgName=="hg19"){
-				chr.size<-seqlengths(Hsapiens)[viewpoint.chr]
-				
+				genome <- BSgenome.Hsapiens.UCSC.hg19.masked
+				chr.size<-seqlengths(genome)[viewpoint.chr]
 			}else if(orgName =="mm9"){
-				chr.size<-seqlengths(Mmusculus)[viewpoint.chr]
-				
+				genome <- BSgenome.Mmusculus.UCSC.mm9.masked
+				chr.size<-seqlengths(genome)[viewpoint.chr]
 			}
 			if(selected_view=="experiment"){
 				expInteractions   <-expInteractionRegions(object)
