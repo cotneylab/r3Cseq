@@ -1,15 +1,22 @@
 Package: r3Cseq
-Version: 1.9.3
+Version: 1.9.4
 Date: 10-22-2013
 Title: Analysis of Chromosome Conformation Capture and Next-generation
         Sequencing (3C-seq)
-Author: Supat Thongjuea, MRC Molecular Haematology Unit, Weatherall Institute of Molecular Medicine, University of Oxford, UK <supat.thongjuea@ndcls.ox.ac.uk>
+Author: Supat Thongjuea, MRC Molecular Haematology Unit, Weatherall
+        Institute of Molecular Medicine, University of Oxford, UK
+        <supat.thongjuea@ndcls.ox.ac.uk>
 Maintainer: Supat Thongjuea <supat.thongjuea@ndcls.ox.ac.uk>
-Depends: GenomicRanges,Rsamtools,data.table,rtracklayer,VGAM,qvalue,RColorBrewer,sqldf,methods
-Suggests: BSgenome.Mmusculus.UCSC.mm9.masked,BSgenome.Hsapiens.UCSC.hg18.masked,BSgenome.Hsapiens.UCSC.hg19.masked
-Description: This package is an implementation of data analysis for the long-range interactions from 3C-seq assay.
+Depends:
+        GenomicRanges,Rsamtools,data.table,rtracklayer,VGAM,qvalue,RColorBrewer,sqldf,methods
+Suggests:
+        BSgenome.Mmusculus.UCSC.mm9.masked,BSgenome.Hsapiens.UCSC.hg18.masked,BSgenome.Hsapiens.UCSC.hg19.masked
+Description: This package is an implementation of data analysis for the
+        long-range interactions from 3C-seq assay.
 License: GPL-3
 URL: http://r3cseq.genereg.net
-biocViews: Preprocessing, Sequencing, HighThroughputSequencing
-Collate: AllClasses.R AllGenerics.R Export.R FunctionInCommon.R FunctionsForBatchAnalysis.R RestrictionEnzymeFunctions.R FunctionsForNoReplicationAnalysis.R Report.R Visualize3Cseq.R Annotation.R
-
+Collate: AllClasses.R AllGenerics.R Export.R FunctionInCommon.R
+        FunctionsForBatchAnalysis.R RestrictionEnzymeFunctions.R
+        FunctionsForNoReplicationAnalysis.R Report.R Visualize3Cseq.R
+        Annotation.R
+biocViews: Preprocessing, Sequencing, Sequencing
