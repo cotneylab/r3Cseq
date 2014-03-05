@@ -1,5 +1,5 @@
 Package: r3Cseq
-Version: 1.9.4
+Version: 1.9.5
 Date: 10-22-2013
 Title: Analysis of Chromosome Conformation Capture and Next-generation
         Sequencing (3C-seq)
@@ -19,4 +19,4 @@ Collate: AllClasses.R AllGenerics.R Export.R FunctionInCommon.R
         FunctionsForBatchAnalysis.R RestrictionEnzymeFunctions.R
         FunctionsForNoReplicationAnalysis.R Report.R Visualize3Cseq.R
         Annotation.R
-biocViews: Preprocessing, Sequencing, Sequencing
+biocViews: Preprocessing, Sequencing
