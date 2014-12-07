@@ -23,10 +23,9 @@ getExpInteractionsInRefseq<-function(obj,cutoff.qvalue=0.05,expanded_upstream=50
 		##########perform overlapping####
 		o<- findOverlaps(expInteraction.GRanges,subject=genes.GRanges)
 		
-		my.interactions<-expInteraction.frame[queryHits(o),]
-		my.genes<-genes.frame[subjectHits(o),]
-		
-		ol <-cbind(my.interactions,my.genes) 
+		my.interactions<-expInteraction.frame[queryHits(o), c("nReads", "RPMs")]
+		my.genes<-genes.frame[subjectHits(o), c("chromosome_g", "name")]
+		ol <- cbind(my.interactions,my.genes) 
 		annotated<- sqldf("select chromosome_g,name,sum(nReads),sum(RPMs) from ol group by name")
 		annotated<- annotated[order(annotated[,4],decreasing=T),]
 		colnames(annotated)<-c("chromosome","gene_name","total_nReads","total_RPMs")
