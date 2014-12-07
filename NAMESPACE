@@ -1,6 +1,34 @@
+import(methods)
+
+importMethodsFrom(Biostrings, reverseComplement, matchPattern,
+	DNAString)
+
+importMethodsFrom(GenomeInfoDb, seqlengths, "seqlengths<-",
+	"seqlevels<-")
+
+importFrom(RColorBrewer, brewer.pal)
+
+importFrom(Rsamtools, scanBamFlag)
+importMethodsFrom(Rsamtools, scanBam, ScanBamParam)
+
+importFrom(VGAM, vsmooth.spline, zeta)
+
+importFrom(data.table, data.table, setkey, setnames)
+
+importFrom(qvalue, qvalue)
+
+importFrom(sqldf, sqldf)
+
+importFrom(stats, lm, pchisq, pnorm, smooth.spline)
+
+importFrom(utils, write.table)
+
+import(IRanges, GenomicRanges, rtracklayer)
+
 exportClasses(
     "r3Cseq","r3CseqInBatch"
 )
+
 export(
     "getCoverage",
     "expCoverage",

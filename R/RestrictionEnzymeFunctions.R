@@ -3,7 +3,7 @@
 setMethod("initialize", "repbaseEnzyme",
 		function(.Object)
 		{
-			enzyme.file<-system.file("data/enzymeDb.rda", package="r3Cseq")
+			enzyme.file<-system.file("data", "enzymeDb.rda", package="r3Cseq")
 			if(file.exists(enzyme.file)==TRUE){
 				data<-load(file=enzyme.file)
 				.Object@enzymeRestriction = enzyme.db

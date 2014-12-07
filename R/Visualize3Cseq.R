@@ -1181,8 +1181,8 @@ setMethod("plotDomainogramNearViewpoint",
 				image(as.matrix(log2(1e-10+expInteractionMatrix[,2:col.n])),xaxt="n",yaxt="n",ylab="Window (Kb)",col=shades,xlab="Distance (bp) relative to the viewpoint")
 				abline(v=0.5,lty=3,col="red",lwd=2)
 				legend("topleft",legend = s.names, fill=c(rev(brewer.pal(5,"Reds")),"gray"), cex=0.55,title="",bty="n")
-				axis(1, at=c(seq(0,1,by=0.1)),lab=c(seq(-distance,distance,distance/5)),cex.axis=0.8,las=2)
-				axis(2, at=c(0, 1),lab=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)
+				axis(1, at=c(seq(0,1,by=0.1)),labels=c(seq(-distance,distance,distance/5)),cex.axis=0.8,las=2)
+				axis(2, at=c(0, 1),labels=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)
 			}
 			if(selected_view=="control"){
 				contrInteractions <-contrInteractionRegions(object)	
@@ -1308,8 +1308,8 @@ setMethod("plotDomainogramNearViewpoint",
 				image(as.matrix(log2(1e-10+contrInteractionMatrix[,2:col.n])),xaxt="n",yaxt="n",ylab="Window (Kb)",col=shades,xlab="Distance (bp) relative to the viewpoint")
 				abline(v=0.5,lty=3,col="red",lwd=2)
 				legend("topleft",legend = s.names, fill=c(rev(brewer.pal(5,"Blues")),"gray"), cex=0.55,title="",bty="n")
-				axis(1, at=c(seq(0,1,by=0.1)),lab=c(seq(-distance,distance,distance/5)),cex.axis=0.8,las=2)
-				axis(2, at=c(0, 1),lab=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)
+				axis(1, at=c(seq(0,1,by=0.1)),labels=c(seq(-distance,distance,distance/5)),cex.axis=0.8,las=2)
+				axis(2, at=c(0, 1),labels=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)
 			}
 			if(selected_view=="both"){
 				######look around the viewpoint###
@@ -1397,7 +1397,7 @@ setMethod("plotDomainogramNearViewpoint",
 				image(as.matrix(log2(1e-10+expInteractionMatrix[,2:col.n])),xaxt="n",yaxt="n",ylab="Window (Kb)",col=shades,xlab="")
 				abline(v=0.5,lty=3,col="red",lwd=2)
 				legend("topleft",legend = s.names, fill=c(rev(brewer.pal(5,"Reds")),"gray"), cex=0.55,title="experiment",bty="n")
-				axis(2, at=c(0, 1),lab=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)
+				axis(2, at=c(0, 1),labels=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)
 				
 				
 				###########Draw Domainogram in the control################
@@ -1414,8 +1414,8 @@ setMethod("plotDomainogramNearViewpoint",
 				image(as.matrix(log2(1e-10+contrInteractionMatrix[,2:col.n])),xaxt="n",yaxt="n",ylab="Window (Kb)",col=shades,xlab="Distance (bp) relative to the viewpoint")
 				abline(v=0.5,lty=3,col="red",lwd=2)
 				legend("topleft",legend = s.names, fill=c(rev(brewer.pal(5,"Blues")),"gray"), cex=0.55,title="control",bty="n")
-				axis(1, at=c(seq(0,1,by=0.1)),lab=c(seq(-distance,distance,distance/5)),cex.axis=0.8,las=2)
-				axis(2, at=c(0, 1),lab=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)	
+				axis(1, at=c(seq(0,1,by=0.1)),labels=c(seq(-distance,distance,distance/5)),cex.axis=0.8,las=2)
+				axis(2, at=c(0, 1),labels=c(paste(maximum_window/1000,"Kb"),"2 Kb"),cex.axis=0.8,las=2)	
 			}	
 		}
 )
