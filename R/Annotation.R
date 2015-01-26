@@ -1,6 +1,6 @@
 # TODO: The following functions are implemented for get the list of genes containing high interactions.
 # Author: Supat Thongjuea
-# Contact : supat.thongjuea@bccs.uib.no 
+# Contact : supat.thongjuea@ndcls.ox.ac.uk
 ###############################################################################
 getExpInteractionsInRefseq<-function(obj,cutoff.qvalue=0.05,expanded_upstream=50e3,expanded_downstream=10e3){
 	stopifnot( is(obj, "r3Cseq") | is(obj,"r3CseqInBatch"))	

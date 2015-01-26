@@ -74,6 +74,7 @@ setMethod("getEnzymeRestrictionPositionInSelectedGenome",
 			stop("Require the correct format chromosome name : 'chr1','chrX','chrY'")
 		}
 		sequences<-getEnzymeRestrictionSequences(object,enzyme.name)	
+		
 		if('BSgenome.Hsapiens.UCSC.hg19.masked' %in% loadedNamespaces()==TRUE){
 			detach(package:BSgenome.Hsapiens.UCSC.hg19.masked,unload=TRUE)
 		}
@@ -83,6 +84,13 @@ setMethod("getEnzymeRestrictionPositionInSelectedGenome",
 		if('BSgenome.Mmusculus.UCSC.mm9.masked' %in% loadedNamespaces()==TRUE){
 			detach(package:BSgenome.Mmusculus.UCSC.mm9.masked,unload=TRUE)
 		}
+		if('BSgenome.Mmusculus.UCSC.mm10.masked' %in% loadedNamespaces()==TRUE){
+			detach(package:BSgenome.Mmusculus.UCSC.mm10.masked,unload=TRUE)
+		}
+		if('BSgenome.Rnorvegicus.UCSC.rn5.masked' %in% loadedNamespaces()==TRUE){
+			detach(package:BSgenome.Rnorvegicus.UCSC.rn5.masked,unload=TRUE)
+		}
+		
 		if(genome=="hg18"){
 			library(BSgenome.Hsapiens.UCSC.hg18.masked)
 			genome <- BSgenome.Hsapiens.UCSC.hg18.masked
@@ -101,8 +109,21 @@ setMethod("getEnzymeRestrictionPositionInSelectedGenome",
 			hits<-matchPattern(sequences,genome[[chromosome]],fixed=FALSE)
 			hits.frame<-data.frame(chromosome=chromosome,start=start(hits),end=end(hits))
 			return(hits.frame)
+			
+		}else if(genome =="mm10"){
+			library(BSgenome.Mmusculus.UCSC.mm10.masked)
+			genome <- BSgenome.Mmusculus.UCSC.mm10.masked
+			hits<-matchPattern(sequences,genome[[chromosome]],fixed=FALSE)
+			hits.frame<-data.frame(chromosome=chromosome,start=start(hits),end=end(hits))
+			return(hits.frame)	
+		}else if(genome =="rn5"){
+			library(BSgenome.Rnorvegicus.UCSC.rn5.masked)
+			genome <- BSgenome.Rnorvegicus.UCSC.rn5.masked
+			hits<-matchPattern(sequences,genome[[chromosome]],fixed=FALSE)
+			hits.frame<-data.frame(chromosome=chromosome,start=start(hits),end=end(hits))
+			return(hits.frame)	
 		}else{
-			stop("Require the selected genome: hg18, hg19, or mm9.")
+			stop("Require the selected genome: hg18, hg19, mm9, mm10 or rn5.")
 		}
 	}
 )
@@ -150,8 +171,20 @@ setMethod("getWholeGenomeRestrictionFragments",
 					fragments<-rbind(fragments,chr.fragments)
 				}
 				return(fragments)
+			}else if(genome =="mm10"){
+				for (chr in paste('chr',c(seq(1,19),'X','Y'),sep='')){
+					chr.fragments<-getRestrictionFragments(object,enzyme.name,"mm10",chr)
+					fragments<-rbind(fragments,chr.fragments)
+				}
+				return(fragments)
+			}else if(genome =="rn5"){
+				for (chr in paste('chr',c(seq(1,20),'X'),sep='')){
+					chr.fragments<-getRestrictionFragments(object,enzyme.name,"rn5",chr)
+					fragments<-rbind(fragments,chr.fragments)
+				}
+				return(fragments)
 			}else{
-				stop("Require the selected genome: hg18, hg19, or mm9.")
+				stop("Require the selected genome: hg18, hg19, mm9, mm10 or rn5.")
 			}
 		}
 )

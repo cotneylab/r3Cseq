@@ -1,6 +1,6 @@
 # TODO: The following functions are implemented for exporting the output of 3C-seq results.
 # Author: Supat Thongjuea
-# Contact : supat.thongjuea@bccs.uib.no 
+# Contact : supat.thongjuea@ndcls.ox.ac.uk
 ###############################################################################
 setGeneric(
 		name="export3CseqRawReads2bedGraph",
@@ -15,16 +15,7 @@ setMethod("export3CseqRawReads2bedGraph",
 			if(!is(object,"r3Cseq")){
 				stop("Need the r3Cseq object")
 			}
-			#############Loading the Bsgenome package######################
-			if('BSgenome.Hsapiens.UCSC.hg19.masked' %in% loadedNamespaces()==TRUE){
-				detach(package:BSgenome.Hsapiens.UCSC.hg19.masked,unload=TRUE)
-			}
-			if('BSgenome.Hsapiens.UCSC.hg18.masked' %in% loadedNamespaces()==TRUE){
-				detach(package:BSgenome.Hsapiens.UCSC.hg18.masked,unload=TRUE)
-			}
-			if('BSgenome.Mmusculus.UCSC.mm9.masked' %in% loadedNamespaces()==TRUE){
-				detach(package:BSgenome.Mmusculus.UCSC.mm9.masked,unload=TRUE)
-			}
+			
 			if(isControlInvolved(object)==FALSE){
 				expRawReads.GRanges<-expRawData(object)
 				expLabeled<-expLabel(object)	
@@ -33,34 +24,8 @@ setMethod("export3CseqRawReads2bedGraph",
 				if(length(expRawReads.GRanges)>0){	
 					print("making coverage vector......")
 					exp.read.cov      <- RleList()
-					if(orgName=="hg18"){		
-						library(BSgenome.Hsapiens.UCSC.hg18.masked)
-						genome <- BSgenome.Hsapiens.UCSC.hg18.masked
-						hg18.chromlens <- seqlengths(genome)
-						seqlevels(expRawReads.GRanges)<-names(hg18.chromlens)
-						seqlengths(expRawReads.GRanges)<-hg18.chromlens		
-						exp.read.cov   <- coverage(expRawReads.GRanges)
-						exp.read.cov   <-exp.read.cov[names(exp.read.cov) %in% paste('chr',c(seq(1,22),'X','Y'),sep='')]
-					}else if(orgName=="hg19"){
-						library(BSgenome.Hsapiens.UCSC.hg19.masked)
-						genome <- BSgenome.Hsapiens.UCSC.hg19.masked
-						hg19.chromlens <- seqlengths(genome)
-						seqlevels(expRawReads.GRanges)<-names(hg19.chromlens)
-						seqlengths(expRawReads.GRanges)<-hg19.chromlens			
-						exp.read.cov   <- coverage(expRawReads.GRanges)
-						exp.read.cov   <-exp.read.cov[names(exp.read.cov) %in% paste('chr',c(seq(1,22),'X','Y'),sep='')]
-					}else if(orgName =="mm9"){
-						library(BSgenome.Mmusculus.UCSC.mm9.masked)
-						genome <- BSgenome.Mmusculus.UCSC.mm9.masked
-						mm9.chromlens <- seqlengths(genome)
-						seqlevels(expRawReads.GRanges)<-names(mm9.chromlens)
-						seqlengths(expRawReads.GRanges)<-mm9.chromlens		
-						exp.read.cov   <- coverage(expRawReads.GRanges)
-						exp.read.cov   <-exp.read.cov[names(exp.read.cov) %in% paste('chr',c(seq(1,19),'X','Y'),sep='')]
-					}else{
-						stop("Your input organism name is not in the list ('mm9','hg18',and 'hg19')")
-					}
-					export.iranges<-as(exp.read.cov,"RangedData")
+					#***Fix the error in this version by changing from RangeData to GRanges
+					export.iranges<-as(exp.read.cov,"GRanges")
 					export.ucsc<-as(export.iranges,"UCSCData")
 					export.ucsc@trackLine <- new("GraphTrackLine",type="bedGraph",name=expLabeled,description="Raw reads")		
 					file_name<-paste(expLabeled,".bedGraph",".gz",sep="")
@@ -82,60 +47,20 @@ setMethod("export3CseqRawReads2bedGraph",
 					print("making coverage vector......")
 					exp.read.cov      <- RleList()
 					contr.read.cov      <- RleList()
-					if(orgName=="hg18"){		
-						library(BSgenome.Hsapiens.UCSC.hg18.masked)
-						genome <- BSgenome.Hsapiens.UCSC.hg18.masked
-						hg18.chromlens <- seqlengths(genome)
-						seqlevels(expRawReads.GRanges)<-names(hg18.chromlens)
-						seqlengths(expRawReads.GRanges)<-hg18.chromlens		
-						exp.read.cov   <- coverage(expRawReads.GRanges)
-						
-						seqlevels(contrRawReads.GRanges)<-names(hg18.chromlens)
-						seqlengths(contrexpRawReads.GRanges)<-hg18.chromlens		
-						contr.read.cov   <- coverage(contrRawReads.GRanges)
-						
-						exp.read.cov   <-exp.read.cov[names(exp.read.cov) %in% paste('chr',c(seq(1,22),'X','Y'),sep='')]
-						contr.read.cov   <-contr.read.cov[names(contr.read.cov) %in% paste('chr',c(seq(1,22),'X','Y'),sep='')]
-					}else if(orgName=="hg19"){
-						library(BSgenome.Hsapiens.UCSC.hg19.masked)
-						genome <- BSgenome.Hsapiens.UCSC.hg19.masked
-						hg19.chromlens <- seqlengths(genome)
-						seqlevels(expRawReads.GRanges)<-names(hg19.chromlens)
-						seqlengths(expRawReads.GRanges)<-hg19.chromlens			
-						exp.read.cov   <- coverage(expRawReads.GRanges)
-						
-						seqlevels(contrRawReads.GRanges)<-names(hg19.chromlens)
-						seqlengths(contrexpRawReads.GRanges)<-hg19.chromlens		
-						contr.read.cov   <- coverage(contrRawReads.GRanges)
-						
-						exp.read.cov   <-exp.read.cov[names(exp.read.cov) %in% paste('chr',c(seq(1,22),'X','Y'),sep='')]
-						contr.read.cov   <-contr.read.cov[names(contr.read.cov) %in% paste('chr',c(seq(1,22),'X','Y'),sep='')]
-						
-					}else if(orgName =="mm9"){
-						library(BSgenome.Mmusculus.UCSC.mm9.masked)
-						genome <- BSgenome.Mmusculus.UCSC.mm9.masked
-						mm9.chromlens <- seqlengths(genome)
-						seqlevels(expRawReads.GRanges)<-names(mm9.chromlens)
-						seqlengths(expRawReads.GRanges)<-mm9.chromlens		
-						exp.read.cov   <- coverage(expRawReads.GRanges)
-						
-						seqlevels(expRawReads.GRanges)<-names(mm9.chromlens)
-						seqlengths(expRawReads.GRanges)<-mm9.chromlens		
-						contr.read.cov   <- coverage(contrRawReads.GRanges)
-						
-						exp.read.cov   <-exp.read.cov[names(exp.read.cov) %in% paste('chr',c(seq(1,19),'X','Y'),sep='')]
-						contr.read.cov   <-contr.read.cov[names(contr.read.cov) %in% paste('chr',c(seq(1,19),'X','Y'),sep='')]
-					}else{
-						stop("Your input organism name is not in the list ('mm9','hg18',and 'hg19')")
-					}
-					export.iranges<-as(exp.read.cov,"RangedData")
+					
+					exp.read.cov   <- coverage(expRawReads.GRanges)	
+					contr.read.cov   <- coverage(contrRawReads.GRanges)
+					
+					#***Fix the error in this version by changing from RangeData to GRanges
+					export.iranges<-as(exp.read.cov,"GRanges")
 					export.ucsc<-as(export.iranges,"UCSCData")
 					export.ucsc@trackLine <- new("GraphTrackLine",type="bedGraph",name=expLabeled,description="Raw reads")		
 					file_name<-paste(expLabeled,".bedGraph",".gz",sep="")
 					export(export.ucsc,file_name)
 					print(paste("File",file_name,"' is created."))
 					
-					export.iranges<-as(contr.read.cov,"RangedData")
+					#***Fix the error in this version by changing from RangeData to GRanges
+					export.iranges<-as(contr.read.cov,"GRanges")
 					export.ucsc<-as(export.iranges,"UCSCData")
 					export.ucsc@trackLine <- new("GraphTrackLine",type="bedGraph",name=contrLabeled,description="Raw reads")		
 					file_name<-paste(contrLabeled,".bedGraph",".gz",sep="")
@@ -173,7 +98,8 @@ setMethod("export3Cseq2bedGraph",
 					if(nrow(expRPMs)>0){
 						export.f <-data.frame(space=space(expRPMs),start=start(expRPMs),end=end(expRPMs),score=expRPMs$RPMs)
 						export.iranges<-RangedData(space=export.f$space,IRanges(start=export.f$start,end=export.f$end),score=export.f$score)
-						export.iranges<-export.iranges[export.iranges$score>0,]
+						#export.iranges<-export.iranges[export.iranges$score>0,]<--fix the error in this version
+						export.iranges<-as(export.iranges[export.iranges$score>0,],"GRanges")
 						export.ucsc<-as(export.iranges,"UCSCData")
 						export.ucsc@trackLine <- new("GraphTrackLine",type="bedGraph",name=paste(expLabeled,"_RPMs",sep=""),description="read per million")		
 						file_name<-paste(expLabeled,".RPMs.bedGraph.gz",sep="")
@@ -186,7 +112,8 @@ setMethod("export3Cseq2bedGraph",
 					if(nrow(expRPMs)>0){
 						export.f <-data.frame(space=space(expRPMs),start=start(expRPMs),end=end(expRPMs),score=expRPMs$nReads)
 						export.iranges<-RangedData(space=export.f$space,IRanges(start=export.f$start,end=export.f$end),score=export.f$score)
-						export.iranges<-export.iranges[export.iranges$score>0,]
+						#export.iranges<-export.iranges[export.iranges$score>0,]
+						export.iranges<-as(export.iranges[export.iranges$score>0,],"GRanges")
 						export.ucsc<-as(export.iranges,"UCSCData")
 						export.ucsc@trackLine <- new("GraphTrackLine",type="bedGraph",name=paste(expLabeled,"_ReadCounts",sep=""),description="read count")	
 						file_name<-paste(expLabeled,".ReadCounts.bedGraph.gz",sep="")
@@ -210,7 +137,8 @@ setMethod("export3Cseq2bedGraph",
 
 					if(nrow(expRPMs)>0){
 						export.iranges<-RangedData(space=space(expRPMs),IRanges(start=start(expRPMs),end=end(expRPMs)),score=expRPMs$RPMs)
-						export.iranges<-export.iranges[export.iranges$score>0,]
+						#export.iranges<-export.iranges[export.iranges$score>0,]
+						export.iranges<-as(export.iranges[export.iranges$score>0,],"GRanges")
 						export.ucsc<-as(export.iranges,"UCSCData")
 						export.ucsc@trackLine <- new("GraphTrackLine",type="bedGraph",name=paste(expLabeled,"_RPMs",sep=""),description="reads per million")	
 						file_name<-paste(expLabeled,".RPMs.bedGraph.gz",sep="")
@@ -219,7 +147,8 @@ setMethod("export3Cseq2bedGraph",
 						
 
 						export.iranges<-RangedData(space=space(contrRPMs),IRanges(start=start(contrRPMs),end=end(contrRPMs)),score=contrRPMs$RPMs)
-						export.iranges<-export.iranges[export.iranges$score>0,]
+						#export.iranges<-export.iranges[export.iranges$score>0,]
+						export.iranges<-as(export.iranges[export.iranges$score>0,],"GRanges")
 						export.ucsc<-as(export.iranges,"UCSCData")
 						export.ucsc@trackLine <- new("GraphTrackLine",type="bedGraph",name=paste(controlLabeled,"_RPMs",sep=""),description="reads per million")	
 						file_name<-paste(controlLabeled,".RPMs.bedGraph.gz",sep="")
@@ -232,7 +161,8 @@ setMethod("export3Cseq2bedGraph",
 				}else if(datatype=="read_count"){
 					if(nrow(expRPMs)>0){
 						export.iranges<-RangedData(space=space(expRPMs),IRanges(start=start(expRPMs),end=end(expRPMs)),score=expRPMs$nReads)
-						export.iranges<-export.iranges[export.iranges$score>0,]
+						#export.iranges<-export.iranges[export.iranges$score>0,]
+						export.iranges<-as(export.iranges[export.iranges$score>0,],"GRanges")
 						export.ucsc<-as(export.iranges,"UCSCData")
 						export.ucsc@trackLine <- new("GraphTrackLine",type="bedGraph",name=paste(expLabeled,"_ReadCounts",sep=""),description="read count")	
 						file_name<-paste(expLabeled,".ReadCounts.bedGraph.gz",sep="")
@@ -240,7 +170,8 @@ setMethod("export3Cseq2bedGraph",
 						print(paste("File",file_name,"' is created."))
 					
 						export.iranges<-RangedData(space=space(contrRPMs),IRanges(start=start(contrRPMs),end=end(contrRPMs)),score=contrRPMs$nReads)
-						export.iranges<-export.iranges[export.iranges$score>0,]
+						#export.iranges<-export.iranges[export.iranges$score>0,]
+						export.iranges<-as(export.iranges[export.iranges$score>0,],"GRanges")
 						export.ucsc<-as(export.iranges,"UCSCData")
 						export.ucsc@trackLine <- new("GraphTrackLine",type="bedGraph",name=paste(controlLabeled,"_ReadCounts",sep=""),description="read count")	
 						file_name<-paste(controlLabeled,".ReadCounts.bedGraph.gz",sep="")

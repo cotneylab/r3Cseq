@@ -32,8 +32,8 @@ setClass(
 		validity = function(object) {
 			if(object@organismName==character(1))
 				return( "The organism name is empty" )
-			if(!object@organismName %in% c("mm9","hg18","hg19"))
-				return( "This version of r3Cseq supports only mm9, hg18 and hg19 assembly." )
+			if(!object@organismName %in% c("mm9","mm10","hg18","hg19","rn5"))
+				return( "This version of r3Cseq supports only for mm9, mm10, hg18, hg19, and rn5 assembly." )
 			##############################################
 			if(length(object@restrictionEnzyme)==0)
 				return( "Please enter the primary_restrictionEnzyme parameter" )

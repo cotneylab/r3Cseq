@@ -1,6 +1,6 @@
 # TODO: These following functions were implemented to get interaction regions.
 # Author: Supat Thongjuea
-# Contact : supat.thongjuea@bccs.uib.no 
+# Contact : supat.thongjuea@ndcls.ox.ac.uk
 
 #####
 setGeneric(

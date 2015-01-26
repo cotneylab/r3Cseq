@@ -1,6 +1,6 @@
 # TODO: The function below can be used to generate the report.
 # Author: Supat Thongjuea
-# Contact : supat.thongjuea@bccs.uib.no 
+# Contact : supat.thongjuea@ndcls.ox.ac.uk
 ###############################################################################
 generate3CseqReport<-function (obj){
 	

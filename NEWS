@@ -1,3 +1,9 @@
+
+version 1.13.1: (2015-01-26)
+
+- fixed the bugs in function "export3CseqRawReads2bedGraph"
+- added "mm10" and "rn5" genomes into the package
+
 version 1.9.2: (2013-11-11)
 
 - fixed the bugs in function getFragmentsPerWindow for "overlapping window"

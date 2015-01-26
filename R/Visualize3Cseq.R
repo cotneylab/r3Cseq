@@ -1,6 +1,6 @@
 # TODO: These following functions are implemented for visualizing 3C-seq data.
 # Author: Supat Thongjuea
-# Contact:supat.thongjuea@bccs.uib.no 
+# Contact:supat.thongjuea@ndcls.ox.ac.uk 
 #####################################
 plotOverviewInteractions<-function (obj,cutoff.qvalue=0.05){
 			
@@ -30,8 +30,23 @@ plotOverviewInteractions<-function (obj,cutoff.qvalue=0.05){
 						chr.info<-data.frame(name=chr,size=chr.size)
 						chr.data<-rbind(chr.data,chr.info)
 					}
+					
+				}else if(orgName =="mm10"){
+					for (chr in c(paste('chr',seq(1,19),sep=''),'chrX','chrY')){
+						genome <- BSgenome.Mmusculus.UCSC.mm10.masked
+						chr.size<-seqlengths(genome)[chr]
+						chr.info<-data.frame(name=chr,size=chr.size)
+						chr.data<-rbind(chr.data,chr.info)
+					}
+				}else if(orgName =="rn5"){
+					for (chr in c(paste('chr',seq(1,20),sep=''),'chrX')){
+						genome <- BSgenome.Rnorvegicus.UCSC.rn5.masked
+						chr.size<-seqlengths(genome)[chr]
+						chr.info<-data.frame(name=chr,size=chr.size)
+						chr.data<-rbind(chr.data,chr.info)
+					}
 				}else{
-					stop("Your input organism name is not in the list ('mm9','hg18',and 'hg19')")
+					stop("Your input organism name is not in the list ('mm9','mm10','hg18','hg19', and 'rn5')")
 				}
 				######check interactions############
 				expInteractions <-expInteractionRegions(obj)
@@ -181,8 +196,22 @@ plotOverviewInteractions<-function (obj,cutoff.qvalue=0.05){
 						chr.info<-data.frame(name=chr,size=chr.size)
 						chr.data<-rbind(chr.data,chr.info)
 					}
+				}else if(orgName =="mm10"){
+					for (chr in c(paste('chr',seq(1,19),sep=''),'chrX','chrY')){
+						genome <- BSgenome.Mmusculus.UCSC.mm10.masked
+						chr.size<-seqlengths(genome)[chr]
+						chr.info<-data.frame(name=chr,size=chr.size)
+						chr.data<-rbind(chr.data,chr.info)
+					}
+				}else if(orgName =="rn5"){
+					for (chr in c(paste('chr',seq(1,20),sep=''),'chrX')){
+						genome <- BSgenome.Rnorvegicus.UCSC.rn5.masked
+						chr.size<-seqlengths(genome)[chr]
+						chr.info<-data.frame(name=chr,size=chr.size)
+						chr.data<-rbind(chr.data,chr.info)
+					}
 				}else{
-					stop("Your input organism name is not in the list ('mm9','hg18',and 'hg19')")
+					stop("Your input organism name is not in the list ('mm9','mm10','hg18','hg19', and 'rn5')")
 				}
 	
 				chr.size.max<-max(chr.data$size)
@@ -358,7 +387,13 @@ plotInteractionsNearViewpoint<-function(obj,distance=5e5,log2fc_cutoff=1,yLim=0)
 					chr.size<-seqlengths(genome)[viewpoint.chr]
 			}else if(orgName =="mm9"){
 					genome <- BSgenome.Mmusculus.UCSC.mm9.masked
+					chr.size<-seqlengths(genome)[viewpoint.chr]	
+			}else if(orgName =="mm10"){
+					genome <- BSgenome.Mmusculus.UCSC.mm10.masked
 					chr.size<-seqlengths(genome)[viewpoint.chr]
+			}else if(orgName =="rn5"){
+					genome <- BSgenome.Rnorvegicus.UCSC.rn5.masked
+					chr.size<-seqlengths(genome)[viewpoint.chr]	
 			}
 			
 			if(isControlInvolved(obj)==FALSE){
@@ -716,8 +751,14 @@ plotInteractionsPerChromosome<-function(obj,chromosomeName){
 				}else if(orgName =="mm9"){
 					genome <- BSgenome.Mmusculus.UCSC.mm9.masked
 					chr.size<-seqlengths(genome)[chromosomeName]
+				}else if(orgName =="mm10"){
+					genome <- BSgenome.Mmusculus.UCSC.mm10.masked
+					chr.size<-seqlengths(genome)[chromosomeName]
+				}else if(orgName =="rn5"){
+					genome <- BSgenome.Rnorvegicus.UCSC.rn5.masked
+					chr.size<-seqlengths(genome)[chromosomeName]
 				}else{
-					stop("Your input organism name is not in the list ('mm9','hg18',and 'hg19')")
+					stop("Your input organism name is not in the list ('mm9','mm10','hg18','hg19', and 'rn5')")
 				}
 				
 				#expLabeled<-expLabel(obj)
@@ -827,8 +868,14 @@ plotInteractionsPerChromosome<-function(obj,chromosomeName){
 				}else if(orgName =="mm9"){
 					genome <- BSgenome.Mmusculus.UCSC.mm9.masked
 					chr.size<-seqlengths(genome)[chromosomeName]
+				}else if(orgName =="mm10"){
+					genome <- BSgenome.Mmusculus.UCSC.mm10.masked
+					chr.size<-seqlengths(genome)[chromosomeName]
+				}else if(orgName =="rn5"){
+					genome <- BSgenome.Rnorvegicus.UCSC.rn5.masked
+					chr.size<-seqlengths(genome)[chromosomeName]
 				}else{
-					stop("Your input organism name is not in the list ('mm9','hg18',and 'hg19')")
+					stop("Your input organism name is not in the list ('mm9','mm10','hg18','hg19', and 'rn5')")
 				}
 				
 				#expLabeled<-expLabel(obj)
@@ -1051,12 +1098,22 @@ setMethod("plotDomainogramNearViewpoint",
 			if(orgName=="hg18"){
 				genome <- BSgenome.Hsapiens.UCSC.hg18.masked
 				chr.size<-seqlengths(genome)[viewpoint.chr]
+			
 			}else if(orgName=="hg19"){
 				genome <- BSgenome.Hsapiens.UCSC.hg19.masked
 				chr.size<-seqlengths(genome)[viewpoint.chr]
+			
 			}else if(orgName =="mm9"){
 				genome <- BSgenome.Mmusculus.UCSC.mm9.masked
 				chr.size<-seqlengths(genome)[viewpoint.chr]
+				
+			}else if(orgName =="mm10"){
+					genome <- BSgenome.Mmusculus.UCSC.mm10.masked
+					chr.size<-seqlengths(genome)[viewpoint.chr]
+					
+			}else if(orgName =="rn5"){
+					genome <- BSgenome.Rnorvegicus.UCSC.rn5.masked
+					chr.size<-seqlengths(genome)[viewpoint.chr]
 			}
 			if(selected_view=="experiment"){
 				expInteractions   <-expInteractionRegions(object)
