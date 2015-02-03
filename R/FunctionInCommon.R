@@ -5,7 +5,8 @@
 getViewpoint<-function (obj){
 	stopifnot( is( obj, "r3Cseq" ) |is( obj, "r3CseqInBatch" ) )
 	#######get organism name ############
-	genome<-organismName(obj)
+	#######Fixed genome to genome.assembly
+	genome.assembly<-organismName(obj)
 	#######get forward primer############
 	primer_f<-viewpoint_primer_forward(obj)
 	primer_r<-viewpoint_primer_reverse(obj)
@@ -28,8 +29,7 @@ getViewpoint<-function (obj){
 		detach(package:BSgenome.Rnorvegicus.UCSC.rn5.masked,unload=TRUE)
 	}
 	
-	
-	if(genome=="hg18"){
+	if(genome.assembly=="hg18"){
 		library(BSgenome.Hsapiens.UCSC.hg18.masked)
 		genome <- BSgenome.Hsapiens.UCSC.hg18.masked
 		hits_f_f<-matchPattern(DNAString(primer_f),genome[[viewpoint_chr]],fixed=FALSE)
@@ -37,7 +37,7 @@ getViewpoint<-function (obj){
 		hits_f_positions<-c(start(hits_f_f),end(hits_f_f),start(hits_f_r),end(hits_f_r))
 		
 		if(length(hits_f_positions)==0){
-			stop(paste("Could not find the forward primer position in",genome," :",viewpoint_chr, ". Please check the input forward primer"))
+			stop(paste("Could not find the forward primer position in",genome.assembly," :",viewpoint_chr, ". Please check the input forward primer"))
 		}
 		
 		hits_r_f<-matchPattern(DNAString(primer_r),genome[[viewpoint_chr]],fixed=FALSE)
@@ -46,7 +46,7 @@ getViewpoint<-function (obj){
 		hits_r_positions<-c(start(hits_r_f),end(hits_r_f),start(hits_r_r),end(hits_r_r))
 		
 		if(length(hits_r_positions)==0){
-			stop(paste("Could not find the reverse primer position in",genome," :",viewpoint_chr, ". Please check the input reverse primer"))
+			stop(paste("Could not find the reverse primer position in",genome.assembly," :",viewpoint_chr, ". Please check the input reverse primer"))
 		}
 		
 		hit_positions<-c(hits_f_positions,hits_r_positions)
@@ -80,7 +80,7 @@ getViewpoint<-function (obj){
 				stop(paste("The position of your input primers are not unique. We detected multiple positions of your input primers!!!"))
 			}
 		}
-	}else if(genome=="hg19"){
+	}else if(genome.assembly=="hg19"){
 		library(BSgenome.Hsapiens.UCSC.hg19.masked)
 		genome <- BSgenome.Hsapiens.UCSC.hg19.masked
 		hits_f_f<-matchPattern(DNAString(primer_f),genome[[viewpoint_chr]],fixed=FALSE)
@@ -88,7 +88,7 @@ getViewpoint<-function (obj){
 		hits_f_positions<-c(start(hits_f_f),end(hits_f_f),start(hits_f_r),end(hits_f_r))
 		
 		if(length(hits_f_positions)==0){
-			stop(paste("Could not find the forward primer position in",genome," :",viewpoint_chr, ". Please check the input forward primer"))
+			stop(paste("Could not find the forward primer position in",genome.assembly," :",viewpoint_chr, ". Please check the input forward primer"))
 		}
 		
 		hits_r_f<-matchPattern(DNAString(primer_r),genome[[viewpoint_chr]],fixed=FALSE)
@@ -97,7 +97,7 @@ getViewpoint<-function (obj){
 		hits_r_positions<-c(start(hits_r_f),end(hits_r_f),start(hits_r_r),end(hits_r_r))
 		
 		if(length(hits_r_positions)==0){
-			stop(paste("Could not find the reverse primer position in",genome," :",viewpoint_chr, ". Please check the input reverse primer"))
+			stop(paste("Could not find the reverse primer position in",genome.assembly," :",viewpoint_chr, ". Please check the input reverse primer"))
 		}
 		
 		hit_positions<-c(hits_f_positions,hits_r_positions)
@@ -132,7 +132,7 @@ getViewpoint<-function (obj){
 			}
 		}
 	
-	}else if(genome =="mm9"){
+	}else if(genome.assembly =="mm9"){
 		library(BSgenome.Mmusculus.UCSC.mm9.masked)
 		genome <- BSgenome.Mmusculus.UCSC.mm9.masked
 		hits_f_f<-matchPattern(DNAString(primer_f),genome[[viewpoint_chr]],fixed=FALSE)
@@ -140,7 +140,7 @@ getViewpoint<-function (obj){
 		hits_f_positions<-c(start(hits_f_f),end(hits_f_f),start(hits_f_r),end(hits_f_r))
 		
 		if(length(hits_f_positions)==0){
-			stop(paste("Could not find the forward primer position in",genome," :",viewpoint_chr, ". Please check the input forward primer"))
+			stop(paste("Could not find the forward primer position in",genome.assembly," :",viewpoint_chr, ". Please check the input forward primer"))
 		}
 		
 		hits_r_f<-matchPattern(DNAString(primer_r),genome[[viewpoint_chr]],fixed=FALSE)
@@ -149,7 +149,7 @@ getViewpoint<-function (obj){
 		hits_r_positions<-c(start(hits_r_f),end(hits_r_f),start(hits_r_r),end(hits_r_r))
 		
 		if(length(hits_r_positions)==0){
-			stop(paste("Could not find the reverse primer position in",genome," :",viewpoint_chr, ". Please check the input reverse primer"))
+			stop(paste("Could not find the reverse primer position in",genome.assembly," :",viewpoint_chr, ". Please check the input reverse primer"))
 		}
 		
 		hit_positions<-c(hits_f_positions,hits_r_positions)
@@ -184,7 +184,7 @@ getViewpoint<-function (obj){
 			}
 		}
 	
-	}else if(genome =="mm10"){
+	}else if(genome.assembly =="mm10"){
 			library(BSgenome.Mmusculus.UCSC.mm10.masked)
 			genome <- BSgenome.Mmusculus.UCSC.mm10.masked
 			hits_f_f<-matchPattern(DNAString(primer_f),genome[[viewpoint_chr]],fixed=FALSE)
@@ -192,7 +192,7 @@ getViewpoint<-function (obj){
 			hits_f_positions<-c(start(hits_f_f),end(hits_f_f),start(hits_f_r),end(hits_f_r))
 			
 			if(length(hits_f_positions)==0){
-				stop(paste("Could not find the forward primer position in",genome," :",viewpoint_chr, ". Please check the input forward primer"))
+				stop(paste("Could not find the forward primer position in",genome.assembly," :",viewpoint_chr, ". Please check the input forward primer"))
 			}
 			
 			hits_r_f<-matchPattern(DNAString(primer_r),genome[[viewpoint_chr]],fixed=FALSE)
@@ -201,7 +201,7 @@ getViewpoint<-function (obj){
 			hits_r_positions<-c(start(hits_r_f),end(hits_r_f),start(hits_r_r),end(hits_r_r))
 			
 			if(length(hits_r_positions)==0){
-				stop(paste("Could not find the reverse primer position in",genome," :",viewpoint_chr, ". Please check the input reverse primer"))
+				stop(paste("Could not find the reverse primer position in",genome.assembly," :",viewpoint_chr, ". Please check the input reverse primer"))
 			}
 			
 			hit_positions<-c(hits_f_positions,hits_r_positions)
@@ -235,7 +235,7 @@ getViewpoint<-function (obj){
 					stop(paste("The position of your input primers are not unique. We detected multiple positions of your input primers!!!"))
 				}
 			}
-	}else if(genome =="rn5"){
+	}else if(genome.assembly =="rn5"){
 				library(BSgenome.Rnorvegicus.UCSC.rn5.masked)
 				genome <- BSgenome.Rnorvegicus.UCSC.rn5.masked
 				hits_f_f<-matchPattern(DNAString(primer_f),genome[[viewpoint_chr]],fixed=FALSE)
@@ -243,7 +243,7 @@ getViewpoint<-function (obj){
 				hits_f_positions<-c(start(hits_f_f),end(hits_f_f),start(hits_f_r),end(hits_f_r))
 				
 				if(length(hits_f_positions)==0){
-					stop(paste("Could not find the forward primer position in",genome," :",viewpoint_chr, ". Please check the input forward primer"))
+					stop(paste("Could not find the forward primer position in",genome.assembly," :",viewpoint_chr, ". Please check the input forward primer"))
 				}
 				
 				hits_r_f<-matchPattern(DNAString(primer_r),genome[[viewpoint_chr]],fixed=FALSE)
@@ -252,7 +252,7 @@ getViewpoint<-function (obj){
 				hits_r_positions<-c(start(hits_r_f),end(hits_r_f),start(hits_r_r),end(hits_r_r))
 				
 				if(length(hits_r_positions)==0){
-					stop(paste("Could not find the reverse primer position in",genome," :",viewpoint_chr, ". Please check the input reverse primer"))
+					stop(paste("Could not find the reverse primer position in",genome.assembly," :",viewpoint_chr, ". Please check the input reverse primer"))
 				}
 				
 				hit_positions<-c(hits_f_positions,hits_r_positions)

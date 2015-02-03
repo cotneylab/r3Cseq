@@ -9,8 +9,8 @@ Maintainer: Supat Thongjuea <supat.thongjuea@ndcls.ox.ac.uk>
 Depends: GenomicRanges, Rsamtools, rtracklayer, VGAM, qvalue
 Imports: methods, GenomeInfoDb, IRanges, Biostrings, data.table,
 	sqldf, RColorBrewer
-Suggests: BSgenome.Mmusculus.UCSC.mm9.masked, BSgenome.Hsapiens.UCSC.hg18.masked,
-	BSgenome.Hsapiens.UCSC.hg19.masked
+Suggests: BSgenome.Mmusculus.UCSC.mm9.masked, BSgenome.Mmusculus.UCSC.mm10.masked, BSgenome.Hsapiens.UCSC.hg18.masked,
+	BSgenome.Hsapiens.UCSC.hg19.masked, BSgenome.Rnorvegicus.UCSC.rn5.masked
 Description: This package is an implementation of data analysis for the
         long-range interactions from 3C-seq assay.
 License: GPL-3
