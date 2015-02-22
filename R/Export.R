@@ -96,7 +96,8 @@ setMethod("export3Cseq2bedGraph",
 				
 				if(datatype=="rpm"){	
 					if(nrow(expRPMs)>0){
-						export.f <-data.frame(space=space(expRPMs),start=start(expRPMs),end=end(expRPMs),score=expRPMs$RPMs)
+						##Fix export.f by adding "as.character"
+						export.f <-data.frame(space=as.character(space(expRPMs)),start=start(expRPMs),end=end(expRPMs),score=expRPMs$RPMs)
 						export.iranges<-RangedData(space=export.f$space,IRanges(start=export.f$start,end=export.f$end),score=export.f$score)
 						#export.iranges<-export.iranges[export.iranges$score>0,]<--fix the error in this version
 						export.iranges<-as(export.iranges[export.iranges$score>0,],"GRanges")
@@ -110,7 +111,7 @@ setMethod("export3Cseq2bedGraph",
 					}
 				}else if(datatype=="read_count"){
 					if(nrow(expRPMs)>0){
-						export.f <-data.frame(space=space(expRPMs),start=start(expRPMs),end=end(expRPMs),score=expRPMs$nReads)
+						export.f <-data.frame(space=as.character(space(expRPMs)),start=start(expRPMs),end=end(expRPMs),score=expRPMs$nReads)
 						export.iranges<-RangedData(space=export.f$space,IRanges(start=export.f$start,end=export.f$end),score=export.f$score)
 						#export.iranges<-export.iranges[export.iranges$score>0,]
 						export.iranges<-as(export.iranges[export.iranges$score>0,],"GRanges")
@@ -136,7 +137,7 @@ setMethod("export3Cseq2bedGraph",
 				if(datatype=="rpm"){
 
 					if(nrow(expRPMs)>0){
-						export.iranges<-RangedData(space=space(expRPMs),IRanges(start=start(expRPMs),end=end(expRPMs)),score=expRPMs$RPMs)
+						export.iranges<-RangedData(space=as.character(space(expRPMs)),IRanges(start=start(expRPMs),end=end(expRPMs)),score=expRPMs$RPMs)
 						#export.iranges<-export.iranges[export.iranges$score>0,]
 						export.iranges<-as(export.iranges[export.iranges$score>0,],"GRanges")
 						export.ucsc<-as(export.iranges,"UCSCData")
@@ -146,7 +147,7 @@ setMethod("export3Cseq2bedGraph",
 						print(paste("File",file_name,"' is created."))
 						
 
-						export.iranges<-RangedData(space=space(contrRPMs),IRanges(start=start(contrRPMs),end=end(contrRPMs)),score=contrRPMs$RPMs)
+						export.iranges<-RangedData(space=as.character(space(contrRPMs)),IRanges(start=start(contrRPMs),end=end(contrRPMs)),score=contrRPMs$RPMs)
 						#export.iranges<-export.iranges[export.iranges$score>0,]
 						export.iranges<-as(export.iranges[export.iranges$score>0,],"GRanges")
 						export.ucsc<-as(export.iranges,"UCSCData")
@@ -160,7 +161,7 @@ setMethod("export3Cseq2bedGraph",
 					}
 				}else if(datatype=="read_count"){
 					if(nrow(expRPMs)>0){
-						export.iranges<-RangedData(space=space(expRPMs),IRanges(start=start(expRPMs),end=end(expRPMs)),score=expRPMs$nReads)
+						export.iranges<-RangedData(space=as.character(space(expRPMs)),IRanges(start=start(expRPMs),end=end(expRPMs)),score=expRPMs$nReads)
 						#export.iranges<-export.iranges[export.iranges$score>0,]
 						export.iranges<-as(export.iranges[export.iranges$score>0,],"GRanges")
 						export.ucsc<-as(export.iranges,"UCSCData")
@@ -169,7 +170,7 @@ setMethod("export3Cseq2bedGraph",
 						export(export.ucsc,file_name,"bedGraph")
 						print(paste("File",file_name,"' is created."))
 					
-						export.iranges<-RangedData(space=space(contrRPMs),IRanges(start=start(contrRPMs),end=end(contrRPMs)),score=contrRPMs$nReads)
+						export.iranges<-RangedData(space=as.character(space(contrRPMs)),IRanges(start=start(contrRPMs),end=end(contrRPMs)),score=contrRPMs$nReads)
 						#export.iranges<-export.iranges[export.iranges$score>0,]
 						export.iranges<-as(export.iranges[export.iranges$score>0,],"GRanges")
 						export.ucsc<-as(export.iranges,"UCSCData")

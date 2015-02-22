@@ -65,11 +65,15 @@ setMethod("getRawReads",
 					expLibrarySize(object)   <-length(exp.GRanges)
 					contrLibrarySize(object) <-length(contr.GRanges)
 				
+					#######Remove chr.._random chromosomes############################################
+					#exp.GRanges<-exp.GRanges[seqnames(exp.GRanges) %in% paste('chr',c(seq(1,50),'X','Y'),sep='')]
+					#contr.GRanges<-contr.GRanges[seqnames(contr.GRanges) %in% paste('chr',c(seq(1,50),'X','Y'),sep='')]
 					#######assign raw read to the object########
 					expReadLength(object)<-exp.read.length
 					contrReadLength(object)<-contr.read.length
 					expRawData(object)<-exp.GRanges
 					contrRawData(object)<-contr.GRanges
+					
 					assign(objName,object,envir=parent.frame())
 					invisible(1)
 					print("Raw reads processing is done.")
@@ -90,7 +94,9 @@ setMethod("getRawReads",
 					exp.bam <- scanBam(exp.bam.file, param=param)
 					exp.read.length <-width(exp.bam[[1]]$seq[1])
 					exp.GRanges<-GRanges(seqnames=as.vector(exp.bam[[1]]$rname),IRanges(start=exp.bam[[1]]$pos,width=exp.read.length),strand=exp.bam[[1]]$strand)	
-							
+					
+					#######Remove chr.._random chromosomes############################################
+					#exp.GRanges<-exp.GRanges[seqnames(exp.GRanges) %in% paste('chr',c(seq(1,50),'X','Y'),sep='')]
 					##########assign raw read to the object######
 					expLibrarySize(object)   <-length(exp.GRanges)	
 					expReadLength(object)<-exp.read.length
