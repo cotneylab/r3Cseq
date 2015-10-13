@@ -1,0 +1,392 @@
+library(zebrafishRNASeq)#
+library(RSkittleBrewer)#
+library(genefilter)#
+library(RUVSeq)#
+library(edgeR)#
+library(sva)#
+library(ffpe)
+install.packages(ffpe)
+source("http://bioconductor.org/biocLite.R")#
+biocLite("ffpe")
+library(zebrafishRNASeq)#
+library(RSkittleBrewer)#
+library(genefilter)#
+library(RUVSeq)#
+library(edgeR)#
+library(sva)#
+library(ffpe)
+library(RColorBrewer)#
+library(corrplot)#
+library(limma)#
+trop = RSkittleBrewer('tropical')
+install.packages(corrplot)
+install.packages("corrplot")
+library(corrplot)#
+M <- cor(mtcars)#
+corrplot(M, method = "circle")
+library(zebrafishRNASeq)#
+library(RSkittleBrewer)#
+library(genefilter)#
+library(RUVSeq)#
+library(edgeR)#
+library(sva)#
+library(ffpe)
+library(RColorBrewer)#
+library(corrplot)#
+library(limma)#
+trop = RSkittleBrewer('tropical')
+trop
+data(zfGenes)
+zfGenes
+filter = apply(zfGenes, 1, function(x) length(x[x>5])>=2)#
+filtered = zfGenes[filter,]
+genes = rownames(filtered)[grep("^ENS", rownames(filtered))]
+nrow(genes)
+head(genes)
+controls = grepl("^ERCC", rownames(filtered))
+controls
+spikes =  rownames(filtered)[grep("^ERCC", rownames(filtered))]
+spikes
+group = as.factor(rep(c("Ctl", "Trt"), each=3))
+group
+set = newSeqExpressionSet(as.matrix(filtered),#
+                           phenoData = data.frame(group, row.names=colnames(filtered)))
+head(set)
+dat0 = counts(set)
+dat0 = exprs(set)
+head(dat0)
+mod1 = model.matrix(~group)
+mod1
+mod0 = cbind(mod1[,1])
+mod0
+batch_unsup_sva = svaseq(dat0,mod1,mod0,n.sv=1)$sv
+filter <- apply(zfGenes, 1, function(x) length(x[x>5])>=2) filtered <- zfGenes[filter,]genes <- rownames(filtered)[grep("ˆENS", rownames(filtered))] spikes <- rownames(filtered)[grep("ˆERCC", rownames(filtered))]
+library(RUVSeq)## Warning: multiple methods tables found for ’plotPCA’library(zebrafishRNASeq) data(zfGenes) head(zfGenes)
+library(RUVSeq)
+library(zebrafishRNASeq);data(zfGenes);head(zfGenes)
+filter <- apply(zfGenes, 1, function(x) length(x[x>5])>=2)
+head(filter)
+filter
+filtered <- zfGenes[filter,]
+filtered
+genes <- rownames(filtered)[grep("ˆENS", rownames(filtered))]
+head(genes)
+genes
+library(RUVSeq)
+library(r3Cseq)
+library(zebrafishRNASeq)
+data(zfGenes)
+filter <- apply(zfGenes, 1, function(x) length(x[x>5])>=2)
+filtered <- zfGenes[filter,]genes <- rownames(filtered)[grep("ˆENS", rownames(filtered))] spikes <- rownames(filtered)[grep("ˆERCC", rownames(filtered))]
+genes <- rownames(filtered)[grep("ˆENS", rownames(filtered))]
+head(genes)
+spikes <- rownames(filtered)[grep("ˆERCC", rownames(filtered))]
+spikes
+genes
+x <- as.factor(rep(c("Ctl", "Trt"), each=3))
+x
+set <- newSeqExpressionSet(as.matrix(filtered),phenoData = data.frame(x, row.names=colnames(filtered)))set
+library(RColorBrewer)
+colors <- brewer.pal(3, "Set2")plotRLE(set, outline=FALSE, ylim=c(-4, 4), col=colors[x]) plotPCA(set, col=colors[x], cex=1.2)
+￼set <- betweenLaneNormalization(set, which="upper")
+library(RUVSeq)
+library(zebrafishRNASeq)
+data(zfGenes) head(zfGenes)
+library(EDASeq)
+library(statmod)#
+library(gdata)#
+library(genefilter)#
+library(DESeq)#
+library(edgeR)#
+library(SUVSeq)
+library(statmod)#
+library(gdata)#
+library(genefilter)#
+library(DESeq)#
+library(edgeR)#
+library(RUVSeq)
+2557-2499
+2557-2449
+1906-2014
+library(SVA)
+library(SVG)
+library(sva)
+svaseq
+?svaseq
+?sva
+source("http://bioconductor.org/biocLite.R")#
+biocLite("sva")
+source("http://bioconductor.org/biocLite.R")#
+biocLite()
+source("http://bioconductor.org/biocLite.R")#
+biocLite("sva")
+library(sva)
+svaseq
+?svaseq
+?sva
+source("http://bioconductor.org/biocLite.R")#
+biocLite("sva")
+library(sva)
+?sva
+?svaseq
+library(ruvseq)
+library(RUVseq)
+library(RUVSeq)
+?svaseq
+ibrary(zebrafishRNASeq)#
+library(RSkittleBrewer)#
+library(genefilter)#
+library(RUVSeq)#
+library(edgeR)#
+library(sva)#
+library(ffpe)#
+library(RColorBrewer)#
+library(corrplot)#
+library(limma)
+svaseq
+?svaseq
+source("http://bioconductor.org/biocLite.R")#
+biocLite("sva")
+?BiocUpgrade
+source("http://bioconductor.org/biocLite.R")#
+    biocLite("BiocUpgrade")
+source("http://bioconductor.org/biocLite.R")#
+biocLite("sva")
+library(sva)
+?svaseq
+3598-830
+2768-500
+806/6
+806/62
+3481-600
+2881-830
+3481-732
+2749-830
+1919-200
+1719+2000
+490000+60000+30000
+490000-490000*0.18
+401800-70000
+331800-100000
+403000+161200+54075
+618275-490275
+source("http://bioconductor.org/biocLite.R")#
+biocLite()
+install.packages("sqldf")
+?lappy
+?apply
+z <- array(1:24, dim = 2:4)
+z
+1678+20990
+1678+2090
+3786-830
+2956-956
+133629-133629*0.2
+490275-0.2*490274
+490275-0.2*490275
+392220-70000-100000
+install.packages("factoMineR")
+install.packages("FactoMineR")
+d <- dist(mydata) # euclidean distances between the rows#
+fit <- cmdscale(d,eig=TRUE, k=2) # k is the number of dim#
+fit # view results#
+#
+# plot solution#
+x <- fit$points[,1]#
+y <- fit$points[,2]#
+plot(x, y, xlab="Coordinate 1", ylab="Coordinate 2",#
+  main="Metric MDS", type="n")#
+text(x, y, labels = row.names(mydata), cex=.7)
+?mds
+cmdscale
+?cmdscale
+loc <- cmdscale(eurodist)#
+x <- loc[, 1]#
+y <- -loc[, 2] # reflect so North is at the top#
+## note asp = 1, to ensure Euclidean distances are represented correctly#
+plot(x, y, type = "n", xlab = "", ylab = "", asp = 1, axes = FALSE,#
+     main = "cmdscale(eurodist)")#
+text(x, y, rownames(loc), cex = 0.6)
+loc
+eurodist
+?cmdscale
+loc <- cmdscale(eurodist)#
+x <- loc[, 1]#
+y <- -loc[, 2] # reflect so North is at the top#
+## note asp = 1, to ensure Euclidean distances are represented correctly#
+plot(x, y, type = "n", xlab = "", ylab = "", asp = 1, axes = FALSE,#
+     main = "cmdscale(eurodist)")#
+text(x, y, rownames(loc), cex = 0.6)
+3100-830
+2270
+3100-830
+270
+1.5*290
+3000-290
+2710-830
+1880-500
+1380*50
+120000*4
+490275+60000
+490275-490275*0.2
+392220-70000
+322220-100000
+61387.73-14000
+47387.73*12
+47387.73*12*2
+40000*0.2-40000
+40000-0.2*40000
+32000/12
+2666-900
+1766-766
+38511/12
+3209-3209*0.2
+2567-1200
+275000+161200+54075
+490275-490275*0.2
+install.packages("tsne")
+library(tsne)
+?tsne
+colors = rainbow(length(unique(iris$Species)))#
+names(colors) = unique(iris$Species)#
+ecb = function(x,y){ plot(x,t='n'); text(x,labels=iris$Species, col=colors[iris$Species]) }#
+tsne_iris = tsne(iris[,1:4], epoch_callback = ecb, perplexity=50)
+pca_iris = princomp(iris[,1:4])$scores[,1:2]#
+plot(pca_iris, t='n')#
+text(pca_iris, labels=iris$Species,col=colors[iris$Species])
+iris
+tsne_iris = tsne(iris[,1:4],perplexity=50)
+tsne_iris
+plot(tsne_iris)
+?tsne
+tsne
+install.packages("Rtsne")
+library(Rtsne) # Load package#
+iris_unique <- unique(iris) # Remove duplicates#
+tsne_out <- Rtsne(as.matrix(iris_unique[,1:4])) # Run TSNE#
+plot(tsne_out$Y,col=iris$Species) # Plot the result
+tsne_out
+library(Rtsne) # Load package#
+iris_unique <- unique(iris) # Remove duplicates
+iris_unique
+library(r3Cseq)
+source("http://bioconductor.org/biocLite.R")#
+biocLite("r3Cseq")
+library(r3Cseq)
+data(Myb_prom_FL)#
+data(Myb_prom_FB)
+my3Cseq.obj<-new("r3Cseq",organismName='mm9',isControlInvolved=TRUE,#
+viewpoint_chromosome='chr10',viewpoint_primer_forward='TCTTTGTTTGATGGCATCTGTT',#
+viewpoint_primer_reverse='AAAGGGGAGGAGAAGGAGGT',expLabel="Myb_prom_FL",#
+contrLabel="MYb_prom_FB",restrictionEnzyme='HindIII')
+expRawData(my3Cseq.obj)<-exp.GRanges#
+contrRawData(my3Cseq.obj)<-contr.GRanges
+my3Cseq.obj
+getReadCountPerRestrictionFragment(my3Cseq.obj)
+library(BSgenome.Mmusculus.UCSC.mm9.masked)
+library(BSgenome.Mmusculus.UCSC.mm9)
+source("http://bioconductor.org/biocLite.R")#
+biocLite("BSgenome.Mmusculus.UCSC.mm9.masked")
+source("http://bioconductor.org/biocLite.R")#
+biocLite("BSgenome.Mmusculus.UCSC.mm10.masked")
+getReadCountPerRestrictionFragment(my3Cseq.obj)
+calculateRPM(my3Cseq.obj)
+getInteractions(my3Cseq.obj,fdr=0.05)
+####################################################
+fetal.liver.interactions<-expInteractionRegions(my3Cseq.obj)#
+fetal.liver.interactions
+fetal.brain.interactions<-contrInteractionRegions(my3Cseq.obj)#
+fetal.brain.interactions
+####################################################
+viewpoint<-getViewpoint(my3Cseq.obj)#
+viewpoint
+plotOverviewInteractions(my3Cseq.obj)
+### code chunk number 14: plotInteractionsNearViewpoint#
+####################################################
+plotInteractionsNearViewpoint(my3Cseq.obj)
+plotDomainogramNearViewpoint(my3Cseq.obj)
+detected_genes<-getExpInteractionsInRefseq(my3Cseq.obj)#
+head(detected_genes)
+export3Cseq2bedGraph(my3Cseq.obj)
+18*3
+library(BSgenome.Mmusculus.UCSC.mm10)
+library(BSgenome.Mmusculus.UCSC.mm10.masked)
+load(file="mm10refGene.rdata")
+ls()
+head(mm10refGene)
+library(sqldf)#
+my.data<-read.table("rn4.refGene.annotation.txt",header=T)
+head(my.data)
+my.data$strand[my.data$strand=="-"]<- -1
+my.data$strand[my.data$strand=="-",]<- -1
+head(my.data)
+library(sqldf)#
+my.data<-read.table("rn4.refGene.annotation.txt",header=T)#
+my.data$strand[my.data$strand=="-",]<- -1
+library(sqldf)#
+my.data<-read.table("rn4.refGene.annotation.txt",header=T)#
+my.data$strand2[my.data$strand=="-1"]<- -1
+head(my.data)
+library(sqldf)#
+my.data<-read.table("rn4.refGene.annotation.txt",header=T)#
+my.data$strand2[my.data$strand=="-1",]<- -1
+class(my.data$strand)
+library(sqldf)#
+my.data<-read.table("rn4.refGene.annotation.txt",header=T)#
+my.data$strand2[as.character(my.data$strand=="-1"),]<- -1
+library(sqldf)#
+my.data<-read.table("rn4.refGene.annotation.txt",header=T)#
+my.data$strand2[as.character(my.data$strand)=="-1"]<- -1
+head(my.data)
+my.data<-read.table("rn4.refGene.annotation.txt",header=T)#
+my.data$strand2[as.character(my.data$strand)=="-1",]<- -1
+my.data<-read.table("rn4.refGene.annotation.txt",header=T)#
+my.data$strand2 <- ifelse(1,-1,my.data$strand==1)
+head(my.data)
+my.data<-read.table("rn4.refGene.annotation.txt",header=T)#
+my.data$strand2 <- ifelse(1,-1,my.data$strand=="+")
+head(my.data)
+my.data<-read.table("rn4.refGene.annotation.txt",header=T)#
+my.data$strand2 <- 1#
+my.data$strand2[my.data$strand=="-"]<- -1
+head(my.data)
+head(my.data,n=10)
+my.data<-data.frame(chromosome=my.data$chromosome,strand=my.data$strand2,#
+		start=my.data$start,end=my.data$end,name=my.data$name)
+head(my.data)
+rn4refGene<-my.data#
+my.uniq<-sqldf("select chromosome,strand, min(start),max(end),name from rn4refGene group by name")
+head(my.uniq)
+unique(my.uniq$chromosome)
+as.character(unique(my.uniq$chromosome))
+order(as.character(unique(my.uniq$chromosome)))
+sort(as.character(unique(my.uniq$chromosome)))
+library(sqldf)#
+my.data<-read.table("rn4.refGene.annotation.txt",header=T)#
+my.data$strand2 <- 1#
+my.data$strand2[my.data$strand=="-"]<- -1#
+my.data<-data.frame(chromosome=my.data$chromosome,strand=my.data$strand2,#
+		start=my.data$start,end=my.data$end,name=my.data$name)#
+#
+rn4refGene<-my.data#
+my.uniq<-sqldf("select chromosome,strand, min(start),max(end),name from rn4refGene group by name")#
+#
+colnames(my.uniq)<-c("chromosome","strand","start","end","name")#
+#
+rn4refGene<-my.uniq#
+save(rn4refGene,file="rn4refGene.rdata")
+head(rn4refGene)
+library(sqldf)#
+my.data<-read.table("rn5.refGene.annotation.txt",header=T)#
+my.data$strand2 <- 1#
+my.data$strand2[my.data$strand=="-"]<- -1#
+my.data<-data.frame(chromosome=my.data$chromosome,strand=my.data$strand2,#
+		start=my.data$start,end=my.data$end,name=my.data$name)
+head(my.data)
+rn5refGene<-my.data#
+my.uniq<-sqldf("select chromosome,strand, min(start),max(end),name from rn5refGene group by name")
+head(my.uniq)
+colnames(my.uniq)<-c("chromosome","strand","start","end","name")#
+#
+rn5refGene<-my.uniq#
+save(rn5refGene,file="rn5refGene.rdata")
