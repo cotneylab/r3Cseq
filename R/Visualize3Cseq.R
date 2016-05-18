@@ -370,8 +370,8 @@ plotOverviewInteractions<-function (obj,cutoff.qvalue=0.05){
 plotInteractionsNearViewpoint<-function(obj,distance=5e5,log2fc_cutoff=1,yLim=0){
 			
 			stopifnot( is(obj, "r3Cseq") | is(obj,"r3CseqInBatch"))
-			if(distance < 50000 | distance > 500000){
-				print("You distance is too high or too low!!!. Please input the distance between 50Kb - 500Kb")
+			if(distance < 50000 | distance > 5000000){
+				print("You distance is too high or too low!!!. Please input the distance between 50Kb - 5Mb")
 			}
 			########Get viewpoint############
 			viewpoint <-getViewpoint(obj)
@@ -439,7 +439,7 @@ plotInteractionsNearViewpoint<-function(obj,distance=5e5,log2fc_cutoff=1,yLim=0)
 										y1.start=10
 									}
 								}
-								text(gx$rel.start,y1.start+2,gx$name,cex =0.8)
+								text(gx$rel.start,y1.start+2,gx$name,cex =0.5)
 								
 								if(gx.size >=100){
 									s.q <-ifelse(gx.size <=5000,500,5000)
@@ -1078,8 +1078,8 @@ setMethod("plotDomainogramNearViewpoint",
 				
 			}
 			
-			if(distance < 100000 | distance > 500000){
-				stop("Please select distance between 100Kb - 500Kb")
+			if(distance < 100000 | distance > 5000000){
+				stop("Please select distance between 100Kb - 5Mb")
 			}
 			if(maximum_window > 50e3){
 				stop("The maximum allow for windowing is 50Kb.")
